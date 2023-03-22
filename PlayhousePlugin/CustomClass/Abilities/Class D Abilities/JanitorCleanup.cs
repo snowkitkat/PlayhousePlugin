@@ -65,7 +65,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
             }
             
             Ply.ShowCenterDownHint($"<color=yellow>Body Cleaned!</color>",3);
-            NetworkServer.Destroy(doll.gameObject);
+            NetworkServer.Destroy(doll.GameObject);
             return true;
         }
     }

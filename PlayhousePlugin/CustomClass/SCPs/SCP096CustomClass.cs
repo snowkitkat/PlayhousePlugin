@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin.CustomClass.SCP
@@ -16,7 +17,7 @@ namespace PlayhousePlugin.CustomClass.SCP
         public override void Replace(Player ply)
         {
             Dispose();
-            ply.Role.Type = Ply.Role.Type;
+            ply.Role.Set(Ply.Role.Type);
         }
         public SCP096CustomClass(Player ply)
         {
@@ -48,7 +49,7 @@ namespace PlayhousePlugin.CustomClass.SCP
                 foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, Ply.Position) <= 7))
                 {
                     if (ply == Ply) continue;
-                    if (ply.Role.Type == RoleType.Scp0492)
+                    if (ply.Role.Type == RoleTypeId.Scp0492)
                     {
                         if (!PlayersAlreadyAffected.Contains(ply))
                         {

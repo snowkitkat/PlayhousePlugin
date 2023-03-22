@@ -2,6 +2,13 @@ using System;
 using System.Linq;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Map;
+using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp079;
+using Exiled.Events.EventArgs.Scp106;
+using Exiled.Events.EventArgs.Scp914;
+using Exiled.Events.EventArgs.Server;
+using Exiled.Events.EventArgs.Warhead;
 using Respawning;
 
 namespace PlayhousePlugin.Webhooks
@@ -155,7 +162,7 @@ namespace PlayhousePlugin.Webhooks
                 $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasTriggeredATeslaGate, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type)}");
         }
 
-        public void OnThrowingGrenade(ThrowingItemEventArgs ev)
+        public void OnThrowingGrenade(ThrownProjectileEventArgs ev)
         {
             PlayhousePlugin.Singleton.GameLogsQueue.Add(
                 $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.ThrewAGrenade, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type, ev.Item.Type)}");
@@ -163,16 +170,16 @@ namespace PlayhousePlugin.Webhooks
 
         public void OnHurting(HurtingEventArgs ev)
         {
-            if (ev.Attacker != null && ev.Target != null && ev.Amount != 0)
+            if (ev.Attacker != null && ev.Player != null && ev.Amount != 0)
                 PlayhousePlugin.Singleton.PvPLogsQueue.Add(
-                    $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasDamagedForWith, ev.Attacker.Nickname, ev.Attacker.UserId, ev.Attacker.Role.Type, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role.Type, ev.Amount, ev.Handler.Base.ServerLogsText)}");
+                    $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasDamagedForWith, ev.Attacker.Nickname, ev.Attacker.UserId, ev.Attacker.Role.Type, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type, ev.Amount, ev.DamageHandler.Base.ServerLogsText)}");
         }
 
         public void OnDying(DiedEventArgs ev)
         {
-            if (ev.Killer != null && ev.Target != null)
+            if (ev.Attacker != null && ev.Player != null)
                 PlayhousePlugin.Singleton.PvPLogsQueue.Add(
-                    $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasKilledWith, ev.Killer.Nickname, ev.Killer.UserId, ev.Killer.Role.Type, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role.Type, ev.Handler.Base.ServerLogsText)}");
+                    $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasKilledWith, ev.Attacker.Nickname, ev.Attacker.UserId, ev.Attacker.Role.Type, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type, ev.DamageHandler.Base.ServerLogsText)}");
         }
 
         public void OnInteractingDoor(InteractingDoorEventArgs ev)

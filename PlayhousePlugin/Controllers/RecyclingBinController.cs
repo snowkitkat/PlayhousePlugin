@@ -208,7 +208,7 @@ namespace PlayhousePlugin.Controllers
                     
                     if (!pickup.NetworkInfo.ItemId.IsAmmo())
                     {
-                        Item.Create(ItemType.Coin).Spawn(gameObject.transform.position + gameObject.transform.forward * 2 + Vector3.up);
+                        Item.Create(ItemType.Coin).CreatePickup(gameObject.transform.position + gameObject.transform.forward * 2 + Vector3.up);
                         pickup.DestroySelf();
                     }
                     else

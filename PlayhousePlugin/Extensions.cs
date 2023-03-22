@@ -5,6 +5,7 @@ using Exiled.API.Enums;
 using System.Linq;
 using Interactables.Interobjects.DoorUtils;
 using Hints;
+using PlayerRoles;
 using PlayhousePlugin.Components;
 using PlayhousePlugin.CustomClass;
 using UnityEngine;
@@ -60,7 +61,7 @@ namespace PlayhousePlugin
 			return !string.IsNullOrEmpty(group) && PlayhousePlugin.PlayhousePluginRef.Config.ActiveGroups.Contains(group);
 		}
 
-		public static RoleType GetRole(this Ragdoll ragdoll)
+		public static RoleTypeId GetRole(this Ragdoll ragdoll)
 		{
 			return ragdoll.NetworkInfo.RoleType;
 		}

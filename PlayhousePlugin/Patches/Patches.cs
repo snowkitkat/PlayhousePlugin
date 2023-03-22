@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using Exiled.API.Features;
+using Exiled.API.Features.Items;
+using Exiled.Events.Handlers;
 using HarmonyLib;
 using Hints;
 using Interactables.Interobjects.DoorUtils;
@@ -13,14 +15,20 @@ using Mirror;
 using InventorySystem.Items.Firearms.Modules;
 using InventorySystem.Items.Keycards;
 using NorthwoodLib.Pools;
-using PlayableScps;
+
+using PlayerRoles;
+using PlayerRoles.PlayableScps;
 using PlayerStatsSystem;
 using PlayhousePlugin.CustomClass.SCP;
 using PlayhousePlugin.CustomClass.SCP_Abilities;
-using Scp096 = PlayableScps.Scp096;
+using Player = Exiled.API.Features.Player;
+// using Scp096 = PlayableScps.Scp096;
 
 
-namespace PlayhousePlugin
+// namespace PlayhousePlugin
+
+/*
+
 {
 	// SCP Speaking
 	[HarmonyPatch(typeof(Radio), nameof(Radio.UserCode_CmdSyncTransmissionStatus))]
@@ -28,14 +36,14 @@ namespace PlayhousePlugin
 	{
 		public static bool Prefix(Radio __instance, bool b)
 		{
-			if (Player.Get(__instance._hub).IsScp)
+			if (Player.Get(__instance.Serial).IsScp)
 				__instance._dissonanceSetup.MimicAs939 = b;
 			return true;
 		}
 	}
 
 	
-	[HarmonyPatch(typeof(Scp096), nameof(Scp096.UpdateVision))]
+	[HarmonyPatch(typeof(Scp096), nameof(Scp096.AddingTarget))]
 	public static class Scp096DelayRemove
 	{
 		public static bool Prefix(Scp096 __instance)
@@ -45,8 +53,8 @@ namespace PlayhousePlugin
 			{
 				ReferenceHub value = keyValuePair.Value;
 				CharacterClassManager characterClassManager = value.characterClassManager;
-				if (characterClassManager.CurClass != RoleType.Spectator &&
-				    characterClassManager.CurClass != RoleType.Tutorial &&
+				if (characterClassManager.CurClass != RoleTypeId.Spectator &&
+				    characterClassManager.CurClass != RoleTypeId.Tutorial &&
 				    !(value == __instance.Hub) &&
 				    !characterClassManager.IsAnyScp() &&
 				    Vector3.Dot((value.PlayerCameraReference.position - vector).normalized, __instance.Hub.PlayerCameraReference.forward) >= 0.1f)
@@ -485,5 +493,5 @@ public class StickyGrenade
 			foreach (var code in newInstructions)
 				yield return code;
 		}
-	}*/
-}
+	}
+} */

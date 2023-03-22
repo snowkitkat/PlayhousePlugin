@@ -2,16 +2,22 @@ using System.Collections.Generic;
 using System.Linq;
 using CustomPlayerEffects;
 using Exiled.API.Features;
+using Exiled.API.Features.Roles;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Player;
+using MapEditorReborn.Events.EventArgs;
 using MEC;
 using PlayableScps.Interfaces;
+using PlayerRoles;
+using PlayerRoles.PlayableScps.HumeShield;
 using PlayerStatsSystem;
 using PlayhousePlugin.CustomClass.SCP_Abilities;
 using UnityEngine;
+using TeleportingEventArgs = Exiled.Events.EventArgs.Scp106.TeleportingEventArgs;
 
 namespace PlayhousePlugin.CustomClass.SCP
 {
-    public class SCP106CustomClass : CustomClassBase, IShielded
+    public class SCP106CustomClass : CustomClassBase, IHumeShieldRole
     {
         public override Player Ply { get; set; }
         public override string Name { get; } = "SCP-106";
@@ -25,7 +31,7 @@ namespace PlayhousePlugin.CustomClass.SCP
         public override void Replace(Player ply)
         {
             Dispose();
-            ply.Role.Type = Ply.Role.Type;
+            ply.Role.Set(Ply.Role.Type);
         }
 
         public override void Dispose()
@@ -91,7 +97,7 @@ namespace PlayhousePlugin.CustomClass.SCP
             });
         }
 
-        private void Scp106OnTeleporting(TeleportingEventArgs ev)
+        private void Scp106OnTeleporting(TeleportingEventArgs teleportingEventArgs)
         {
             if (((Vanish) Ply.CustomClassManager().CustomClass.ActiveAbilities[0]).IsVanish)
             {
@@ -110,7 +116,7 @@ namespace PlayhousePlugin.CustomClass.SCP
             ev.Player.EnableEffect<Burned>(15);
             ev.Player.EnableEffect<Concussed>(10);
             ev.Player.EnableEffect<Deafened>(15);
-            ev.Player.EnableEffect<Amnesia>(6);
+            ev.Player.EnableEffect<AmnesiaItems>(6);
             RecentlyHit = true;
             
             // If the person isn't in vanish and they are still in cooldown and (current lapsed seconds is greater than 3 OR they recently vanished) then set the cooldown to 3 and restart the counter
@@ -149,7 +155,7 @@ namespace PlayhousePlugin.CustomClass.SCP
                 foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, Ply.Position) <= 7))
                 {
                     if (ply == Ply) continue;
-                    if (ply.Role.Type == RoleType.Scp0492)
+                    if (ply.Role.Type == RoleTypeId.Scp0492)
                     {
                         if (!PlayersAlreadyAffected.Contains(ply))
                         {
@@ -191,5 +197,7 @@ namespace PlayhousePlugin.CustomClass.SCP
                 return _ahpProcess;
             }
         }
+
+        public HumeShieldModuleBase HumeShieldModule { get; }
     }
 }

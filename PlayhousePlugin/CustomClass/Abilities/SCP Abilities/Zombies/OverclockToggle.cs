@@ -29,7 +29,7 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
                 // Enable ability
                 Ply.ReferenceHub.playerEffectsController.EnableEffect<Hemorrhage>();
                 Ply.ReferenceHub.playerEffectsController.EnableEffect<Scp207>();
-                Ply.ReferenceHub.playerEffectsController.ChangeEffectIntensity<Scp207>(2);
+                Ply.ReferenceHub.playerEffectsController.ChangeState<Scp207>(2);
                 Ply.ShowCenterDownHint("<color=yellow>Overclock is now ON</color>",2);
                 Enabled = true;
                 return true;

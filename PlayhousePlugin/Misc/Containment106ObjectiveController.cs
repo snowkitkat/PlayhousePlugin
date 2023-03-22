@@ -2,6 +2,7 @@ using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Mirror;
+using PlayerRoles;
 using PlayhousePlugin.Components;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace PlayhousePlugin
             g.GetComponent<ObjectivePointComponent>().ObjectiveCaptured += OnObjectiveCaptured;
             g.GetComponent<ObjectivePointComponent>().Radius = 5;
             g.GetComponent<ObjectivePointComponent>().AllowAllToCap = true;
-            g.GetComponent<ObjectivePointComponent>().RoleToNotify = RoleType.Scp106;
+            g.GetComponent<ObjectivePointComponent>().RoleToNotify = RoleTypeId.Scp106;
             ObjectivePoint = g;
             
         }

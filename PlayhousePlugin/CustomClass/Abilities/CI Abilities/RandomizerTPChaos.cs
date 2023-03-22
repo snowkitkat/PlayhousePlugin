@@ -8,6 +8,8 @@ using MapEditorReborn.API.Features.Objects;
 using MEC;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using UnityEngine;
 
 namespace PlayhousePlugin.CustomClass.Abilities
@@ -28,10 +30,10 @@ namespace PlayhousePlugin.CustomClass.Abilities
         
         public override bool UseCooldownAbility()
         {
-	        if (Ply.Role.Type == RoleType.Tutorial)
+	        if (Ply.Role.Type == RoleTypeId.Tutorial)
 		        return false;
 	        
-            if (!Ply.ReferenceHub.playerMovementSync.Grounded)
+            if (!Ply.ReferenceHub.IsGrounded())
             {
                 Ply.ShowCenterDownHint("<color=red>You are not on the ground</color>", 3);
                 return false;
@@ -82,7 +84,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 				
 				foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, buildingPosition) <= TeleporterRadius)) // 1) Get players in radius
 				{
-					if (ply.Role.Team != Team.CHI && ply.Role.Team != Team.CDP) continue;
+					if (ply.Role.Team != Team.ChaosInsurgency && ply.Role.Team != Team.ClassD) continue;
 
 					if (RecentlyTeleported.Contains(ply)) continue;
 					if (teleporterPlayers.ContainsKey(ply))
@@ -215,9 +217,10 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        {RoomType.HczServers, "Server Room"},
 	        {RoomType.HczStraight, "Heavy Hallway"},
 	        {RoomType.HczTesla, "Tesla"},
-	        {RoomType.HczChkpA, "Heavy Elevator A"},
-	        {RoomType.HczChkpB, "Heavy Elevator B"},
-	        {RoomType.HczEzCheckpoint, "Heavy Checkpoint"},
+	        {RoomType.LczCheckpointA, "Heavy Elevator A"},
+	        {RoomType.LczCheckpointB, "Heavy Elevator B"},
+	        {RoomType.HczEzCheckpointA, "Entrance Checkpoint A"},
+	        {RoomType.HczEzCheckpointB, "Entrance Checkpoint B"},
 	        {RoomType.HczTCross, "Heavy T Room"},
 	        {RoomType.EzCafeteria, "Entrance Cafe"},
 	        {RoomType.EzConference, "Entrance Conference"},
@@ -234,7 +237,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        {RoomType.EzGateB, "Gate B"},
 	        {RoomType.EzTCross, "Entrance T Room"},
 	        {RoomType.EzUpstairsPcs, "Entrance Upstairs PCs"},
-	        {RoomType.Lcz012, "012"},
+	        {RoomType.Lcz330, "012"},
 	        {RoomType.Lcz173, "173's Chamber"},
 	        {RoomType.Lcz914, "914"},
 	        {RoomType.LczAirlock, "Airlock"},
@@ -245,8 +248,6 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        {RoomType.LczPlants, "Light Weed Room"},
 	        {RoomType.LczStraight, "Light Hallway"},
 	        {RoomType.LczToilets, "Light Washrooms"},
-	        {RoomType.LczChkpA, "Light Elevator A"},
-	        {RoomType.LczChkpB, "Light Elevator B"},
 	        {RoomType.LczGlassBox, "GR-18"},
 	        {RoomType.LczTCross, "Light T Room"},
 	        {RoomType.LczClassDSpawn, "Class D Spawn"},

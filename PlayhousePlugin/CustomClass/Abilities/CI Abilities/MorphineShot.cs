@@ -23,7 +23,8 @@ namespace PlayhousePlugin.CustomClass.Abilities
             Ply.CurrentItem = null;
             EventHandler.Stunned.Add(Ply);
             Ply.ReferenceHub.playerEffectsController.EnableEffect<Ensnared>(5);
-            Ply.ReferenceHub.playerEffectsController.EnableEffect<Amnesia>(5);
+            Ply.ReferenceHub.playerEffectsController.EnableEffect<AmnesiaVision>(5);
+            Ply.ReferenceHub.playerEffectsController.EnableEffect<AmnesiaItems>(5);
             Ply.ReferenceHub.playerEffectsController.EnableEffect<Concussed>(2);
             Timing.CallDelayed(2, () =>
             {

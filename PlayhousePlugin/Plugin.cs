@@ -72,8 +72,8 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.DroppingAmmo += Handler.OnDroppingAmmo;
 			Exiled.Events.Handlers.Player.Hurting += Handler.OnHurting;
 			Exiled.Events.Handlers.Player.Shooting += Handler.OnShooting;
-			Exiled.Events.Handlers.Player.ChangingMuteStatus += Handler.OnMute;
-			Exiled.Events.Handlers.Player.ChangingIntercomMuteStatus += Handler.OnIntercomMute;
+			Exiled.Events.Handlers.Player.IssuingMute += Handler.OnMute;
+			Exiled.Events.Handlers.Player.IntercomSpeaking += Handler.OnIntercomMute;
 			Exiled.Events.Handlers.Player.UsedItem += Handler.OnMedicalItemDequipped;
 			Exiled.Events.Handlers.Player.ChangingItem += Handler.ChangingItem;
 			Exiled.Events.Handlers.Player.EnteringPocketDimension += Handler.OnEnterPocketDimension;
@@ -83,9 +83,7 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.DroppingItem += Handler.OnDropItem;
 			Exiled.Events.Handlers.Player.Banning += Handler.OnBan;
 			Exiled.Events.Handlers.Player.ReloadingWeapon += Handler.OnReloading;
-			Exiled.Events.Handlers.Player.EnteringFemurBreaker += Handler.FemurBreaker;
 			//Exiled.Events.Handlers.Player.ReceivingEffect += Handler.OnEffect;
-			Exiled.Events.Handlers.Scp106.Containing += Handler.On106Contain;
 			Exiled.Events.Handlers.Scp049.FinishingRecall += Handler.OnRevive;
 			Exiled.Events.Handlers.Player.SpawningRagdoll += Handler.RagdollSpawning;
 			Exiled.Events.Handlers.Player.ChangingRole += Handler.OnSetClass;
@@ -180,8 +178,8 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.DroppingAmmo -= Handler.OnDroppingAmmo;
 			Exiled.Events.Handlers.Player.Hurting -= Handler.OnHurting;
 			Exiled.Events.Handlers.Player.Shooting -= Handler.OnShooting;
-			Exiled.Events.Handlers.Player.ChangingMuteStatus -= Handler.OnMute;
-			Exiled.Events.Handlers.Player.ChangingIntercomMuteStatus -= Handler.OnIntercomMute;
+			Exiled.Events.Handlers.Player.IssuingMute -= Handler.OnMute;
+			Exiled.Events.Handlers.Player.IntercomSpeaking -= Handler.OnIntercomMute;
 			Exiled.Events.Handlers.Player.UsedItem -= Handler.OnMedicalItemDequipped;
 			Exiled.Events.Handlers.Player.ChangingItem -= Handler.ChangingItem;
 			Exiled.Events.Handlers.Player.EnteringPocketDimension -= Handler.OnEnterPocketDimension;
@@ -192,9 +190,7 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.DroppingAmmo -= Handler.OnDroppingAmmo;
 			Exiled.Events.Handlers.Player.Banning -= Handler.OnBan;
 			Exiled.Events.Handlers.Player.ReloadingWeapon -= Handler.OnReloading;
-			Exiled.Events.Handlers.Player.EnteringFemurBreaker -= Handler.FemurBreaker;
 			//Exiled.Events.Handlers.Player.ReceivingEffect -= Handler.OnEffect;
-			Exiled.Events.Handlers.Scp106.Containing -= Handler.On106Contain;
 			Exiled.Events.Handlers.Scp049.FinishingRecall -= Handler.OnRevive;
 			Exiled.Events.Handlers.Player.SpawningRagdoll -= Handler.RagdollSpawning;
 			Exiled.Events.Handlers.Player.ChangingRole -= Handler.OnSetClass;

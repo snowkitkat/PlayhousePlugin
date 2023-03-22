@@ -5,6 +5,7 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using PlayerStatsSystem;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 
 			Ragdoll doll = colliders[0].gameObject.GetComponentInParent<Ragdoll>();
 
-			Player patient = Player.Get(doll.Info.OwnerHub);
+			Player patient = Player.Get(doll.NetworkInfo.OwnerHub);
 			if (patient != null)
 			{
 				if (patient.IsAlive)
@@ -49,7 +50,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 					return false;
 				}
 
-				patient.Role.Type = RoleType.NtfSergeant;
+				patient.Role.Set(RoleTypeId.NtfSergeant);
 				Vector3 pos = Ply.Position;
 				Timing.CallDelayed(0.75f, () =>
 				{
@@ -62,13 +63,13 @@ namespace PlayhousePlugin.CustomClass.Abilities
 					Ply.ShowCenterDownHint($"<color=yellow>Revived Patient!</color>",3);
 				});
 
-				NetworkServer.Destroy(doll.gameObject);
+				NetworkServer.Destroy(doll.GameObject);
 				return true;
 			}
 			else
 			{
 				Ply.ShowCenterDownHint($"<color=yellow>This is an unrevivable body</color>",3);
-				NetworkServer.Destroy(doll.gameObject);
+				NetworkServer.Destroy(doll.GameObject);
 				return false;
 			}
         }

@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEngine;
 using InventorySystem.Items.Pickups;
 using Exiled.API.Extensions;
+using PlayerRoles;
 
 namespace PlayhousePlugin
 {
@@ -57,7 +58,7 @@ namespace PlayhousePlugin
 
 			// Cleans all the ragdolls
 			foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
-				NetworkServer.Destroy(doll.gameObject);
+				NetworkServer.Destroy(doll.GameObject);
 
 			List<Player> classds = new List<Player> { };
 			List<Player> scientists = new List<Player> { };
@@ -101,7 +102,7 @@ namespace PlayhousePlugin
 
 			foreach (Player scientist in scientists)
 			{
-				scientist.Role.Type = RoleType.Scientist;
+				scientist.Role.Set(RoleTypeId.Scientist);
 				Timing.CallDelayed(0.8f, () =>
 				{
 					scientist.ClearInventory();
@@ -114,13 +115,13 @@ namespace PlayhousePlugin
 
 			foreach (Player classd in classds)
 			{
-				classd.Role.Type = RoleType.ClassD;
+				classd.Role.Set(RoleTypeId.ClassD);
 				Timing.CallDelayed(0.8f, () =>
 				{
 					classd.ClearInventory();
 					classd.ClearBroadcasts();
 					classd.AddItem(ItemType.GunCOM15);
-					classd.Position = RoleExtensions.GetRandomSpawnProperties(RoleType.ClassD).Item1;
+					classd.Position = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.ClassD).Position;
 					classd.Ammo[ItemType.Ammo9x19] = 10;
 				});
 			}
@@ -159,32 +160,32 @@ namespace PlayhousePlugin
 
 			foreach (Player scientist in scientists)
 			{
-				scientist.Role.Type = RoleType.Scientist;
+				scientist.Role.Set(RoleTypeId.Scientist);
 				Timing.CallDelayed(0.8f, () =>
 				{
 					scientist.ClearInventory();
 					scientist.ClearBroadcasts();
 					scientist.AddItem(ItemType.GunFSP9);
 					scientist.Position = new Vector3(
-						RoleExtensions.GetRandomSpawnProperties(RoleType.Scp096).Item1.x,
-						RoleExtensions.GetRandomSpawnProperties(RoleType.Scp096).Item1.y + 2f,
-						RoleExtensions.GetRandomSpawnProperties(RoleType.Scp096).Item1.z);
+						RoleExtensions.GetRandomSpawnLocation(RoleTypeId.Scp096).Position.x,
+						RoleExtensions.GetRandomSpawnLocation(RoleTypeId.Scp096).Position.y + 2f,
+						RoleExtensions.GetRandomSpawnLocation(RoleTypeId.Scp096).Position.z);
 					scientist.Ammo[ItemType.Ammo9x19] = 10;
 				});
 			}
 
 			foreach (Player classd in classds)
 			{
-				classd.Role.Type = RoleType.ClassD;
+				classd.Role.Set(RoleTypeId.ClassD);
 				Timing.CallDelayed(0.8f, () =>
 				{
 					classd.ClearInventory();
 					classd.ClearBroadcasts();
 					classd.AddItem(ItemType.GunFSP9);
 					classd.Position = new Vector3(
-						RoleExtensions.GetRandomSpawnProperties(RoleType.Scp93953).Item1.x,
-						RoleExtensions.GetRandomSpawnProperties(RoleType.Scp93953).Item1.y + 2f,
-						RoleExtensions.GetRandomSpawnProperties(RoleType.Scp93953).Item1.z);
+						RoleExtensions.GetRandomSpawnLocation(RoleTypeId.Scp939).Position.x,
+						RoleExtensions.GetRandomSpawnLocation(RoleTypeId.Scp939).Position.y + 2f,
+						RoleExtensions.GetRandomSpawnLocation(RoleTypeId.Scp939).Position.z);
 					classd.Ammo[ItemType.Ammo9x19] = 10;
 				});
 			}
@@ -207,12 +208,12 @@ namespace PlayhousePlugin
 			List<Player> guards = new List<Player> { };
 			bool toggle = false;
 
-			Vector3 pt1 = RoleExtensions.GetRandomSpawnProperties(RoleType.FacilityGuard).Item1;
-			Vector3 pt2 = RoleExtensions.GetRandomSpawnProperties(RoleType.FacilityGuard).Item1;
+			Vector3 pt1 = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.FacilityGuard).Position;
+			Vector3 pt2 = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.FacilityGuard).Position;
 
 			while(pt1 == pt2)
 			{
-				pt2 = RoleExtensions.GetRandomSpawnProperties(RoleType.FacilityGuard).Item1;
+				pt2 = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.FacilityGuard).Position;
 			}
 
 			foreach (Player Ply in Player.List)
@@ -231,7 +232,7 @@ namespace PlayhousePlugin
 
 			foreach (Player guard in guards)
 			{
-				guard.Role.Type = RoleType.FacilityGuard;
+				guard.Role.Set(RoleTypeId.FacilityGuard);
 				Timing.CallDelayed(0.8f, () =>
 				{
 					guard.ClearInventory();
@@ -247,7 +248,7 @@ namespace PlayhousePlugin
 
 			foreach (Player classd in classds)
 			{
-				classd.Role.Type = RoleType.ClassD;
+				classd.Role.Set(RoleTypeId.ClassD);
 				Timing.CallDelayed(0.8f, () =>
 				{
 					classd.ClearInventory();

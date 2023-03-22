@@ -5,6 +5,7 @@ using Exiled.API.Features;
 using MapEditorReborn.API.Features;
 using MEC;
 using Mirror;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin.CustomClass.Abilities
@@ -101,7 +102,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
                 PlayersAlreadyAffected.Clear();
                 foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, circle.transform.position) <= 4))
                 {
-                    if ((ply.Role.Team == Team.MTF || ply.Role.Team == Team.RSC || ply.Role.Team == Team.SCP) && !ply.IsCuffed)
+                    if ((ply.Role.Team == Team.FoundationForces || ply.Role.Team == Team.Scientists || ply.Role.Team == Team.SCPs) && !ply.IsCuffed)
                     {
                         if (PlayersAlreadyAffected.Contains(ply)) continue;
                         UtilityMethods.ApplyPoison(ply, Ply);

@@ -1,11 +1,13 @@
-﻿using CustomPlayerEffects;
-using Exiled.API.Enums;
+﻿using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using MEC;
 using System;
 using System.Collections.Generic;
+using CustomPlayerEffects;
+using Exiled.API.Features.Pickups;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin
@@ -87,7 +89,7 @@ namespace PlayhousePlugin
 							afk = true;
 							if (Ply.CurrentRoom.Type == RoomType.Lcz914)
 							{
-								if (player.Role.Team == Team.SCP || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
+								if (player.Role.Team == Team.SCPs || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
 								{
 									MirrorExtensions.SendFakeSyncVar(player, pickup.netIdentity, pickupType, "NetworkInfo", fakePickupInfo);
 								}
@@ -103,7 +105,7 @@ namespace PlayhousePlugin
 							}
 							else
 							{
-								if (player.Role.Team == Team.SCP || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
+								if (player.Role.Team == Team.SCPs || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
 								{
 									MirrorExtensions.SendFakeSyncVar(player, pickup.netIdentity, pickupType, "NetworkInfo", fakePickupInfo);
 								}
@@ -123,7 +125,7 @@ namespace PlayhousePlugin
 						{
 							if (Ply.CurrentRoom.Type == RoomType.Lcz914)
 							{
-								if (player.Role.Team == Team.SCP || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
+								if (player.Role.Team == Team.SCPs || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
 								{
 									MirrorExtensions.SendFakeSyncVar(player, pickup.netIdentity, pickupType, "NetworkInfo", fakePickupInfo);
 								}
@@ -138,7 +140,7 @@ namespace PlayhousePlugin
 							}
 							else
 							{
-								if (player.Role.Team == Team.SCP || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
+								if (player.Role.Team == Team.SCPs || Ply.ReferenceHub.playerEffectsController.GetEffect<Invisible>().IsEnabled)
 								{
 									MirrorExtensions.SendFakeSyncVar(player, pickup.netIdentity, pickupType, "NetworkInfo", fakePickupInfo);
 								}

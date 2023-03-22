@@ -5,6 +5,7 @@ using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Mirror;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin
@@ -70,14 +71,13 @@ namespace PlayhousePlugin
 			Enabled
 		}
 
-		public static List<RoleType> SCPRoles = new List<RoleType>()
+		public static List<RoleTypeId> SCPRoles = new List<RoleTypeId>()
 		{
-			RoleType.Scp049,
-			RoleType.Scp096,
-			RoleType.Scp106,
-			RoleType.Scp173,
-			RoleType.Scp93953,
-			RoleType.Scp93989
+			RoleTypeId.Scp049,
+			RoleTypeId.Scp096,
+			RoleTypeId.Scp106,
+			RoleTypeId.Scp173,
+			RoleTypeId.Scp939
 		};
 		
 		public class PosRot
@@ -94,7 +94,7 @@ namespace PlayhousePlugin
 
 		public static Dictionary<RoomType, List<PosRot>> ObjectivePointLocations = new Dictionary<RoomType, List<PosRot>>()
 		{
-			{RoomType.HczEzCheckpoint, new List<PosRot>{new PosRot(new Vector3(-5.9f, 2.1f, 9.6f), new Vector3(0,180,0)),
+			{RoomType.HczEzCheckpointA, new List<PosRot>{new PosRot(new Vector3(-5.9f, 2.1f, 9.6f), new Vector3(0,180,0)),
 				new PosRot(new Vector3(6.5f, 1.8f, 6.1f), new Vector3(0,270,0))}}, // Heavy's side
 			{RoomType.EzConference, new List<PosRot>{new PosRot(new Vector3(-4.2f, 1.9f, -1.8f), new Vector3(0,90,0))}},
 			{RoomType.EzIntercom, new List<PosRot>{new PosRot(new Vector3(-0.1f, 2, 2.3f), new Vector3(0,180,0))}},
@@ -102,8 +102,8 @@ namespace PlayhousePlugin
 			{RoomType.Hcz106, new List<PosRot>{new PosRot(new Vector3(20, 2.4f, 4.7f), new Vector3(0,180,0))}},
 			{RoomType.HczTCross, new List<PosRot>{new PosRot(new Vector3(3.0f, 2.2f, -4.9f), new Vector3(0,270,0))}},
 			{RoomType.Hcz049, new List<PosRot>{new PosRot(new Vector3(-8.8f, 2.2f, 2.9f), new Vector3(0,180,0))}},
-			{RoomType.HczChkpB, new List<PosRot>{new PosRot(new Vector3(3.5f, 1.6f, -0.3f), new Vector3(0,270,0))}},
-			{RoomType.HczChkpA, new List<PosRot>{new PosRot(new Vector3(3.5f, 1.6f, -0.3f), new Vector3(0,270,0))}},
+			{RoomType.LczCheckpointA, new List<PosRot>{new PosRot(new Vector3(3.5f, 1.6f, -0.3f), new Vector3(0,270,0))}},
+			{RoomType.LczCheckpointB, new List<PosRot>{new PosRot(new Vector3(3.5f, 1.6f, -0.3f), new Vector3(0,270,0))}},
 			{RoomType.HczArmory, new List<PosRot>{new PosRot(new Vector3(-0.5f, 2.2f, 2.2f), new Vector3(0, 270, 0))}},
 			{RoomType.Hcz079, new List<PosRot>{new PosRot(new Vector3(9.5f, -2.6f, 2.2f), new Vector3(0,180,0))}},
 			{RoomType.HczServers, new List<PosRot>{new PosRot(new Vector3(-5.6f, 1.8f, 4.2f), new Vector3(0,270,0)),
@@ -289,7 +289,7 @@ namespace PlayhousePlugin
 		public string Userid;
 		public string Name;
 		public List<Item> Items;
-		public RoleType Role;
+		public RoleTypeId Role;
 		public Vector3 Position;
 		public float Health;
 		public Dictionary<AmmoType, ushort> Ammo;

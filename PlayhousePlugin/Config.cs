@@ -5,6 +5,8 @@ namespace PlayhousePlugin
 {
 	public sealed class Config : IConfig
 	{
+		public bool Debug { get; set; } = false;
+		
 		public bool IsEnabled { get; set; } = true;
 		public bool UseCustomSequence { get; set; } = false;
 		public float TagInterval { get; set; } = 0.5f;

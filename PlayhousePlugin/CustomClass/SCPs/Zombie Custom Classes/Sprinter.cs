@@ -22,7 +22,7 @@ namespace PlayhousePlugin.CustomClass.SCP
         public override void Replace(Player ply)
         {
             Dispose();
-            ply.Role.Type = Ply.Role.Type;
+            ply.Role.Set(Ply.Role.Type);
             ply.CustomClassManager().CustomClass = new Sprinter(ply);
         }
 
@@ -38,7 +38,7 @@ namespace PlayhousePlugin.CustomClass.SCP
             Ply.AddItem(ItemType.SCP207);
 
             Ply.ReferenceHub.playerEffectsController.EnableEffect<Scp207>();
-            Ply.ReferenceHub.playerEffectsController.ChangeEffectIntensity<Scp207>(2);
+            Ply.ReferenceHub.playerEffectsController.ChangeState<Scp207>(2);
 
             if (EventHandler.SillySunday)
             {

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AdminToys;
 using Exiled.API.Extensions;
 using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
@@ -140,7 +139,7 @@ namespace PlayhousePlugin
                     Log.Info(component.ToString());
                 }
                 
-                if(block.TryGetComponent<PrimitiveObjectToy>(out var primitive))
+                if(block.TryGetComponent<PrimitiveObject>(out var primitive))
                     DefaultScales.Add(block, primitive.Scale);
             }
 
@@ -167,10 +166,10 @@ namespace PlayhousePlugin
 
                                 foreach (var block in obj.AttachedBlocks)
                                 {
-                                    if (block.TryGetComponent<PrimitiveObjectToy>(out var primitive))
+                                    if (block.TryGetComponent<PrimitiveObject>(out var primitive))
                                     {
                                         MirrorExtensions.SendFakeSyncVar(player, block.GetComponent<NetworkIdentity>(),
-                                            block.GetComponent<PrimitiveObjectToy>().GetType(),
+                                            block.GetComponent<PrimitiveObject>().GetType(),
                                             "NetworkScale", Vector3.zero);
                                     }
                                 }
@@ -182,10 +181,10 @@ namespace PlayhousePlugin
 
                                 foreach (var block in obj.AttachedBlocks)
                                 {
-                                    if (block.TryGetComponent<PrimitiveObjectToy>(out var primitive))
+                                    if (block.TryGetComponent<PrimitiveObject>(out var primitive))
                                     {
                                         MirrorExtensions.SendFakeSyncVar(player, block.GetComponent<NetworkIdentity>(),
-                                            block.GetComponent<PrimitiveObjectToy>().GetType(),
+                                            block.GetComponent<PrimitiveObject>().GetType(),
                                             "NetworkScale", Vector3.zero);
                                     }
                                 }
@@ -200,10 +199,10 @@ namespace PlayhousePlugin
                                 
                                 foreach (var block in obj.AttachedBlocks)
                                 {
-                                    if (block.TryGetComponent<PrimitiveObjectToy>(out var primitive))
+                                    if (block.TryGetComponent<PrimitiveObject>(out var primitive))
                                     {
                                         MirrorExtensions.SendFakeSyncVar(player, block.GetComponent<NetworkIdentity>(),
-                                            block.GetComponent<PrimitiveObjectToy>().GetType(),
+                                            block.GetComponent<PrimitiveObject>().GetType(),
                                             "NetworkScale", DefaultScales[block]);
                                     }
                                 }
@@ -214,10 +213,10 @@ namespace PlayhousePlugin
 
                                 foreach (var block in obj.AttachedBlocks)
                                 {
-                                    if (block.TryGetComponent<PrimitiveObjectToy>(out var primitive))
+                                    if (block.TryGetComponent<PrimitiveObject>(out var primitive))
                                     {
                                         MirrorExtensions.SendFakeSyncVar(player, block.GetComponent<NetworkIdentity>(),
-                                            block.GetComponent<PrimitiveObjectToy>().GetType(),
+                                            block.GetComponent<PrimitiveObject>().GetType(),
                                             "NetworkScale", DefaultScales[block]);
                                     }
                                 }

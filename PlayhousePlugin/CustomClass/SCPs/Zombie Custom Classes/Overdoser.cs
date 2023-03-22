@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using PlayhousePlugin.CustomClass.SCP_Abilities;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace PlayhousePlugin.CustomClass.SCP
         public override void Replace(Player ply)
         {
             Dispose();
-            ply.Role.Type = Ply.Role.Type;
+            ply.Role.Set(Ply.Role.Type);
             ply.CustomClassManager().CustomClass = new Overdoser(ply);
         }
 
@@ -72,7 +73,7 @@ namespace PlayhousePlugin.CustomClass.SCP
                 foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, Ply.Position) <= 5))
                 {
                     if (ply == Ply) continue;
-                    if (ply.Role.Team == Team.SCP && ply.Role.Type != RoleType.Scp106)
+                    if (ply.Role.Team == Team.SCPs && ply.Role.Type != RoleTypeId.Scp106)
                     {
                         if (!PlayersAlreadyAffected.Contains(ply))
                         {

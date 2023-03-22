@@ -1,5 +1,6 @@
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin.CustomClass
@@ -14,7 +15,7 @@ namespace PlayhousePlugin.CustomClass
 
         public override void Escape()
         {
-            Ply.Role.Type = RoleType.ChaosRifleman;
+            Ply.Role.Set(RoleTypeId.ChaosRifleman);
             Ply.CustomClassManager().DisposeCustomClass();
             Ply.CustomClassManager().CustomClass = new ChaosManager(Ply);
         }
@@ -22,7 +23,7 @@ namespace PlayhousePlugin.CustomClass
         public override void Replace(Player ply)
         {
             Dispose();
-            ply.Role.Type = Ply.Role.Type;
+            ply.Role.Set(Ply.Role.Type);
             Vector3 pos = Ply.Position;
             Timing.CallDelayed(0.1f, () =>
             {

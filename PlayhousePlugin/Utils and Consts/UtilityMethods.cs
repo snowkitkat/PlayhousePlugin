@@ -13,15 +13,18 @@ using System;
 using AdminToys;
 using Exiled.API.Features.Items;
 using Exiled.API.Extensions;
+using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Player;
 using Footprinting;
 using RemoteAdmin;
 using Mirror.LiteNetLib4Mirror;
 using InventorySystem;
-using InventorySystem.Items.Firearms.Ammo;
 using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
+using PlayerRoles;
 using PlayerStatsSystem;
+using AmmoPickup = InventorySystem.Items.Firearms.Ammo.AmmoPickup;
 
 namespace PlayhousePlugin
 {
@@ -95,7 +98,7 @@ namespace PlayhousePlugin
 		{
 			var nade = (ExplosiveGrenade) ExplosiveGrenade.Create(grenadeType, player);
 			nade.FuseTime = 99999;
-			var pickup = nade.Spawn(player.Position);
+			var pickup = nade.CreatePickup(player.Position);
 			nade.Base.ServerThrow(10, 1, Vector3.one, player.CameraTransform.forward*2);
 			//nade.SpawnActive(player.Position, player);
 			return pickup;
@@ -157,7 +160,7 @@ namespace PlayhousePlugin
 			}
 			else
 			{
-				if (p.Role.Type != RoleType.Scp079 && p.IsAlive)
+				if (p.Role.Type != RoleTypeId.Scp079 && p.IsAlive)
 				{
 					p.Hurt(4f, "Military Grade Bio-Weapon");
 					//p.Hurt(7.5f, Exterminator, damageType: DamageTypes.Poison);
@@ -235,7 +238,7 @@ namespace PlayhousePlugin
 		// Overheals AHP of target
 		public static void ApplyOverheal(Player p, float h, bool displayHint, Player Healer)
 		{
-			if (p.MaxArtificialHealth == 0 && (p.Role.Type == RoleType.Scp049 || p.Role.Type == RoleType.Scp0492))
+			if (p.MaxArtificialHealth == 0 && (p.Role.Type == RoleTypeId.Scp049 || p.Role.Type == RoleTypeId.Scp0492))
 			{
 				p.MaxArtificialHealth = 100;
 			}
@@ -317,7 +320,7 @@ namespace PlayhousePlugin
 			}
 		}
 
-		public static void SpawnRagdoll(Vector3 pos, Quaternion rot, RoleType roleType, string deathCause, Player owner = null)
+		public static void SpawnRagdoll(Vector3 pos, Quaternion rot, RoleTypeId roleType, string deathCause, Player owner = null)
 		{
 			ReferenceHub target = owner?.ReferenceHub ?? ReferenceHub.HostHub;
 			Exiled.API.Features.Ragdoll.Spawn(new RagdollInfo(target, new CustomReasonDamageHandler(deathCause), pos, rot));
@@ -334,7 +337,7 @@ namespace PlayhousePlugin
 
 			// Cleans all the ragdolls
 			foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
-				NetworkServer.Destroy(doll.gameObject);
+				NetworkServer.Destroy(doll.GameObject);
 		}
 
 		/// <summary>
@@ -354,7 +357,7 @@ namespace PlayhousePlugin
 		{
 			// Cleans all the ragdolls
 			foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
-				NetworkServer.Destroy(doll.gameObject);
+				NetworkServer.Destroy(doll.GameObject);
 		}
 
 		/// <summary>

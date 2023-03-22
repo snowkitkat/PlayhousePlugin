@@ -15,7 +15,7 @@ namespace PlayhousePlugin.CustomClass.SCP
         public override void Replace(Player ply)
         {
             Dispose();
-            ply.Role.Type = Ply.Role.Type;
+            ply.Role.Set(Ply.Role.Type);
         }
 
         public SCP079CustomClass(Player ply)

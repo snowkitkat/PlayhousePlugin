@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using MEC;
 using System.Net.Http;
+using System.Net.WebSockets;
 using CustomPlayerEffects;
 using Mirror;
 using Interactables.Interobjects.DoorUtils;
@@ -19,6 +20,15 @@ using AdminToys;
 using Respawning;
 using Exiled.Loader;
 using Exiled.API.Features.Items;
+using Exiled.API.Features.Pickups;
+using Exiled.Events.EventArgs.Map;
+using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp049;
+using Exiled.Events.EventArgs.Scp096;
+using Exiled.Events.EventArgs.Scp914;
+using Exiled.Events.EventArgs.Server;
+using Exiled.Events.EventArgs.Warhead;
+using Exiled.Events.Handlers;
 using GameCore;
 using InventorySystem.Items.Pickups;
 using InventorySystem.Items.ThrowableProjectiles;
@@ -30,6 +40,7 @@ using Kognity.DB.Account.Components;
 using Kognity.DB.Common.Cache;
 using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
+using PlayerRoles;
 using PlayerStatsSystem;
 using PlayhousePlugin.Commands;
 using Respawning.NamingRules;
@@ -41,8 +52,14 @@ using PlayhousePlugin.CustomClass.SCP;
 using PlayhousePlugin.CustomClass.SCP_Abilities;
 using PlayhousePlugin.CustomGameMode;
 using Unity.Mathematics;
+using UnityEngine.Networking.PlayerConnection;
 using WebSocketSharp;
+using Cassie = Exiled.API.Features.Cassie;
 using Log = Exiled.API.Features.Log;
+using Map = Exiled.API.Features.Map;
+using Player = Exiled.API.Features.Player;
+using Server = Exiled.API.Features.Server;
+using Warhead = Exiled.API.Features.Warhead;
 
 namespace PlayhousePlugin
 {
@@ -184,13 +201,13 @@ namespace PlayhousePlugin
 
 		private void Ws_OnError(object sender, WebSocketSharp.ErrorEventArgs e)
 		{
-			Log.Error(e.Message);
+			Log.Error((object)e.Message);
 		}
 
 		private void Ws_OnMessage(object sender, MessageEventArgs e)
 		{
 			Log.Info("EEEEEEEEEEEEEEEEEEEE");
-			Log.Info(e.Data);
+			Log.Info(e.playerId);
 		}
 
 		public void MapDonatorToObjects()

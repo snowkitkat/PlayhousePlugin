@@ -1,22 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Windows.Forms.VisualStyles;
 using AdminToys;
 using Exiled.API.Features;
 using MapEditorReborn.API.Features;
+using MapEditorReborn.API.Features.Objects;
 using MEC;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
 using UnityEngine;
+using Quaternion = System.Numerics.Quaternion;
+using Vector3 = System.Numerics.Vector3;
 
 namespace PlayhousePlugin.Controllers
 {
     public class ElevatorController
     {
         private Vector3 RootPosition = new Vector3(-13f, 987.2f, -65.1f);
-        private PrimitiveObjectToy BottomDoor;
-        private PrimitiveObjectToy TopDoor;
-        private PrimitiveObjectToy Platform;
+        private PrimitiveObject BottomDoor;
+        private PrimitiveObject TopDoor;
+        private PrimitiveObject Platform;
         private bool goingBack = false;
         public static CoroutineHandle CoroutineHandle;
 
@@ -24,12 +29,12 @@ namespace PlayhousePlugin.Controllers
         {
             var Elevator = MapUtils.GetSchematicDataByName("Elevator");
             ObjectSpawner.SpawnSchematic("Elevator",
-                RootPosition, Quaternion.Euler(new Vector3(0,-90,0)), Vector3.one, Elevator);
+                RootPosition, Quaternion.Euler(new Vector3(0,-90,0)), Vector3.One, Elevator);
 
             for (int i = 0; i < 5; i++)
             {
                 var SpotLight = UnityEngine.Object.Instantiate(LiteNetLib4MirrorNetworkManager.singleton.spawnPrefabs.First(x => x.name == "LightSourceToy"));
-                SpotLight.GetComponent<LightSourceToy>().OnSpawned(Server.Host.ReferenceHub, new ArraySegment<string>());
+                SpotLight.GetComponent<LightSourceObject>().Spa(Server.Host.ReferenceHub, new ArraySegment<string>());
 				
                 SpotLight.GetComponent<LightSourceToy>().NetworkLightColor = new Color(200/255f, 128/255f,128/255f);
                 SpotLight.GetComponent<LightSourceToy>().NetworkLightRange = 5;
@@ -81,7 +86,7 @@ namespace PlayhousePlugin.Controllers
             while (true)
             {
                 yield return Timing.WaitForOneFrame;
-                Platform.transform.position = Vector3.MoveTowards(Platform.transform.position, this.goingBack ? RootPosition : RootPosition+Vector3.up*14, Time.deltaTime*2.25f);
+                Platform.transform.position = Vector3.MoveTowards(Platform.transform.position, this.goingBack ? RootPosition : RootPosition+Vector3.up*14, VisualStyleElement.TaskbarClock.Time.deltaTime*2.25f);
                 
                 if (Vector3.Distance(Platform.transform.position, goingBack ? RootPosition : RootPosition+Vector3.up*14) <= 0f)
                 {

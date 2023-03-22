@@ -1,5 +1,6 @@
 using System;
 using Exiled.API.Features;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin.CustomClass.SCP_Abilities
@@ -31,14 +32,14 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
 	            out RaycastHit raycastHit, 5);
             
             var patient = Player.Get(raycastHit.rigidbody.gameObject);
-            if (patient == null || (patient.Role.Team != Team.SCP || patient.Role.Type == RoleType.Scp0492))
+            if (patient == null || (patient.Role.Team != Team.SCPs || patient.Role.Type == RoleTypeId.Scp0492))
             {
 	            Ply.ShowCenterDownHint("<color=red>There are no patients within range.</color>", 4);
 	            return false;
             }
             
             float hpToGive;
-            if (patient.Role.Type == RoleType.Scp106)
+            if (patient.Role.Type == RoleTypeId.Scp106)
             {
 	            hpToGive = 10 * _049multiplier;
 	            if (patient.Health + hpToGive >= patient.MaxHealth)
