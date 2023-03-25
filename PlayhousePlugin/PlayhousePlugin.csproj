@@ -588,6 +588,8 @@
     <Compile Include="Cosmetics\PetFollow.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosDispenser.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosSpeedpad.cs" />
+    <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosTeleporterEntrance.cs" />
+    <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosTeleporterExit.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\ChaosMedicRevive.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\GasGrenade.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\TonicShot.cs" />
@@ -597,6 +599,8 @@
     <Compile Include="CustomClass\Abilities\Class D Abilities\JanitorCleanup.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\Dispenser.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\Speedpad.cs" />
+    <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\TeleporterEntrance.cs" />
+    <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\TeleporterExit.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\HotBullets.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\MiniDispenserNTF.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\NTFGasGrenade.cs" />

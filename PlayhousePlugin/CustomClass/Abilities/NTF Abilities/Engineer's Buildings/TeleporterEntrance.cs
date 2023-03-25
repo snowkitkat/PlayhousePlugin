@@ -34,25 +34,25 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        
             if (!Ply.ReferenceHub.IsGrounded())
             {
-                Ply.ShowCenterDownHint("<color=red>You are not on the ground</color>", 3);
+                Ply.ShowHint("<color=red>You are not on the ground</color>", 3);
                 return false;
             }
 
             if (Ply.CurrentRoom.Type == RoomType.Pocket)
             {
-                Ply.ShowCenterDownHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
+                Ply.ShowHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
                 return false;
             }
 	        
             if (!IsBuilt)
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Teleporter Entrance goin' up!</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Teleporter Entrance goin' up!</color>", 3);
                 BuildingCoroutine = Timing.RunCoroutine(BuildTeleporterEntrance());
                 return true;
             }
             else
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Entrance Destroyed</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Entrance Destroyed</color>", 3);
                 Timing.KillCoroutines(BuildingCoroutine);
                 BuildingMapObject.Destroy();
                 IsBuilt = false;
@@ -171,7 +171,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 					else
 					{
 						teleporterPlayers.Add(ply, new TeleporterPlayers(1, true));
-						ply.ShowCenterDownHint($"<color=#1fadff>Teleporter charging, stand still!\nYou will be teleported to: <color=#d1eeff>{RoomName[teleporterExit.Room.Type]}</color></color>", 5);
+						ply.ShowHint($"<color=#1fadff>Teleporter charging, stand still!\nYou will be teleported to: <color=#d1eeff>{RoomName[teleporterExit.Room.Type]}</color></color>", 5);
 					}
 				}
 

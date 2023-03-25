@@ -33,25 +33,25 @@ namespace PlayhousePlugin.CustomClass.Abilities
             
             if (!Ply.ReferenceHub.IsGrounded())
             {
-                Ply.ShowCenterDownHint("<color=red>You are not on the ground</color>", 3);
+                Ply.ShowHint("<color=red>You are not on the ground</color>", 3);
                 return false;
             }
 
             if (Ply.CurrentRoom.Type == RoomType.Pocket)
             {
-                Ply.ShowCenterDownHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
+                Ply.ShowHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
                 return false;
             }
 	        
             if (!IsBuilt)
             {
-                Ply.ShowCenterDownHint($"<color=yellow>Teleporter Exit comin' up!</color>", 3);
+                Ply.ShowHint($"<color=yellow>Teleporter Exit comin' up!</color>", 3);
                 BuildingCoroutine = Timing.RunCoroutine(TeleporterExit());
                 return true;
             }
             else
             {
-                Ply.ShowCenterDownHint($"<color=yellow>Exit Destroyed</color>", 3);
+                Ply.ShowHint($"<color=yellow>Exit Destroyed</color>", 3);
                 Timing.KillCoroutines(BuildingCoroutine);
                 BuildingMapObject.Destroy();
                 IsBuilt = false;
