@@ -2,6 +2,7 @@ using Exiled.API.Features;
 using MEC;
 using System.Collections.Generic;
 using Exiled.API.Enums;
+using PlayerRoles;
 using Respawning;
 using UnityEngine;
 
@@ -71,37 +72,23 @@ namespace PlayhousePlugin
 					room.ResetColor();
 				}
 			});
-
-			if (ObjectivePointController.objectivesCapped != 6)
+			
 			{
 				// Chaos Advantage
-				ObjectivePointController.FailedObjectives = true;
 				Map.Broadcast(6, "<color=red><b><i>Failed to prepare for decontamination. Site Wide Decontamination Protocol Failure.</i></b></color>");
 				Cassie.Message("pitch_0.6 .g6 .g6 pitch_0.95 site wide decontamination protocol failure . information systems offline . radio systems offline . warhead system failure .  detonation in 7 minutes pitch_0.6 .g6 .g6", true, false);
 				
-				ObjectivePointController.RapidSpawnWaves = true;
 				Respawn.ForceWave(SpawnableTeamType.ChaosInsurgency);
 				RespawnManager.Singleton.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
-				RespawnManager.Singleton._timeForNextSequence = 60;
-				ObjectivePointController.Team = SpawnableTeamType.ChaosInsurgency;
 			}
-			else
 			{
 				// MTF Advantage
-				ObjectivePointController.FailedObjectives = false;
 				Map.Broadcast(6, "<color=red><b><i>Decontamination in 1 Minute!</i></b></color>");
 				Cassie.Message("pitch_0.6 .g6 .g6 pitch_0.85 Danger Danger . facility decontamination in 1 minute . evacuate now . pitch_0.2 .g4 yd_2.5 .g4 yd_2.5 .g4", true, false);			
 				
-				ObjectivePointController.RapidSpawnWaves = true;
 				Respawn.ForceWave(SpawnableTeamType.NineTailedFox);
 				RespawnManager.Singleton.NextKnownTeam = SpawnableTeamType.NineTailedFox;
-				RespawnManager.Singleton._timeForNextSequence = 60;
-				ObjectivePointController.Team = SpawnableTeamType.NineTailedFox;
-			}
-
-
-			if (!ObjectivePointController.FailedObjectives) // MTF Decon
-			{
+				{
 				yield return Timing.WaitForSeconds(30);
 				//Cassie.Message("30 Seconds", true, false);
 				EventHandler.coroutines.Add(Timing.RunCoroutine(FadeToYellow()));
@@ -127,8 +114,7 @@ namespace PlayhousePlugin
 				
 				yield return Timing.WaitForSeconds(10);
 				EventHandler.coroutines.Add(Timing.RunCoroutine(KillPlayers()));
-				ObjectivePointController.DisableElevators = true;
-			}
+				}
 			else // Autonuke 
 			{
 				yield return Timing.WaitForSeconds(60);
@@ -196,32 +182,22 @@ namespace PlayhousePlugin
 				yield return Timing.WaitForSeconds(1);
 				foreach (var player in Player.List)
 				{
-					if (player.Role.Type == RoleType.Scp079) continue;
+					if (player.Role.Type == RoleTypeId.Scp079) continue;
 					if (player.ReferenceHub.transform.position.y < 800)
 					{
 						player.Hurt((int)player.MaxHealth*0.1f, "Decontamination");
 						Log.Info("DECONTAMINATING");
-					}
-
-					if (player.Role.Type == RoleType.Scp106)
-					{
-						player.ReferenceHub.scp106PlayerScript.NetworkportalPosition = Vector3.zero;
 					}
 				}
 			}
 			
 			foreach (var player in Player.List)
 			{
-				if (player.Role.Type == RoleType.Scp079) continue;
+				if (player.Role.Type == RoleTypeId.Scp079) continue;
 				if (player.ReferenceHub.transform.position.y < 800)
 				{
 					player.Hurt(int.MaxValue, "Please die already");
 					Log.Info("DECONTAMINATING");
-				}
-
-				if (player.Role.Type == RoleType.Scp106)
-				{
-					player.ReferenceHub.scp106PlayerScript.NetworkportalPosition = Vector3.zero;
 				}
 			}
 		}

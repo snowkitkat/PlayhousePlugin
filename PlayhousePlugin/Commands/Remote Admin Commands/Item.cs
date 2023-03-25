@@ -112,7 +112,7 @@ namespace PlayhousePlugin.Commands
             // Spawn count number of items of type itemType with scale scale
             for (var i = 0; i < count; i++)
             {
-                var item = Item.Create(itemType).Spawn(Player.Get(((PlayerCommandSender) sender).ReferenceHub).Position);
+                var item = Item.Create(itemType).CreatePickup(Player.Get(((PlayerCommandSender) sender).ReferenceHub).Position);
                 if(scale != Vector3.one)
                     item.Scale = scale;
             }

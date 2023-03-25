@@ -2,6 +2,7 @@
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
+using PlayerRoles;
 using PlayerStatsSystem;
 using RemoteAdmin;
 
@@ -29,13 +30,13 @@ namespace PlayhousePlugin.Commands
 			{
 				if (EventHandler.SillySunday)
 				{
-					if (p.Role.Type == RoleType.Tutorial && p.RemoteAdminAccess)
+					if (p.Role.Type == RoleTypeId.Tutorial && p.RemoteAdminAccess)
 					{
 						UtilityMethods.FakeExplode(p);
 					}
 					else
 					{
-						if (!p.IsSpawnProtected && p.Role.Type != RoleType.Tutorial)
+						if (!p.IsSpawnProtected && p.Role.Type != RoleTypeId.Tutorial)
 						{
 							UtilityMethods.FakeExplode(p);
 						}

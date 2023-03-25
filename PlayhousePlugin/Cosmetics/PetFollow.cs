@@ -10,7 +10,7 @@ using Exiled.API.Features.Pickups;
 using PlayerRoles;
 using UnityEngine;
 
-namespace PlayhousePlugin
+/* namespace PlayhousePlugin
 {
 	public class PetFollow
 	{
@@ -220,3 +220,4 @@ namespace PlayhousePlugin
 		}
 	}
 }
+*/

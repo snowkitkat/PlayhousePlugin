@@ -5,7 +5,7 @@ using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
 using MEC;
 
-namespace PlayhousePlugin.CustomGameMode
+/* namespace PlayhousePlugin.CustomGameMode
 {
     public class BreakoutBlitz
     {
@@ -39,4 +39,4 @@ namespace PlayhousePlugin.CustomGameMode
             }
         }
     }
-}
+}*/

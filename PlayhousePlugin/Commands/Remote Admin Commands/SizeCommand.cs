@@ -2,6 +2,7 @@
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin.Commands
@@ -33,7 +34,7 @@ namespace PlayhousePlugin.Commands
                 case "reset":
                     foreach (Player Ply in Player.List)
                     {
-                        if (Ply.Role.Type == RoleType.Spectator || Ply.Role.Type == RoleType.None)
+                        if (Ply.Role.Type == RoleTypeId.Spectator || Ply.Role.Type == RoleTypeId.None)
                             continue;
                         
                         Ply.Scale = Vector3.one;
@@ -69,7 +70,7 @@ namespace PlayhousePlugin.Commands
 
                     foreach (Player Ply in Player.List)
                     {
-                        if (Ply.Role.Type == RoleType.Spectator || Ply.Role.Type == RoleType.None)
+                        if (Ply.Role.Type == RoleTypeId.Spectator || Ply.Role.Type == RoleTypeId.None)
                             continue;
 
                         Ply.Scale = new Vector3(xval, yval, zval);

@@ -1,6 +1,7 @@
 ﻿using System;
 using CommandSystem;
 using Exiled.API.Features;
+using PlayerRoles;
 using RemoteAdmin;
 
 namespace PlayhousePlugin.Commands
@@ -23,9 +24,9 @@ namespace PlayhousePlugin.Commands
 			var p = Player.Get(((PlayerCommandSender)sender).ReferenceHub);
 			var Handler = PlayhousePlugin.PlayhousePluginRef.Handler;
 
-			if (p.Role.Team == Team.SCP && EventHandler.SillySunday)
+			if (p.Role.Team == Team.SCPs && EventHandler.SillySunday)
 			{
-				if(p.Role.Type == RoleType.Scp0492)
+				if(p.Role.Type == RoleTypeId.Scp0492)
 				{
 					UtilityMethods.Explode(p);
 					/*

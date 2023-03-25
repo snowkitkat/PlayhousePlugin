@@ -37,20 +37,12 @@ namespace PlayhousePlugin.CustomClass
         {
             var chaosDispenser = ((ChaosDispenser)ActiveAbilities[0]).BuildingMapObject;
             var chaosSpeedpad = ((ChaosSpeedpad)ActiveAbilities[1]).BuildingMapObject;
-            var chaosTPentrance = ((ChaosTeleporterEntrance)ActiveAbilities[2]).BuildingMapObject;
-            var chaosTPexit = ((ChaosTeleporterExit)ActiveAbilities[3]).BuildingMapObject;
-            
+
             if(chaosDispenser != null && chaosDispenser.gameObject != null)
                 chaosDispenser.Destroy();
             
             if(chaosSpeedpad != null && chaosSpeedpad.gameObject != null)
                 chaosSpeedpad.Destroy();
-            
-            if(chaosTPentrance != null && chaosTPentrance.gameObject != null)
-                chaosTPentrance.Destroy();
-            
-            if(chaosTPexit != null && chaosTPexit.gameObject != null)
-                chaosTPexit.Destroy();
 
             base.Dispose();
         }
@@ -63,8 +55,6 @@ namespace PlayhousePlugin.CustomClass
             {
                 new ChaosDispenser(ply),
                 new ChaosSpeedpad(ply),
-                new ChaosTeleporterEntrance(ply),
-                new ChaosTeleporterExit(ply)
             };
             ply.CustomClassManager().AbilityIndex = 0;
 

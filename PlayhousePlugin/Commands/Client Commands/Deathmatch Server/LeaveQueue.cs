@@ -2,6 +2,7 @@
 using CommandSystem;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using RemoteAdmin;
 
 namespace PlayhousePlugin.Commands
@@ -55,7 +56,7 @@ namespace PlayhousePlugin.Commands
 						Timing.KillCoroutines(kc.Unfreezer);
 						Deathmatch.activeMatch[index] = false;
 						
-						kc.Competitor.Role.Type = RoleType.Spectator;
+						kc.Competitor.Role.Set(RoleTypeId.Spectator);
 						kc.Competitor.Broadcast(5, "Your opponent has left and you have been put into spectator.");
 						kc.King = kc.Competitor; // Set the competitor as the new king
 						kc.Competitor = null;
@@ -80,7 +81,7 @@ namespace PlayhousePlugin.Commands
 					{
 						Timing.KillCoroutines(kc.StalemateChecker); // Kill the 
 						Timing.KillCoroutines(kc.Unfreezer);
-						kc.Competitor.Role.Type = RoleType.Spectator; // Set the competitor who left to spectator
+						kc.Competitor.Role.Set(RoleTypeId.Spectator); // Set the competitor who left to spectator
 						
 						// Replacing the competitor now
 						kc.Competitor = kc.Queue[0];
@@ -99,7 +100,7 @@ namespace PlayhousePlugin.Commands
 						Deathmatch.activeMatch[index] = false;
 						
 						kc.Competitor = null;
-						kc.King.Role.Type = RoleType.Spectator;
+						kc.King.Role.Set(RoleTypeId.Spectator);
 						kc.King.Broadcast(5, "Your opponent has left and you have been put into spectator.");
 						
 						Log.Info("L4");							
@@ -108,7 +109,7 @@ namespace PlayhousePlugin.Commands
 			}
 			
 			KingAndCompetitor.RemoveFromQueue(p);
-			p.Role.Type = RoleType.Spectator; 
+			p.Role.Set(RoleTypeId.Spectator);
 			response = "Left queue!";
 			return true;
 		}

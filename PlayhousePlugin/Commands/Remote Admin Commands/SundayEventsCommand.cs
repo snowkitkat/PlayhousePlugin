@@ -2,6 +2,7 @@ using System;
 using CommandSystem;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using RemoteAdmin;
 
 namespace PlayhousePlugin.Commands
@@ -85,16 +86,16 @@ namespace PlayhousePlugin.Commands
                 case "173":
                 case "173infection":
                     if (SillySundayInfectionController.InfectionEnabled &&
-                        SillySundayInfectionController.InfectedRole == RoleType.Scp173)
+                        SillySundayInfectionController.InfectedRole == RoleTypeId.Scp173)
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.None;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.None;
                         SillySundayInfectionController.InfectionEnabled = false;
                         response = "Disabled 173 infection";
                         return true;
                     }
                     else
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.Scp173;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.Scp173;
                         SillySundayInfectionController.InfectionEnabled = true;
                         response = "Enabled 173 infection";
                         return true;
@@ -103,16 +104,16 @@ namespace PlayhousePlugin.Commands
                 case "096":
                 case "096infection":
                     if (SillySundayInfectionController.InfectionEnabled &&
-                        SillySundayInfectionController.InfectedRole == RoleType.Scp096)
+                        SillySundayInfectionController.InfectedRole == RoleTypeId.Scp096)
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.None;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.None;
                         SillySundayInfectionController.InfectionEnabled = false;
                         response = "Disabled 096 infection";
                         return true;
                     }
                     else
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.Scp096;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.Scp096;
                         SillySundayInfectionController.InfectionEnabled = true;
                         response = "Enabled 096 infection";
                         return true;
@@ -121,16 +122,16 @@ namespace PlayhousePlugin.Commands
                 case "049":
                 case "049infection":
                     if (SillySundayInfectionController.InfectionEnabled &&
-                        SillySundayInfectionController.InfectedRole == RoleType.Scp049)
+                        SillySundayInfectionController.InfectedRole == RoleTypeId.Scp049)
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.None;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.None;
                         SillySundayInfectionController.InfectionEnabled = false;
                         response = "Disabled 049 infection";
                         return true;
                     }
                     else
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.Scp049;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.Scp049;
                         SillySundayInfectionController.InfectionEnabled = true;
                         response = "Enabled 049 infection";
                         return true;
@@ -139,16 +140,16 @@ namespace PlayhousePlugin.Commands
                 case "939":
                 case "939infection":
                     if (SillySundayInfectionController.InfectionEnabled &&
-                        SillySundayInfectionController.InfectedRole == RoleType.Scp93989)
+                        SillySundayInfectionController.InfectedRole == RoleTypeId.Scp939)
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.None;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.None;
                         SillySundayInfectionController.InfectionEnabled = false;
                         response = "Disabled 939 infection";
                         return true;
                     }
                     else
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.Scp93989;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.Scp939;
                         SillySundayInfectionController.InfectionEnabled = true;
                         response = "Enabled 939 infection";
                         return true;
@@ -157,16 +158,16 @@ namespace PlayhousePlugin.Commands
                 case "106":
                 case "106infection":
                     if (SillySundayInfectionController.InfectionEnabled &&
-                        SillySundayInfectionController.InfectedRole == RoleType.Scp106)
+                        SillySundayInfectionController.InfectedRole == RoleTypeId.Scp106)
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.None;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.None;
                         SillySundayInfectionController.InfectionEnabled = false;
                         response = "Disabled 106 infection";
                         return true;
                     }
                     else
                     {
-                        SillySundayInfectionController.InfectedRole = RoleType.Scp106;
+                        SillySundayInfectionController.InfectedRole = RoleTypeId.Scp106;
                         SillySundayInfectionController.InfectionEnabled = true;
                         response = "Enabled 106 infection";
                         return true;

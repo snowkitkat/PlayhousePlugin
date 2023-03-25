@@ -427,7 +427,7 @@ namespace PlayhousePlugin
 
 			Timing.CallDelayed(0.5f, () =>
 			{
-				UtilityMethods.CleanupRagdollsAndItems();
+				UtilityMethods.CleanupItems();
 			});
 
 			var gun = GunList.PickRandom();
@@ -527,26 +527,26 @@ namespace PlayhousePlugin
 					    if (KingAndCompetitor.IsInQueue(ply))
 					    {
 						    var kandc = KingAndCompetitor.GetAtIndex(KingAndCompetitor.FindQueueIndex(ply));
-						    ply.ShowCenterDownHint($"<size=70><color=#ff96de>You are {kandc.Queue.IndexOf(ply)+1} in queue</color></size>", 1);
+						    ply.ShowHint($"<size=70><color=#ff96de>You are {kandc.Queue.IndexOf(ply)+1} in queue</color></size>", 1);
 					    }
 				    }
 
 				    if (ply.Role.Team == Team.Dead)
 				    {
 					    if(KingAndCompetitor.IsKing(ply))
-						    ply.ShowCenterDownHint($"<size=70><color=#ff96de>You are currently the King</color></size>\n", 1);
+						    ply.ShowHint($"<size=70><color=#ff96de>You are currently the King</color></size>\n", 1);
 					    else if (KingAndCompetitor.IsCompetitor(ply))
-						    ply.ShowCenterDownHint($"<size=70><color=#ff96de>You are currently the Competitor</color></size>\n", 1);
+						    ply.ShowHint($"<size=70><color=#ff96de>You are currently the Competitor</color></size>\n", 1);
 					    else
 					    {
 						    if (KingAndCompetitor.IsInQueue(ply))
 						    {
 							    var kandc = KingAndCompetitor.GetAtIndex(KingAndCompetitor.FindQueueIndex(ply));
-							    ply.ShowCenterDownHint($"<size=70><color=#ff96de>You are {kandc.Queue.IndexOf(ply)+1} in queue</color></size>", 1);
+							    ply.ShowHint($"<size=70><color=#ff96de>You are {kandc.Queue.IndexOf(ply)+1} in queue</color></size>", 1);
 						    }
 						    else
 						    {
-							    ply.ShowCenterDownHint($"<size=70><color=#ff96de>You are not in the queue!\n\nType \".add\" in your console!</color></size>", 1);
+							    ply.ShowHint($"<size=70><color=#ff96de>You are not in the queue!\n\nType \".add\" in your console!</color></size>", 1);
 						    }
 					    }
 				    }

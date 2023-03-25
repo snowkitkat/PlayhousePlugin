@@ -1,3 +1,4 @@
+using CustomPlayerEffects;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using MEC;
@@ -35,7 +36,8 @@ namespace PlayhousePlugin.CustomClass
         public override void Dispose()
         {
             Timing.KillCoroutines(((TonicShot)ActiveAbilities[0])._coroutineHandle);
-            Ply.ChangeRunningSpeed(ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier);
+            Ply.EnableEffect<MovementBoost>();
+            Ply.ChangeEffectIntensity<MovementBoost>(10);
             base.Dispose();
         }
         public ChaosHeretic(Player ply)

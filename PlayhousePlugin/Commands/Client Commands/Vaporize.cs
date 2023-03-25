@@ -30,12 +30,8 @@ namespace PlayhousePlugin.Commands
 			
 			if (p.IsAlive && !EventHandler.IsDeathMatchServer && !p.IsGodModeEnabled)
 			{
-				var e = new DisruptorDamageHandler(new Footprint(p.ReferenceHub), int.MaxValue)
-				{
-					ForceFullFriendlyFire = true
-				};
-				
-				p.ReferenceHub.playerStats.DealDamage(e);
+
+				p.ReferenceHub.playerStats.DealDamage(ParticleD);
 				
 				if (!p.DoNotTrack)
 				{

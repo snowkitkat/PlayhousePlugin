@@ -26,7 +26,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
         {
             if (Ply.CurrentRoom.Type == RoomType.Pocket)
 			{
-				Ply.ShowCenterDownHint($"<color=yellow>You cannot revive in the Pocket Dimension</color>",3);
+				Ply.ShowHint($"<color=yellow>You cannot revive in the Pocket Dimension</color>",3);
 				return false;
 			}
 
@@ -36,7 +36,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 
 			if (colliders.Count == 0)
 			{
-				Ply.ShowCenterDownHint($"<color=yellow>There are no bodies nearby</color>",3);
+				Ply.ShowHint($"<color=yellow>There are no bodies nearby</color>",3);
 				return false;
 			}
 
@@ -47,7 +47,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 			{
 				if (patient.IsAlive)
 				{
-					Ply.ShowCenterDownHint($"<color=yellow>This person is already alive</color>",3);
+					Ply.ShowHint($"<color=yellow>This person is already alive</color>",3);
 					return false;
 				}
 
@@ -61,7 +61,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 					patient.Position = pos + Vector3.up*1.6f;
 					patient.Broadcast(7, $"<size=60><b><i>You have been revived by an <color=army_green>Chaos Medic</color>!</i></b></size>");
 					
-					Ply.ShowCenterDownHint($"<color=yellow>Revived Patient!</color>",3);
+					Ply.ShowHint($"<color=yellow>Revived Patient!</color>",3);
 				});
 
 				NetworkServer.Destroy(doll.GameObject);
@@ -69,7 +69,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 			}
 			else
 			{
-				Ply.ShowCenterDownHint($"<color=yellow>This is an unrevivable body</color>",3);
+				Ply.ShowHint($"<color=yellow>This is an unrevivable body</color>",3);
 				NetworkServer.Destroy(doll.GameObject);
 				return false;
 			}

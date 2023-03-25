@@ -24,7 +24,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 
             if (colliders.Count == 0)
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>There are no bodies nearby</color>",3);
+	            Ply.ShowHint($"<color=yellow>There are no bodies nearby</color>",3);
             	return false;
             }
 
@@ -64,7 +64,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	            Ply.AddItem(ItemType.KeycardO5);
             }
             
-            Ply.ShowCenterDownHint($"<color=yellow>Body Cleaned!</color>",3);
+            Ply.ShowHint($"<color=yellow>Body Cleaned!</color>",3);
             NetworkServer.Destroy(doll.GameObject);
             return true;
         }

@@ -72,8 +72,6 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.DroppingAmmo += Handler.OnDroppingAmmo;
 			Exiled.Events.Handlers.Player.Hurting += Handler.OnHurting;
 			Exiled.Events.Handlers.Player.Shooting += Handler.OnShooting;
-			Exiled.Events.Handlers.Player.IssuingMute += Handler.OnMute;
-			Exiled.Events.Handlers.Player.IntercomSpeaking += Handler.OnIntercomMute;
 			Exiled.Events.Handlers.Player.UsedItem += Handler.OnMedicalItemDequipped;
 			Exiled.Events.Handlers.Player.ChangingItem += Handler.ChangingItem;
 			Exiled.Events.Handlers.Player.EnteringPocketDimension += Handler.OnEnterPocketDimension;
@@ -97,9 +95,7 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Warhead.Detonated += Handler.OnWarheadDetonated;
 			Exiled.Events.Handlers.Scp914.Activating += Handler.OnActivating914;
 			Exiled.Events.Handlers.Player.FlippingCoin += Handler.OnCoinFlip;
-			Exiled.Events.Handlers.Player.PreAuthenticating += Handler.OnPreAuthenticating;
 			Exiled.Events.Handlers.Player.ProcessingHotkey += Handler.OnHotkey;
-			Exiled.Events.Handlers.Map.ExplodingGrenade += Handler.OnExplodingGrenade;
 			Exiled.Events.Handlers.Warhead.Starting += Handler.OnStartingWarhead;
 			Exiled.Events.Handlers.Warhead.Stopping += Handler.OnStoppingWarhead;
 			Exiled.Events.Handlers.Player.Handcuffing += Handler.OnHandcuff;
@@ -178,8 +174,6 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.DroppingAmmo -= Handler.OnDroppingAmmo;
 			Exiled.Events.Handlers.Player.Hurting -= Handler.OnHurting;
 			Exiled.Events.Handlers.Player.Shooting -= Handler.OnShooting;
-			Exiled.Events.Handlers.Player.IssuingMute -= Handler.OnMute;
-			Exiled.Events.Handlers.Player.IntercomSpeaking -= Handler.OnIntercomMute;
 			Exiled.Events.Handlers.Player.UsedItem -= Handler.OnMedicalItemDequipped;
 			Exiled.Events.Handlers.Player.ChangingItem -= Handler.ChangingItem;
 			Exiled.Events.Handlers.Player.EnteringPocketDimension -= Handler.OnEnterPocketDimension;
@@ -202,9 +196,7 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Map.Decontaminating -= Handler.OnDecontaminating;
 			Exiled.Events.Handlers.Warhead.Detonated -= Handler.OnWarheadDetonated;
 			Exiled.Events.Handlers.Player.FlippingCoin -= Handler.OnCoinFlip;
-			Exiled.Events.Handlers.Player.PreAuthenticating -= Handler.OnPreAuthenticating;
 			Exiled.Events.Handlers.Player.ProcessingHotkey -= Handler.OnHotkey;
-			Exiled.Events.Handlers.Map.ExplodingGrenade -= Handler.OnExplodingGrenade;
 			Exiled.Events.Handlers.Warhead.Starting -= Handler.OnStartingWarhead;
 			Exiled.Events.Handlers.Warhead.Stopping -= Handler.OnStoppingWarhead;
 			Exiled.Events.Handlers.Player.Handcuffing -= Handler.OnHandcuff;

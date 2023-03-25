@@ -2,6 +2,7 @@
 using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
+using PlayerRoles;
 
 namespace PlayhousePlugin.Commands
 {
@@ -41,7 +42,7 @@ namespace PlayhousePlugin.Commands
 
 					foreach (Player Plyr in Player.List)
 					{
-						if (Plyr.Role.Type == RoleType.Spectator || Ply.Role.Type == RoleType.None)
+						if (Plyr.Role.Type == RoleTypeId.Spectator || Ply.Role.Type == RoleTypeId.None)
 							continue;
 
 						Plyr.Position = Ply.Position;

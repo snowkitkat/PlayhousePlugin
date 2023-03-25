@@ -19,7 +19,7 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
                 }
             }
 
-            Ply.ShowCenterDownHint($"<color=yellow>ACHOO!</color>",3);
+            Ply.ShowHint($"<color=yellow>ACHOO!</color>",3);
             return true;
         }
 

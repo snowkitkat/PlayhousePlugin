@@ -88,17 +88,17 @@ namespace PlayhousePlugin.CustomClass
                     if (chance <= 20)
                     {
                         Ply.AddItem(specialItems[EventHandler.random.Next(specialItems.Count)]);
-                        Ply.ShowCenterDownHint($"<color=yellow>Special Item Generated!</color>", 3);
+                        Ply.ShowHint($"<color=yellow>Special Item Generated!</color>", 3);
                     }
                     else
                     {
                         Ply.AddItem(ItemType.GrenadeHE);
-                        Ply.ShowCenterDownHint($"<color=yellow>Explosive Item Generated!</color>", 3);
+                        Ply.ShowHint($"<color=yellow>Explosive Item Generated!</color>", 3);
                     }
                 }
                 else
                 {
-                    Ply.ShowCenterDownHint($"<color=yellow>You would have regenerated an item here, but your inventory is full.</color>", 4);
+                    Ply.ShowHint($"<color=yellow>You would have regenerated an item here, but your inventory is full.</color>", 4);
                 }
             }
         }

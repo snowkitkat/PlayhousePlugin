@@ -35,9 +35,6 @@ using InventorySystem.Items.ThrowableProjectiles;
 using Mirror.LiteNetLib4Mirror;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Usables.Scp330;
-using Kognity.DB.Account;
-using Kognity.DB.Account.Components;
-using Kognity.DB.Common.Cache;
 using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
 using PlayerRoles;
@@ -50,16 +47,19 @@ using PlayhousePlugin.CustomClass;
 using PlayhousePlugin.CustomClass.Abilities;
 using PlayhousePlugin.CustomClass.SCP;
 using PlayhousePlugin.CustomClass.SCP_Abilities;
-using PlayhousePlugin.CustomGameMode;
+using PluginAPI.Core.Items;
+using Steamworks.ServerList;
 using Unity.Mathematics;
 using UnityEngine.Networking.PlayerConnection;
 using WebSocketSharp;
 using Cassie = Exiled.API.Features.Cassie;
 using Log = Exiled.API.Features.Log;
 using Map = Exiled.API.Features.Map;
+using MessageEventArgs = UnityEngine.Networking.PlayerConnection.MessageEventArgs;
 using Player = Exiled.API.Features.Player;
 using Server = Exiled.API.Features.Server;
 using Warhead = Exiled.API.Features.Warhead;
+using WebSocket = WebSocketSharp.WebSocket;
 
 namespace PlayhousePlugin
 {
@@ -204,10 +204,10 @@ namespace PlayhousePlugin
 			Log.Error((object)e.Message);
 		}
 
-		private void Ws_OnMessage(object sender, MessageEventArgs e)
+		private void Ws_OnMessage(object sender, WebSocketSharp.MessageEventArgs messageEventArgs)
 		{
 			Log.Info("EEEEEEEEEEEEEEEEEEEE");
-			Log.Info(e.playerId);
+			Log.Info((object)e.playerId);
 		}
 
 		public void MapDonatorToObjects()
@@ -265,25 +265,12 @@ namespace PlayhousePlugin
 			{
 				if(IsEventServer)
 					Stopwatch.Stop();
-				
-				// I am aware you can do it with  Server.FriendlyFire but I don't want the server to show up as a friendly fire server in the server list.
 				Server.FriendlyFire = true;
-				foreach (Player Ply in Player.List)
-					Ply.IsFriendlyFireEnabled = true;
-
-				UtilityMethods.CleanupRagdollsAndItems();
+				
 				UtilityMethods.RewardPlayers();
 				
 				RoundActive = false;
-
-				Timing.KillCoroutines(ElevatorController.CoroutineHandle);
 				
-				foreach (var door in Door.List)
-					door.Unlock();
-
-				foreach (var room in Room.List)
-					room.ResetColor();
-
 				if (!IsEventServer)
 				{
 					if (GeneralKills.Count == 0)
@@ -461,19 +448,12 @@ namespace PlayhousePlugin
 			SillySundayEventHandler.ResetToDefaults();
 			SillySundayInfectionController.ResetToDefaults();
 			
-			ObjectivePointController.DestroyObjectives();
-			VendingMachineController.DestroyVendingMachines();
-			Containment106ObjectiveController.DestroyObjectives();
-
 			RoundActive = false;
 			
 			Donator.Donators.Clear();
 			
 			PlayersWithInfiniteDrop.Clear();
-
-			PetFollow.Coroutines.Clear();
-			PetFollow.IDsAndPickups.Clear();
-			PetFollow.Pets.Clear();
+			
 			Hat.KillAllhats();
 
 			SillySunday = false;
@@ -518,86 +498,10 @@ namespace PlayhousePlugin
 
 			DisableBulletHoles.DisableBulletHolesBool = false;
 			WipeRadio = false;
-
-			BreakoutBlitz.SCPKills = 0;
-			BreakoutBlitz.ClassDEscapes = 0;
-			BreakoutBlitz.ScientistEscapes = 0;
-			BreakoutBlitz.PickupsToNotClear.Clear();
 			
 			CustomClassManager.Players.Clear();
 		}
-
-		public void WaitingForPlayers()
-		{
-			Round.IsLocked = true;
-			Server.FriendlyFire = false;
-			List<string> lines = new List<string> { "<color=orange>discord.gg/kognity</color>" };
-			foreach(var line in lines)
-			{
-				SyncUnit mtfUnit = new SyncUnit
-				{
-					SpawnableTeam = (byte)SpawnableTeamType.NineTailedFox,
-					UnitName = line
-				};
-				RespawnManager.Singleton.NamingManager.AllUnitNames.Add(mtfUnit);
-			}
-
-			if (!IsDeathMatchServer)
-			{
-				if(!IsEventServer)
-				{
-					ObjectivePointController.SpawnObjectives();
-					Containment106ObjectiveController.SpawnObjectives();
-				
-					GateAReworkController.Spawn();
-					GateBReworkController.Spawn();
-				}
-				
-				RecyclingBinController.SpawnRecyclingBins();
-				VendingMachineController.SpawnVendingMachines();
-			}
-
-			//if(Server.Port != 7778 && Server.Port != 9999)
-				//Timing.RunCoroutine(UtilityMethods.RaimbowHint());
-
-			if (DateTime.Now.DayOfWeek == 0 && (!IsDeathMatchServer))
-			{
-				SillySunday = true;
-			}
-
-			/*
-			if(Server.Port == deathmatchport)
-			{
-				GameCore.Console.singleton.TypeCommand("/mapeditor load tournament");
-				Timing.CallDelayed(0.5f, () =>
-				{
-					foreach(DoorVariant d in Door.List)
-					{
-						d.ServerChangeLock(DoorLockReason.AdminCommand, true);
-					}
-				});
-			}*/
-			
-			try
-			{
-				MapDonatorToObjects();
-			}
-			catch
-			{
-				SendMessageAsync($"Error parsing donator info!! Server {Server.Port} <@216304765494099969> PING KOG **AAAAAAAAAAAAAAAA**\nhttps://tenor.com/view/turtwig-pokemon-turtwig-scream-scream-aaaa-gif-20526778", true);
-			}
-
-			if (IsDeathMatchServer)
-			{
-				Deathmatch.SetupArenas();
-			}
-
-			GameObject.Find("StartRound").transform.localScale = Vector3.zero;
-			coroutines.Add(Timing.RunCoroutine(UtilityMethods.LobbyTimer()));
-
-			lobby = ObjectSpawner.SpawnSchematic("CustomSpawnerLobby", SpawnPoint, Quaternion.identity);
-		}		
-
+		
 		public void ChangingItem(ChangingItemEventArgs ev)
 		{
 			if(Stunned.Contains(ev.Player))
@@ -628,7 +532,7 @@ namespace PlayhousePlugin
 			{
 				ev.Player.EnableEffect<MovementBoost>(1);
 				ev.Player.ChangeEffectIntensity(EffectType.MovementBoost,  15, 8);
-				ev.Player.ShowCenterDownHint("<color=yellow>+Movement Speed Boost</color>", 4);
+				ev.Player.ShowHint("<color=yellow>+Movement Speed Boost</color>", 4);
 			}
 
 			if (ev.Item.Type == ItemType.Medkit || ev.Item.Type == ItemType.SCP500)
@@ -687,10 +591,10 @@ namespace PlayhousePlugin
 			if (ev.Player.Nickname.IsNullOrEmpty() && ev.Player.UserId.IsNullOrEmpty())
 				return;
 			Log.Info("A");
-			List<Player> RAPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
+			List<Player> raPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
 			Log.Info("B");
 			string modsOnline = "";
-			foreach (Player Ply in RAPermsPlayers)
+			foreach (Player Ply in raPermsPlayers)
 			{
 				modsOnline += $"{Ply.Nickname} ";
 				Log.Info("C");
@@ -725,9 +629,9 @@ namespace PlayhousePlugin
 				return;
 			if (ev.Player.Nickname.IsNullOrEmpty() && ev.Player.UserId.IsNullOrEmpty())
 				return;
-			List<Player> RAPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
+			List<Player> raPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
 			string modsOnline = "";
-			foreach (Player Ply in RAPermsPlayers)
+			foreach (Player Ply in raPermsPlayers)
 			{
 				modsOnline += $"{Ply.Nickname} ";
 			}
@@ -775,32 +679,10 @@ namespace PlayhousePlugin
 			{
 				if (ev.Target.RawUserId == "76561198059742329")
 				{
-					ev.Target.ShowCenterDownHint(CustomNotificationMessages.Tony096Responses.PickRandom(), 5);
+					ev.Target.ShowHint(CustomNotificationMessages.Tony096Responses.PickRandom(), 5);
 				}
 				else
-					ev.Target.ShowCenterDownHint(CustomNotificationMessages.responses096AddTarget.PickRandom(), 5);
-			}
-		}
-
-		public void On106Contain(ContainingEventArgs ev)
-		{
-			if (Containment106ObjectiveController.Allow106Containment)
-			{
-				ev.IsAllowed = true;
-			}
-			else
-			{
-				ev.IsAllowed = false;
-				ev.ButtonPresser.ShowCenterDownHint("<color=yellow>You must first capture the objective to your left!</color>", 5);
-			}
-		}
-
-		public void FemurBreaker(EnteringFemurBreakerEventArgs ev)
-		{
-			IEnumerable<Player> players106 = Player.List.Where(ply => ply.Role.Type == RoleType.Scp106);
-			foreach (Player scp in players106)
-			{
-				scp.ShowCenterDownHint("<color=yellow>You sense death near your containment chambers...</color>", 10);
+					ev.Target.ShowHint(CustomNotificationMessages.responses096AddTarget.PickRandom(), 5);
 			}
 		}
 
@@ -816,31 +698,6 @@ namespace PlayhousePlugin
 				if(ev.Player.CurrentRoom.Zone == ZoneType.HeavyContainment)
 					ev.IsAllowed = false;
 				return;
-			}
-
-			// Tony's dummy thing lmao
-			if (ev.Player.RawUserId == "76561198059742329" && ev.Player.IsHuman && !ev.Door.IsOpen & ev.IsAllowed & UtilityMethods.RandomChance(5))
-			{
-				UtilityMethods.SpawnTempDummy(ev.Player,
-					ev.Player.Position + ev.Player.CameraTransform.forward*3,
-					ev.Player.GameObject.transform.rotation*Quaternion.Euler(0,180f,0),
-					Utils.SCPRoles.PickRandom(),
-					1, 1, 1
-				);
-			}
-
-			// 106's door condition
-			if (ev.Door.Nametag != null && ev.Door.Nametag.Contains("106") && ev.Player.Role.Type != RoleType.Scp079)
-			{
-				if (ev.IsAllowed && Generator.List.Count(x=>x.IsEngaged) >= 2)
-				{
-					ev.IsAllowed = true;
-				}
-				else
-				{
-					ev.IsAllowed = false;
-					ev.Player.ShowCenterDownHint("<color=yellow>2 079 Generators are required to open this door!</color>", 4);
-				}
 			}
 
 			// 939 Door notifications
@@ -865,6 +722,7 @@ namespace PlayhousePlugin
 								InformSCPs(ZoneType.LightContainment, "You sense activity at Checkpoint B");
 							}
 						}
+						
 						//Find 939s in light and notify them
 
 					}
@@ -921,7 +779,7 @@ namespace PlayhousePlugin
 			if (ev.IsAllowed)
 				return;
 			
-			if (ev.Player.Role.Type == RoleType.Scp0492 && (!ev.Door.Base.IsCheckpoint()) && !(ev.Door.Base.NetworkActiveLocks == 1))
+			if (ev.Player.Role.Type == RoleTypeId.Scp0492 && (!ev.Door.Base.IsCheckpoint()) && !(ev.Door.Base.NetworkActiveLocks == 1))
 			{
 				if ((!false && ev.Door.Base.IsConsideredOpen()) || (true && doorNameExt1.GetName.Contains("106")))
 				{
@@ -929,7 +787,7 @@ namespace PlayhousePlugin
 				}
 				int amount = 0;
 				DoorNametagExtension d = doorNameExt1;
-				foreach (Player Ply in Player.List.Where(r => r.Role.Type == RoleType.Scp0492).ToList())
+				foreach (Player Ply in Player.List.Where(r => r.Role.Type == RoleTypeId.Scp0492).ToList())
 				{
 					if (d.GetName == "INTERCOM")
 					{
@@ -954,73 +812,20 @@ namespace PlayhousePlugin
 				}
 				else
 				{
-					ev.Player.ShowCenterDownHint("<color=red> You need at least %amount more zombies to open this door.</color>".Replace("%amount", $"{4 - amount}"), 4);
+					ev.Player.ShowHint("<color=red> You need at least %amount more zombies to open this door.</color>".Replace("%amount", $"{4 - amount}"), 4);
 				}
-			}
-		}
-
-		public void ElevatorInteraction(InteractingElevatorEventArgs ev)
-		{
-			if (IsDeathMatchServer)
-			{
-				ev.IsAllowed = false;
-				return;
-			}
-
-			if (SillySundayEventHandler.NerfWarMode)
-			{
-				ev.IsAllowed = false;
-				return;
-			}
-
-			if (ObjectivePointController.DisableElevators)
-			{
-				ev.IsAllowed = false;
-				ev.Player.ShowCenterDownHint("<color=yellow>Elevators have been disabled due to decontamination</color>");
-				return;
-			}
-				
-			switch (ev.Lift.Type)
-			{
-				case ElevatorType.GateA:
-					InformSCPs(ZoneType.Entrance, "You hear the elevator at Gate A");
-					InformSCPs(ZoneType.Surface, "You hear the elevator at Gate A");
-					break;
-
-				case ElevatorType.GateB:
-					InformSCPs(ZoneType.Entrance, "You hear the elevator at Gate B");
-					InformSCPs(ZoneType.Surface, "You hear the elevator at Gate B");
-					break;
-
-				case ElevatorType.LczA:
-					InformSCPs(ZoneType.LightContainment, "You hear the elevator at Elevator A");
-					InformSCPs(ZoneType.HeavyContainment, "You hear the elevator at Elevator A");
-					break;
-
-				case ElevatorType.LczB:
-					InformSCPs(ZoneType.LightContainment, "You hear the elevator at Elevator B");
-					InformSCPs(ZoneType.HeavyContainment, "You hear the elevator at Elevator B");
-					break;
-
-				case ElevatorType.Nuke:
-					InformSCPs(ZoneType.HeavyContainment, "You hear the elevator at Nuke Silo");
-					break;
-
-				case ElevatorType.Scp049:
-					InformSCPs(ZoneType.HeavyContainment, "You hear the elevator at SCP-049's Chamber");
-					break;
 			}
 		}
 
 		public void InformSCPs(ZoneType Zone, string message)
 		{
-			IEnumerable<Player> SCP939s = Player.List.Where(ply => ply.Role.Type.Is939());
+			IEnumerable<Player> scp939S = Player.List.Where(ply => ply.Role.Type == RoleTypeId.Scp939);
 
-			foreach (Player scp in SCP939s)
+			foreach (Player scp in scp939S)
 			{
 				if (scp.CurrentRoom.Zone == Zone)
 				{
-					scp.ShowCenterDownHint($"<color=yellow>{message}</color>", 2);
+					scp.ShowHint($"<color=yellow>{message}</color>", 2);
 				}
 			}
 		}
@@ -1033,39 +838,11 @@ namespace PlayhousePlugin
 					ev.Player.AddItem(ev.Item.Type);
 			}
 		}
-
-		public void OnDroppingAmmo(DroppingAmmoEventArgs ev)
-		{
-			Timing.RunCoroutine(UtilityMethods.DensifyAmmoBoxes(ev));
-		}
-
-		public void OnHotkey(ProcessingHotkeyEventArgs ev)
-		{
-			if (ev.Player.IsScp && ev.Hotkey != HotkeyButton.PrimaryFirearm)
-				ev.IsAllowed = false;
-			
-			/*
-			if (Server.Port != 7778) return;
-			if (ev.Player.GetEffectActive<Amnesia>())
-			{
-				var items = ev.Player.Items.ToList();
-				items.Remove(ev.Player.CurrentItem);
-				for (int i = 0; i < items.Count; i++)
-				{
-					Item item = items[i];
-					if (item.Type.IsArmor())
-					{
-						items.Remove(item);
-						continue;
-					}
-				}
-			}*/
-		}
-
+		
 		public void OnSpawning(SpawningEventArgs ev)
 		{
 			// Flashlight for juless lmao
-			if (ev.Player.RawUserId == "76561198434926562" && ev.RoleType != RoleType.Scp079)
+			if (ev.Player.RawUserId == "76561198434926562")
 			{
 				Timing.CallDelayed(5f, () =>
 				{
@@ -1074,11 +851,11 @@ namespace PlayhousePlugin
 			}
 			
 			// Tony's coin
-			if (ev.Player.RawUserId == "76561198059742329" && ev.RoleType != RoleType.Scp079)
+			if (ev.Player.RawUserId == "76561198059742329")
 			{
 				Timing.CallDelayed(5f, () =>
 				{
-					ev.Player.ShowCenterUpHint("Tony you've been given coin whether you can use it or not.", 4);
+					ev.Player.ShowHint("Tony you've been given coin whether you can use it or not.", 4);
 					ev.Player.AddItem(ItemType.Coin);
 				});
 			}
@@ -1189,17 +966,6 @@ namespace PlayhousePlugin
 			}*/
 		}
 
-		public void OnPreAuthenticating(PreAuthenticatingEventArgs ev)
-		{
-			if (ev.ServerFull && !ev.IsAllowed)
-			{
-				Donator.GetDonator(ev.UserId.Substring(0, ev.UserId.IndexOf("@")), out Donator donator);
-				if(donator != null)
-					if (donator.IsBooster)
-						ev.IsAllowed = true;
-			}
-		}
-
 		public void OnCoinFlip(FlippingCoinEventArgs ev)
 		{
 			if (!Round.IsStarted)
@@ -1213,47 +979,47 @@ namespace PlayhousePlugin
 
 		public void OnHurting(HurtingEventArgs ev)
 		{
-			if (!ev.Target.IsVerified)
+			if (!ev.Player.IsVerified)
 				return;
 			
-			if (ev.Target.IsGodModeEnabled)
+			if (ev.Player.IsGodModeEnabled)
 				return;
 			
 			ItemType type = ItemType.None;
 			byte TranslationID = 0;
 			
-			if (ev.Handler.Base is ExplosionDamageHandler)
+			if (ev.DamageHandler.Base is ExplosionDamageHandler)
 				type = ItemType.GrenadeHE;
-			else if (ev.Handler.Base is MicroHidDamageHandler)
+			else if (ev.DamageHandler.Base is MicroHidDamageHandler)
 				type = ItemType.MicroHID;
-			else if (ev.Handler.Base is Scp018DamageHandler)
+			else if (ev.DamageHandler.Base is Scp018DamageHandler)
 				type = ItemType.SCP018;
-			else if (ev.Handler.Base is FirearmDamageHandler firearmDamageHandler)
+			else if (ev.DamageHandler.Base is FirearmDamageHandler firearmDamageHandler)
 				type = firearmDamageHandler.WeaponType;
-			else if (ev.Handler.Base is UniversalDamageHandler universalDamageHandler)
+			else if (ev.DamageHandler.Base is UniversalDamageHandler universalDamageHandler)
 				TranslationID = universalDamageHandler.TranslationId;
-			else if (ev.Handler.Base is ScpDamageHandler scpDamageHandler)
+			else if (ev.DamageHandler.Base is ScpDamageHandler scpDamageHandler)
 				TranslationID = scpDamageHandler._translationId;
 
 			// Zombie Infection
-			if (ev.Attacker != null && ev.Attacker.Role.Type == RoleType.Scp0492 && ev.Attacker != ev.Target && TranslationID == DeathTranslations.Zombie.Id)
+			if (ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.Scp0492 && ev.Attacker != ev.Player && TranslationID == DeathTranslations.Zombie.Id)
 			{
-				if (!InfectedPlayers.Contains(ev.Target) && ev.Target.Role.Type != RoleType.Tutorial)
+				if (!InfectedPlayers.Contains(ev.Player) && ev.Player.Role.Type != RoleTypeId.Tutorial)
 				{
-					UtilityMethods.InfectPlayer(ev.Target);
+					UtilityMethods.InfectPlayer(ev.Player);
 				}
 			}
 			
 			// Cuffed protection
-			if (ev.Target.IsCuffed)
+			if (ev.Player.IsCuffed)
 			{
-				if (ev.Attacker != null && ev.Attacker != ev.Target.Cuffer)
+				if (ev.Attacker != null && ev.Attacker != ev.Player.Cuffer)
 				{
-					if (Vector3.Distance(ev.Target.Position, ev.Target.Cuffer.Position) <= 8)
+					if (Vector3.Distance(ev.Player.Position, ev.Player.Cuffer.Position) <= 8)
 					{
 						if (type != ItemType.None)
 						{
-							ev.Attacker.ShowCenterDownHint("<color=yellow>You cannot injure detained players</color>",3);
+							ev.Attacker.ShowHint("<color=yellow>You cannot injure detained players</color>",3);
 							ev.Amount = 0;
 							ev.IsAllowed = false;
 							return;
@@ -1261,87 +1027,12 @@ namespace PlayhousePlugin
 					}
 				}
 			}
-
-			// 096 Trigger for custom rage delay
-			if (ev.Target.Role.Type == RoleType.Scp096 && ev.Handler.Type.IsWeapon() &&
-			    ev.Target.CurrentScp is PlayableScps.Scp096 scp && scp.IsPreWindup && ev.Attacker?.Role.Type != RoleType.Tutorial)
-			{
-				scp.PreWindup(0.1f);
-				scp.Enrage();
-			}
-
-			// 106 Rework stuff
-			if (ev.Target.Role.Type == RoleType.Scp106 || ev.Attacker?.Role.Type == RoleType.Scp106)
-			{
-				// If 106 is taking damage
-				if (ev.Target.Role.Type == RoleType.Scp106)
-				{
-					SCP106CustomClass customClass = (SCP106CustomClass)ev.Target.CustomClassManager().CustomClass;
-					Vanish ability = (Vanish)customClass.ActiveAbilities[0];
-
-					if (TranslationID == DeathTranslations.Scp207.Id && ability.IsVanish)
-					{
-						ev.Amount = 0;
-						ev.IsAllowed = false;
-					}
-					else
-					{
-						if (ability.IsVanish && ev.Target != ev.Attacker)
-						{
-							// If they are NOT in the list they can DO damage
-							if (ev.Attacker?.Id != null &&
-							    !ev.Target.TargetGhostsHashSet.Contains((int) ev.Attacker?.Id))
-							{
-								// Full damage vulnerability
-								if (ev.Handler.Type.IsWeapon(false))
-									ev.Amount *= 5;
-							}
-							else
-							{
-								if (ev.Attacker != null)
-								{
-									ev.IsAllowed = false;
-									ev.Amount = 0;
-								}
-							}
-						}
-						else
-						{
-							// 106's bullet resistance rebalance to 0%
-							if (ev.Target.Role.Type == RoleType.Scp106 && ev.Handler.Type.IsWeapon(false))
-								ev.Amount *= 5f;
-
-							if (!customClass.HasVanished)
-							{
-								customClass.Shield.SustainTime = 20;
-							}
-						}
-					}
-				}
-
-				// If 106 is the attacker
-				if (ev.Attacker?.Role.Type == RoleType.Scp106 && ev.Target != ev.Attacker)
-				{
-					SCP106CustomClass customClass = (SCP106CustomClass)ev.Attacker.CustomClassManager().CustomClass;
-					Vanish ability = (Vanish)customClass.ActiveAbilities[0];
-
-					if (ability.IsVanish)
-					{
-						// If the target is in the ghost list means that 106 CANNOT see him so DONT allow the damage
-						if (ev.Attacker.TargetGhostsHashSet.Contains(ev.Target.Id))
-						{
-							ev.IsAllowed = false;
-							ev.Amount = 0;
-						}
-					}
-				}
-			}
-
+			
 			// Damage tweaks for custom classes
-			if (ev.Target.CustomClassManager().CustomClass?.Name == "NTF Scout" ||
-			    ev.Target.CustomClassManager().CustomClass?.Name == "Chaos Scout" ||
-			    ev.Target.CustomClassManager().CustomClass?.Name == "Chaos Hunter" ||
-			    ev.Target.CustomClassManager().CustomClass?.Name == "NTF Hunter")
+			if (ev.Player.CustomClassManager().CustomClass?.Name == "NTF Scout" ||
+			    ev.Player.CustomClassManager().CustomClass?.Name == "Chaos Scout" ||
+			    ev.Player.CustomClassManager().CustomClass?.Name == "Chaos Hunter" ||
+			    ev.Player.CustomClassManager().CustomClass?.Name == "NTF Hunter")
 			{
 				if (TranslationID == DeathTranslations.Scp207.Id)
 				{
@@ -1358,31 +1049,31 @@ namespace PlayhousePlugin
 				
 				else if (type == ItemType.GunRevolver)
 				{
-					if(ev.Attacker.Role.Team == Team.MTF && (ev.Target.Role.Team != Team.MTF && ev.Target.Role.Team != Team.RSC && ev.Target.Role.Team != Team.TUT && ev.Target.Role.Team != Team.RIP))
-						ev.Target.EnableEffect(EffectType.Burned, 10, false);
+					if(ev.Attacker.Role.Team == Team.FoundationForces && (ev.Player.Role.Team != Team.FoundationForces && ev.Player.Role.Team != Team.Scientists && ev.Player.Role.Team != Team.OtherAlive && ev.Player.Role.Team != Team.Dead))
+						ev.Player.EnableEffect(EffectType.Burned, 10, false);
 					
-					else if(ev.Attacker.Role.Team == Team.CHI && (ev.Target.Role.Team != Team.CHI && ev.Target.Role.Team != Team.CDP && ev.Target.Role.Team != Team.TUT && ev.Target.Role.Team != Team.RIP))
-						ev.Target.EnableEffect(EffectType.Burned, 10, false);
+					else if(ev.Attacker.Role.Team == Team.ChaosInsurgency && (ev.Player.Role.Team != Team.ChaosInsurgency && ev.Player.Role.Team != Team.ClassD && ev.Player.Role.Team != Team.OtherAlive && ev.Player.Role.Team != Team.Dead))
+						ev.Player.EnableEffect(EffectType.Burned, 10, false);
 				}
 			}
 			
-			if(ev.Attacker != null && ev.Attacker.Role.Type == RoleType.NtfCaptain)
+			if(ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.NtfCaptain)
 			{
 				if (ev.Attacker.CustomClassManager().CustomClass?.Name == "NTF Captain")
 				{
 					if(((HotBullets)ev.Attacker.CustomClassManager().CustomClass.ActiveAbilities[0]).IsActive)
-						ev.Target.EnableEffect(EffectType.Burned, 10, false);
+						ev.Player.EnableEffect(EffectType.Burned, 10, false);
 				}
 			}
 			
 			// Zombie overclocking shit
-			if (ev.Target.CustomClassManager().CustomClass?.Name == "Zombie Overclocker" && TranslationID == DeathTranslations.Scp207.Id)
+			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Overclocker" && TranslationID == DeathTranslations.Scp207.Id)
 			{
 				ev.Amount = 18;
 			}
 			
 			// Making Sprinter immune to 207 Damage 
-			if (ev.Target.CustomClassManager().CustomClass?.Name == "Zombie Sprinter")
+			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Sprinter")
 			{
 				if (TranslationID == DeathTranslations.Scp207.Id)
 				{
@@ -1391,7 +1082,7 @@ namespace PlayhousePlugin
 			}
 			
 			// Sprinter's Attack Damage 
-			if (ev.Attacker != null && ev.Target.CustomClassManager().CustomClass?.Name == "Zombie Sprinter" && TranslationID == DeathTranslations.Zombie.Id)
+			if (ev.Attacker != null && ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Sprinter" && TranslationID == DeathTranslations.Zombie.Id)
 			{
 				ev.Amount = 20;
 			}
@@ -1401,13 +1092,13 @@ namespace PlayhousePlugin
 			int damageAmount = 0;
 			if (type == ItemType.GrenadeHE)
 			{
-				if (ev.Target.Role.Type != RoleType.Tutorial && !ev.Target.IsGodModeEnabled)
+				if (ev.Player.Role.Type != RoleTypeId.Tutorial && !ev.Player.IsGodModeEnabled)
 					damageAmount = (int)Math.Ceiling(ev.Amount);
 			}
 			else if (TranslationID == DeathTranslations.Scp049.Id || TranslationID == DeathTranslations.Scp096.Id || TranslationID == DeathTranslations.Scp173.Id)
 			{
-				if (ev.Target.Role.Type != RoleType.Tutorial && !ev.Target.IsGodModeEnabled)
-					damageAmount = (int)Math.Ceiling(ev.Target.Health);
+				if (ev.Player.Role.Type != RoleTypeId.Tutorial && !ev.Player.IsGodModeEnabled)
+					damageAmount = (int)Math.Ceiling(ev.Player.Health);
 			}
 			else if (TranslationID == DeathTranslations.Warhead.Id || 
 			         TranslationID == DeathTranslations.Decontamination.Id || 
@@ -1431,7 +1122,7 @@ namespace PlayhousePlugin
 
 			if (damageAmount == -420)
 			{
-				IEnumerable<Player> player106 = Player.List.Where(ply => ply.Role.Type == RoleType.Scp106);
+				IEnumerable<Player> player106 = Player.List.Where(ply => ply.Role.Type == RoleTypeId.Scp106);
 				foreach (Player ply in player106)
 				{
 					if (!ply.DoNotTrack)
@@ -1440,7 +1131,7 @@ namespace PlayhousePlugin
 						{
 							if (ev.Amount == 999990)
 							{
-								damageDealt[ply] += (int)Math.Ceiling(ev.Target.Health);
+								damageDealt[ply] += (int)Math.Ceiling(ev.Player.Health);
 							}
 							else
 							{
@@ -1451,7 +1142,7 @@ namespace PlayhousePlugin
 						{
 							if (ev.Amount == 999990)
 							{
-								damageDealt.Add(ply, (int)Math.Ceiling(ev.Target.Health));
+								damageDealt.Add(ply, (int)Math.Ceiling(ev.Player.Health));
 							}
 							else
 							{
@@ -1463,7 +1154,7 @@ namespace PlayhousePlugin
 			}
 			else
 			{
-				if (ev.Attacker != null && ev.Target.RawUserId != ev.Attacker.RawUserId)
+				if (ev.Attacker != null && ev.Player.RawUserId != ev.Attacker.RawUserId)
 				{
 					if (!ev.Attacker.DoNotTrack)
 					{
@@ -1514,7 +1205,7 @@ namespace PlayhousePlugin
 							Timing.KillCoroutines(kc.Unfreezer);
 							kc.Competitor = null;
 							Deathmatch.activeMatch[index] = false;
-							kc.King.Role.Type = RoleType.Spectator;
+							kc.King.Role.Set(RoleTypeId.Spectator);
 							kc.King.Broadcast(5, "Your opponent has left and you have been put into spectator.");
 							Log.Info("A2");
 						}
@@ -1549,7 +1240,7 @@ namespace PlayhousePlugin
 							Timing.KillCoroutines(kc.Unfreezer);
 							kc.Competitor = null;
 							Deathmatch.activeMatch[index] = false;
-							kc.King.Role.Type = RoleType.Spectator;
+							kc.King.Role.Set(RoleTypeId.Spectator);
 							kc.King.Broadcast(5, "Your opponent has left and you have been put into spectator.");
 							Log.Info("A4");							
 						}
@@ -1593,9 +1284,9 @@ namespace PlayhousePlugin
 			// Cleans all the ragdolls
 			foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
 			{
-				float y = doll.transform.position.y;
+				float y = doll.Transform.position.y;
 				if (y < 200f && y > -200f)
-					NetworkServer.Destroy(doll.gameObject);
+					NetworkServer.Destroy(doll.GameObject);
 			}
 		}
 
@@ -1620,9 +1311,9 @@ namespace PlayhousePlugin
 				// Cleans all the ragdolls
 				foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
 				{
-					float y = doll.transform.position.y;
+					float y = doll.Transform.position.y;
 					if (y < 500f)
-						NetworkServer.Destroy(doll.gameObject);
+						NetworkServer.Destroy(doll.GameObject);
 				}
 			});
 		}
@@ -1647,17 +1338,6 @@ namespace PlayhousePlugin
 			if(!ev.Player.GameObject.TryGetComponent<PlayhousePluginComponent>(out _))
 				ev.Player.GameObject.AddComponent<PlayhousePluginComponent>();
 
-			Task.Run(async () =>
-			{
-				var ctx = new AccountContext();
-				await ctx.Get(ev.Player.UserId);
-				using (var player = await ctx.Get(ev.Player.UserId))
-				{
-
-					player.GetComponent<EconomyComponent>().Deposit(1);
-				}
-			});
-
 			UtilityMethods.FindAndSetCustomBadge(ev.Player);
 			if (!JoinedPlayers.Contains(ev.Player.RawUserId))
 			{
@@ -1674,7 +1354,7 @@ namespace PlayhousePlugin
 					if (Round.IsStarted || (GameCore.RoundStart.singleton.NetworkTimer <= 1 &&
 					                        GameCore.RoundStart.singleton.NetworkTimer != -2)) return;
 					ev.Player.IsOverwatchEnabled = false;
-					ev.Player.Role.Type = RoleType.Tutorial;
+					ev.Player.Role.Set(RoleTypeId.Tutorial);
 					Scp096.TurnedPlayers.Add(ev.Player);
 				});
 
@@ -1862,7 +1542,7 @@ namespace PlayhousePlugin
 			{
 				ev.Player.ShowCenterDownHint($"<color=yellow>You cannot pickup Music Radios!</color>", 4);
 				ev.IsAllowed = false;
-				ev.Pickup.Locked = false;
+				ev.Pickup.IsLocked = false;
 				ev.Pickup.InUse = false;
 				return;
 			}
@@ -1870,7 +1550,7 @@ namespace PlayhousePlugin
 			{
 				ev.Player.ShowCenterDownHint($"<color=yellow>You cannot pickup Pets!</color>", 4);
 				ev.IsAllowed = false;
-				ev.Pickup.Locked = false;
+				ev.Pickup.IsLocked = false;
 				ev.Pickup.InUse = false;
 				return;
 			}
@@ -1878,7 +1558,7 @@ namespace PlayhousePlugin
 			{
 				ev.Player.ShowCenterDownHint($"<color=yellow> You cannot pickup letters!</color>", 4);
 				ev.IsAllowed = false;
-				ev.Pickup.Locked = false;
+				ev.Pickup.IsLocked = false;
 				ev.Pickup.InUse = false;
 				return;
 			}
@@ -1886,7 +1566,7 @@ namespace PlayhousePlugin
 			{
 				ev.Player.ShowCenterDownHint($"<color=yellow> You cannot pickup dev tools!</color>", 4);
 				ev.IsAllowed = false;
-				ev.Pickup.Locked = false;
+				ev.Pickup.IsLocked = false;
 				ev.Pickup.InUse = false;
 				return;
 			}
@@ -1894,7 +1574,7 @@ namespace PlayhousePlugin
 			if (playerAndSticky.Value == null || playerAndSticky.Key == null) return;
 			ev.Player.ShowCenterDownHint($"<color=yellow> You cannot pickup sticky bombs!</color>", 4);
 			ev.IsAllowed = false;
-			ev.Pickup.Locked = false;
+			ev.Pickup.IsLocked = false;
 			ev.Pickup.InUse = false;
 		}
 		public IEnumerator<float> ServerRestarter()
@@ -2068,7 +1748,7 @@ namespace PlayhousePlugin
 					GuardPlayers.Add(player);
 					Log.Info($"Guard1: {player}");
 				}
-				player.Role.Type = RoleType.None;
+				player.Role.Set(RoleTypeId.None);
 			}
 
 			// ---------------------------------------------------------------------------------------\\
@@ -2224,41 +1904,41 @@ namespace PlayhousePlugin
 			{
 				Timing.CallDelayed(0.1f, () =>
 				{
-					ply.Role.Type = RoleType.ClassD;
+					ply.Role.Set(RoleTypeId.ClassD);
 				});
 			}
 			foreach (Player ply in PlayersToSpawnAsScientist)
 			{
 				Timing.CallDelayed(0.1f, () =>
 				{
-					ply.Role.Type = RoleType.Scientist;
+					ply.Role.Set(RoleTypeId.Scientist);
 				});
 			}
 			foreach (Player ply in PlayersToSpawnAsGuard)
 			{
 				Timing.CallDelayed(0.1f, () =>
 				{
-					ply.Role.Type = RoleType.FacilityGuard;
+					ply.Role.Set(RoleTypeId.FacilityGuard);
 				});
 			}
 
 			// ---------------------------------------------------------------------------------------\\
 
 			// SCP Logic, preventing SCP-079 from spawning if there isn't at least 2 other SCPs
-			List<RoleType> Roles = new List<RoleType>
-				{ RoleType.Scp049, RoleType.Scp096, RoleType.Scp106, RoleType.Scp173, RoleType.Scp93953, RoleType.Scp93989 };
+			List<RoleTypeId> Roles = new List<RoleTypeId>
+				{ RoleTypeId.Scp049, RoleTypeId.Scp096, RoleTypeId.Scp106, RoleTypeId.Scp173, RoleTypeId.Scp939 };
 
 			if (PlayersToSpawnAsSCP.Count > 2)
-				Roles.Add(RoleType.Scp079);
+				Roles.Add(RoleTypeId.Scp079);
 
 			foreach (Player ply in PlayersToSpawnAsSCP)
 			{
-				RoleType role = Roles[random.Next(Roles.Count)];
+				RoleTypeId role = Roles[random.Next(Roles.Count)];
 				Roles.Remove(role);
 
 				Timing.CallDelayed(0.1f, () =>
 				{
-					ply.Role.Type = role;
+					ply.Role.Set(role);
 					ply.Broadcast(10, "<color=yellow><b> Did you know you can swap classes with other SCP's?</b></color> Simply type <color=orange>.scpswap (role number)</color> in your in-game console (not RA) to swap!)");
 				});
 			}
@@ -2322,23 +2002,23 @@ namespace PlayhousePlugin
 		{
 			if (Server.Port == 7777)
 			{
-				SendMessageAsync($"Banned Player on **Server #1**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Issuer.Nickname} ({ev.Issuer.UserId})```", true);
+				SendMessageAsync($"Banned Player on **Server #1**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
 			}
 			else if (Server.Port == 8888)
 			{
-				SendMessageAsync($"Banned Player on **Server #2**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Issuer.Nickname} ({ev.Issuer.UserId})```", true);
+				SendMessageAsync($"Banned Player on **Server #2**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
 			}
 			else if (Server.Port == 9999)
 			{
-				SendMessageAsync($"Banned Player on **Server #3**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Issuer.Nickname} ({ev.Issuer.UserId})```", true);
+				SendMessageAsync($"Banned Player on **Server #3**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
 			}
 			else if (Server.Port == 7778)
 			{
-				SendMessageAsync($"Banned Player on **Dev Server**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Issuer.Nickname} ({ev.Issuer.UserId})```", true);
+				SendMessageAsync($"Banned Player on **Dev Server**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
 			}
 			else
 			{
-				SendMessageAsync($"Banned Player on **Server with port: {Server.Port}**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Issuer.Nickname} ({ev.Issuer.UserId})```", true);
+				SendMessageAsync($"Banned Player on **Server with port: {Server.Port}**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
 			}
 
 		}
@@ -2368,7 +2048,7 @@ namespace PlayhousePlugin
 			{
 				switch (ev.NewRole)
 				{
-					case RoleType.ChaosConscript:
+					case RoleTypeId.ChaosConscript:
 						if (BreakoutBlitz.ClassDEscapes + 1 >= BreakoutBlitz.RequiredClassDEscapes)
 						{
 							Map.ClearBroadcasts();
@@ -2382,8 +2062,8 @@ namespace PlayhousePlugin
 						}
 						break;
 					
-					case RoleType.NtfPrivate:
-					case RoleType.NtfSpecialist:
+					case RoleTypeId.NtfPrivate:
+					case RoleTypeId.NtfSpecialist:
 						if (BreakoutBlitz.ScientistEscapes + 1 >= BreakoutBlitz.RequiredScientistEscapes)
 						{
 							Map.ClearBroadcasts();
@@ -2405,7 +2085,7 @@ namespace PlayhousePlugin
 				
 				switch (ev.NewRole)
 				{
-					case RoleType.NtfSpecialist:
+					case RoleTypeId.NtfSpecialist:
 						switch (random.Next(6))
 						{
 							case 0:
@@ -2429,7 +2109,7 @@ namespace PlayhousePlugin
 						}
 						break;
 
-					case RoleType.NtfPrivate:
+					case RoleTypeId.NtfPrivate:
 						switch (random.Next(6))
 						{
 							case 0:
@@ -2453,7 +2133,7 @@ namespace PlayhousePlugin
 						}
 						break;
 				
-					case RoleType.ChaosConscript:
+					case RoleTypeId.ChaosConscript:
 						switch (random.Next(6))
 						{
 							case 0:
@@ -2482,32 +2162,32 @@ namespace PlayhousePlugin
 
 		public void OnDying(DyingEventArgs ev)
 		{
-			if (ev.Target.CustomClassManager().CustomClass?.Name == "Zombie Boomer" && (ev.Handler.Base is FirearmDamageHandler || ev.Handler.Base is ExplosionDamageHandler))
+			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Boomer" && (ev.DamageHandler.Base is FirearmDamageHandler || ev.DamageHandler.Base is ExplosionDamageHandler))
 			{
-				UtilityMethods.FakeExplode(ev.Target);
-				Timing.RunCoroutine(PassiveAbilities.ToxicZone(ev.Target));
+				UtilityMethods.FakeExplode(ev.Player);
+				Timing.RunCoroutine(PassiveAbilities.ToxicZone(ev.Player));
 			}
 
 			if (SillySundayEventHandler.instantRevive)
 			{
-				if (ev.Killer != null && ev.Killer.Role.Type == RoleType.Scp049 && ev.Target != ev.Killer)
+				if (ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.Scp049 && ev.Player != ev.Attacker)
 				{
-					ev.Target.Role.Type = RoleType.Scp0492;
+					ev.Player.Role.Set(RoleTypeId.Scp0492);
 					Timing.CallDelayed(0.5f, () =>
 					{
-						ev.Target.Position = ev.Killer.Position;
+						ev.Player.Position = ev.Attacker.Position;
 					});
 				}
 			}
 			if (SillySundayEventHandler.slaughterhouse)
 			{
-				Vector3 DeathPosition = ev.Target.Position;
-				ev.Target.Broadcast(10, "<i>Respawning in 10 seconds...</i>");
+				Vector3 DeathPosition = ev.Player.Position;
+				ev.Player.Broadcast(10, "<i>Respawning in 10 seconds...</i>");
 				Timing.CallDelayed(10, () =>
 				{
-					ev.Target.ClearBroadcasts();
-					ev.Target.Role.Type = RoleType.ChaosConscript;
-					ev.Target.ClearInventory();
+					ev.Player.ClearBroadcasts();
+					ev.Player.Role.Set(RoleTypeId.ChaosConscript);
+					ev.Player.ClearInventory();
 					/*
 					ev.Target.AddItem(ItemType.GunLogicer);
 					ev.Target.AddItem(ItemType.Medkit);
@@ -2515,24 +2195,17 @@ namespace PlayhousePlugin
 					ev.Target.AddItem(ItemType.KeycardChaosInsurgency);
 					ev.Target.Ammo[ItemType.Ammo762x39] = 450;
 					*/
-					ev.Target.Broadcast(6, "<color=yellow><i>Welcome back...</i>\n<b>Kill the Scientists.</b></color>");
+					ev.Player.Broadcast(6, "<color=yellow><i>Welcome back...</i>\n<b>Kill the Scientists.</b></color>");
 					Timing.CallDelayed(0.5f, () =>
 					{
-						ev.Target.Position = DeathPosition;
+						ev.Player.Position = DeathPosition;
 					});
 				});
 			}
 
-			if (ev.Killer?.Role.Type == RoleType.Scp106)
-			{
-				ev.Target.ClearInventory();
-				PlayerManager.hostHub.characterClassManager.RpcPlaceBlood(ev.Target.ReferenceHub.transform.position, 1, 1);
-				DeletePlayerRagdoll.Add(ev.Target);
-			}
-
 			if (IsEventServer)
 			{
-				if (ev.Killer?.Role.Team == Team.SCP && ev.Killer != ev.Target)
+				if (ev.Attacker?.Role.Team == Team.SCPs && ev.Attacker != ev.Player)
 				{
 					if (BreakoutBlitz.SCPKills + 1 >= BreakoutBlitz.RequiredSCPKills)
 					{
@@ -2547,10 +2220,10 @@ namespace PlayhousePlugin
 					}
 				}
 
-				switch (ev.Target.Role.Team)
+				switch (ev.Player.Role.Team)
 				{
-					case Team.CHI:
-					case Team.CDP:
+					case Team.ChaosInsurgency:
+					case Team.ClassD:
 						if (Stopwatch.ElapsedMilliseconds >= 600000)
 						{
 							if (UtilityMethods.RandomChance(3))
@@ -2559,7 +2232,7 @@ namespace PlayhousePlugin
 								{
 									if (!RoundActive)
 										return;
-									ev.Target.SetRole(RoleType.ChaosRifleman);
+									ev.Player.Role.Set(RoleTypeId.ChaosRifleman);
 								});
 
 								/*
@@ -2596,21 +2269,21 @@ namespace PlayhousePlugin
 								{
 									if (!RoundActive)
 										return;
-									ev.Target.SetRole(RoleType.ClassD);
+									ev.Player.Role.Set(RoleTypeId.ClassD);
 								});
 								
 								Timing.CallDelayed(12, () =>
 								{
 									if (!RoundActive)
 										return;
-									ev.Target.Position = RoleType.Scientist.GetRandomSpawnProperties()
-										.Item1;
+									ev.Player.Position = RoleTypeId.Scientist.GetRandomSpawnLocation()
+										.Position;
 									
 									if (UtilityMethods.RandomChance(2))
-										ev.Target.AddItem(ItemType.KeycardJanitor);
+										ev.Player.AddItem(ItemType.KeycardJanitor);
 								
 									if (UtilityMethods.RandomChance(5))
-										ev.Target.AddItem(ItemType.GunCOM15);
+										ev.Player.AddItem(ItemType.GunCOM15);
 								});
 							}
 						}
@@ -2620,28 +2293,28 @@ namespace PlayhousePlugin
 							{
 								if (!RoundActive)
 									return;
-								ev.Target.SetRole(RoleType.ClassD);
+								ev.Player.Role.Set(RoleTypeId.ClassD);
 							});
 							
 							Timing.CallDelayed(12, () =>
 							{
 								if (!RoundActive)
 									return;
-								ev.Target.Position = RoleType.Scientist.GetRandomSpawnProperties()
-									.Item1;
+								ev.Player.Position = RoleTypeId.Scientist.GetRandomSpawnLocation()
+									.Position;
 
 								if (UtilityMethods.RandomChance(2))
-									ev.Target.AddItem(ItemType.KeycardJanitor);
+									ev.Player.AddItem(ItemType.KeycardJanitor);
 								
 								if (UtilityMethods.RandomChance(5))
-									ev.Target.AddItem(ItemType.GunCOM15);
+									ev.Player.AddItem(ItemType.GunCOM15);
 							});
 						}
-						ev.Target.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
+						ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
 						break;
 					
-					case Team.MTF:
-					case Team.RSC:
+					case Team.FoundationForces:
+					case Team.Scientists:
 						if (Stopwatch.ElapsedMilliseconds >= 600000)
 						{
 							if (UtilityMethods.RandomChance(3))
@@ -2651,7 +2324,7 @@ namespace PlayhousePlugin
 								
 								Timing.CallDelayed(10, () =>
 								{
-									ev.Target.SetRole(RoleType.NtfSergeant);
+									ev.Player.Role.Set(RoleTypeId.NtfSergeant);
 									
 								});
 
@@ -2691,9 +2364,9 @@ namespace PlayhousePlugin
 										return;
 									
 									if (UtilityMethods.RandomChance(2))
-										ev.Target.SetRole(RoleType.Scientist);
+										ev.Player.Role.Set(RoleTypeId.Scientist);
 									else
-										ev.Target.SetRole(RoleType.FacilityGuard);
+										ev.Player.Role.Set(RoleTypeId.FacilityGuard);
 								});
 							}
 						}
@@ -2705,34 +2378,34 @@ namespace PlayhousePlugin
 									return;
 									
 								if (UtilityMethods.RandomChance(2))
-									ev.Target.SetRole(RoleType.Scientist);
+									ev.Player.Role.Set(RoleTypeId.Scientist);
 								else
-									ev.Target.SetRole(RoleType.FacilityGuard);
+									ev.Player.Role.Set(RoleTypeId.FacilityGuard);
 							});
 						}
-						ev.Target.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
+						ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
 						break;
 					
-					case Team.SCP:
-						RoleType role = ev.Target.Role.Type;
+					case Team.SCPs:
+						RoleTypeId role = ev.Player.Role.Type;
 
 						Timing.CallDelayed(10, () =>
 						{
-							ev.Target.SetRole(role);
+							ev.Player.Role.Set(role);
 						});
 						
 						Timing.CallDelayed(13, () =>
 						{
-							ev.Target.Health /= 5;
-							ev.Target.MaxHealth /= 5;
+							ev.Player.Health /= 5;
+							ev.Player.MaxHealth /= 5;
 						});
 						
-						ev.Target.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
+						ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
 						break;
 				}
 			}
 
-			if (ev.Killer != null && RecentlyUncuffed.Contains(ev.Target.Id) && (ev.Killer.Role.Team != Team.SCP && ev.Target != ev.Killer))
+			if (ev.Attacker != null && RecentlyUncuffed.Contains(ev.Player.Id) && (ev.Attacker.Role.Team != Team.SCPs && ev.Player != ev.Attacker))
 			{
 				List<Player> RAPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
 				string modsOnline = "";
@@ -2747,27 +2420,27 @@ namespace PlayhousePlugin
 				}
 				if (Server.Port == 7777)
 				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #1**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Target.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Target.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Target.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #1**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
 				}
 				else if (Server.Port == 8888)
 				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #2**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Target.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Target.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Target.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #2**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
 				}
 				else if (Server.Port == 9999)
 				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #3**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Target.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Target.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Target.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #3**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
 				}
 				else if (Server.Port == 7778)
 				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Dev Server**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Target.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Target.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Target.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Dev Server**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
 				}
 				else
 				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server with port: {Server.Port}**:\n```Killer:{ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Target.Id]).Nickname}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server with port: {Server.Port}**:\n```Killer:{ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname}\nMods Online: {modsOnline}```", true);
 				}
 			}
 
-			if (ev.Killer != null && ev.Target.IsCuffed && ev.Killer.Role.Team != Team.SCP && ev.Target != ev.Killer)
+			if (ev.Attacker != null && ev.Attacker != null && ev.Player.IsCuffed && ev.Attacker.Role.Team != Team.SCPs && ev.Player != ev.Attacker)
 			{
 				List<Player> RAPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
 				string modsOnline = "";
@@ -2776,46 +2449,38 @@ namespace PlayhousePlugin
 					if (Ply.RankName.Contains("Moderator") || Ply.RankName.Contains("Admin") || Ply.RawUserId == "kognity")
 					{
 						Ply.Broadcast(10,
-							$"{ev.Killer.Nickname} as {ev.Killer.Role.Type.ToString()} killed {ev.Target.Nickname} as {ev.Target.Role.Type.ToString()} detained by {ev.Target.Cuffer.Nickname}",
+							$"{ev.Attacker.Nickname} as {ev.Attacker.Role.Type.ToString()} killed {ev.Player.Nickname} as {ev.Player.Role.Type.ToString()} detained by {ev.Player.Cuffer.Nickname}",
 							Broadcast.BroadcastFlags.AdminChat);
 						modsOnline += $"{Ply.Nickname} ";
 					}
 				}
 				if (Server.Port == 7777)
 				{
-					SendMessageAsync($"Detained Kill on **Server #1**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nDetainer: {ev.Target.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Detained Kill on **Server #1**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
 				}
 				else if (Server.Port == 8888)
 				{
-					SendMessageAsync($"Detained Kill on **Server #2**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nDetainer: {ev.Target.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Detained Kill on **Server #2**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
 				}
 				else if (Server.Port == 9999)
 				{
-					SendMessageAsync($"Detained Kill on **Server #3**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nDetainer: {ev.Target.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Detained Kill on **Server #3**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
 				}
 				else if (Server.Port == 7778)
 				{
-					SendMessageAsync($"Detained Kill on **Dev Server**:\n```Killer: {ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nDetainer: {ev.Target.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Detained Kill on **Dev Server**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
 				}
 				else
 				{
-					SendMessageAsync($"Detained Kill on **Server with port: {Server.Port}**:\n```Killer:{ev.Killer.Nickname} ({ev.Killer.UserId}) as {ev.Killer.Role.Type.ToString()}\nDetained Victim: {ev.Target.Nickname} ({ev.Target.UserId}) as {ev.Target.Role.Type.ToString()}\nDetainer: {ev.Target.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
+					SendMessageAsync($"Detained Kill on **Server with port: {Server.Port}**:\n```Killer:{ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
 				}
 			}
 		}
-
-		public void OnExplodingGrenade(ExplodingGrenadeEventArgs ev)
-		{
-			if (GrenadesToFake.Contains(ev.Grenade))
-			{
-				ev.IsAllowed = false;
-				GrenadesToFake.Remove(ev.Grenade);
-			}
-		}
+		
 
 		public void OnHandcuff(HandcuffingEventArgs ev)
 		{
-			if (ev.Target.Role.Type == RoleType.Tutorial)
+			if (ev.Target.Role.Type == RoleTypeId.Tutorial)
 			{
 				ev.IsAllowed = false;
 				return;
@@ -2829,8 +2494,8 @@ namespace PlayhousePlugin
 				if (!RecentlyUncuffed.Contains(ev.Target.Id))
 					RecentlyUncuffed.Add(ev.Target.Id);
 
-				if (!RecentlyUncuffer.ContainsKey(ev.Cuffer.Id))
-					RecentlyUncuffer.Add(ev.Target.Id, ev.Cuffer.Id);
+				if (!RecentlyUncuffer.ContainsKey(ev.Player.Id))
+					RecentlyUncuffer.Add(ev.Target.Id, ev.Player.Id);
 
 				Timing.CallDelayed(5, () =>
 				{
@@ -2853,9 +2518,9 @@ namespace PlayhousePlugin
 			{
 				Timing.CallDelayed(0.5f, () =>
 				{
-					RoleType[] scp_list = new RoleType[] { RoleType.Scp096, RoleType.Scp106, RoleType.Scp173, RoleType.Scp93953, RoleType.Scp93989 };
+					RoleTypeId[] scp_list = new RoleTypeId[] { RoleTypeId.Scp096, RoleTypeId.Scp106, RoleTypeId.Scp173, RoleTypeId.Scp939 };
 					int random_scp = random.Next(5);
-					ev.Target.Role.Type = scp_list[random_scp];
+					ev.Target.Role.Set(scp_list[random_scp]);
 					Timing.CallDelayed(0.5f, () =>
 					{
 						ev.Target.Position = ev.Scp049.Position;
@@ -2880,9 +2545,9 @@ namespace PlayhousePlugin
 
 		public void OnShooting(ShootingEventArgs ev)
 		{
-			if(ev.Shooter.CustomClassManager().CustomClass?.Name == "NTF Containment Specialist" || ev.Shooter.CustomClassManager().CustomClass?.Name == "Chaos Containment Specialist")
+			if(ev.Player.CustomClassManager().CustomClass?.Name == "NTF Containment Specialist" || ev.Player.CustomClassManager().CustomClass?.Name == "Chaos Containment Specialist")
 			{
-				if (ev.Shooter.CurrentItem.Type == ItemType.GunRevolver)
+				if (ev.Player.CurrentItem.Type == ItemType.GunRevolver)
 				{
 					// Tracer
 					var circle = UnityEngine.Object.Instantiate(Utils.PrimitiveBaseObject);
@@ -2893,8 +2558,8 @@ namespace PlayhousePlugin
 
 					Vector3 point;
 					if (Physics.Raycast(
-						    ev.Shooter.CameraTransform.position + ev.Shooter.CameraTransform.forward * 0.5f,
-						    ev.Shooter.CameraTransform.forward,
+						    ev.Player.CameraTransform.position + ev.Player.CameraTransform.forward * 0.5f,
+						    ev.Player.CameraTransform.forward,
 						    out RaycastHit hit,
 						    500,
 						    LayerMask.GetMask("Default", "Hitbox", "Glass", "CCTV", "Door", "Locker")))
@@ -2903,13 +2568,13 @@ namespace PlayhousePlugin
 					}
 					else
 					{
-						point = ev.Shooter.CameraTransform.position + ev.Shooter.CameraTransform.forward * 500;
+						point = ev.Player.CameraTransform.position + ev.Player.CameraTransform.forward * 500;
 					}
 
-					var origin = ev.Shooter.CameraTransform.position + Vector3.down * 0.1f +
-					             ev.Shooter.CameraTransform.right * 0.2f;
+					var origin = ev.Player.CameraTransform.position + Vector3.down * 0.1f +
+					             ev.Player.CameraTransform.right * 0.2f;
 
-					Vector3 pos = ev.Shooter.CameraTransform.position;
+					Vector3 pos = ev.Player.CameraTransform.position;
 
 					Timing.CallDelayed(0.1f, () =>
 					{
@@ -2926,11 +2591,12 @@ namespace PlayhousePlugin
 					});
 					
 					// Recoil
-					var pos1 = ev.Shooter.CameraTransform.position + ev.Shooter.CameraTransform.forward +
+					var pos1 = ev.Player.CameraTransform.position + ev.Player.CameraTransform.forward +
 					          Vector3.up * 0.3f;
 					
-					ev.Shooter.CameraTransform.LookAt(pos1);
-					ev.Shooter.Rotation = new Vector2(0f - ev.Shooter.CameraTransform.eulerAngles.x, ev.Shooter.CameraTransform.eulerAngles.y);
+					ev.Player.CameraTransform.LookAt(pos1);
+					var eulerAngles = ev.Player.CameraTransform.eulerAngles;
+					ev.Player.Rotation = new Vector2(0f - eulerAngles.x, eulerAngles.y);
 				}
 			}
 
@@ -2938,7 +2604,7 @@ namespace PlayhousePlugin
 			// 106 stuff
 			if (p != null)
 			{
-				if (p.Role.Type == RoleType.Scp106)
+				if (p.Role.Type == RoleTypeId.Scp106)
 				{
 					SCP106CustomClass customClass = (SCP106CustomClass) p.CustomClassManager().CustomClass;
 					Vanish ability = (Vanish) customClass.ActiveAbilities[0];
@@ -2946,7 +2612,7 @@ namespace PlayhousePlugin
 					if (ability.IsVanish)
 					{
 						// If they are NOT in the list they can DO damage
-						if (!p.TargetGhostsHashSet.Contains(ev.Shooter.Id) && !ev.Shooter.TargetGhostsHashSet.Contains(p.Id))
+						if (!p.TargetGhostsHashSet.Contains(ev.Player.Id) && !ev.Player.TargetGhostsHashSet.Contains(p.Id))
 						{
 							ev.IsAllowed = true;
 						}
@@ -2994,36 +2660,36 @@ namespace PlayhousePlugin
 				var item = (Item)Item.Create(ev.Shooter.CurrentItem.Type).Spawn(ev.Shooter.CameraTransform.position);
 				item.Base.Rb.velocity = ev.Shooter.CameraTransform.forward * 10;
 			}*/
-			if (ContentGun.ContainsKey(ev.Shooter))
+			if (ContentGun.ContainsKey(ev.Player))
 			{
-				if (ContentGun[ev.Shooter].First > ContentGun[ev.Shooter].Second)
+				if (ContentGun[ev.Player].First > ContentGun[ev.Player].Second)
 				{
 					ev.IsAllowed = false;
 
-					ContentGun[ev.Shooter].Second += 1;
+					ContentGun[ev.Player].Second += 1;
 					
 					var handler = new CustomReasonDamageHandler("Spawned by your nearby patreon supporter :trollface:", float.MaxValue);
-					handler.StartVelocity = ev.Shooter.CameraTransform.forward * 10
-					                        + ev.Shooter.CameraTransform.up;
-					var ragdoll = new Exiled.API.Features.Ragdoll(new RagdollInfo(Exiled.API.Features.Server.Host.ReferenceHub, handler, RoleType.Scientist, ev.Shooter.Position, ev.Shooter.CameraTransform.rotation, "gaming", 1.0));
+					handler.StartVelocity = ev.Player.CameraTransform.forward * 10
+					                        + ev.Player.CameraTransform.up;
+					var ragdoll = new Exiled.API.Features.Ragdoll(new RagdollData(Exiled.API.Features.Server.Host.ReferenceHub, handler, RoleTypeId.Scientist, ev.Player.Position, ev.Player.CameraTransform.rotation, "gaming", 1.0));
 					ragdoll.Scale = new Vector3(UnityEngine.Random.Range(0.25f, 6), UnityEngine.Random.Range(0.25f, 6), UnityEngine.Random.Range(0.25f, 6));
 					
 					ragdoll.Spawn();
 
 					Timing.CallDelayed(8f, () =>
 					{
-						ragdoll.Delete();
+						ragdoll.Destroy();
 					});
 
-					ev.Shooter.ShowCenterDownHint($"<color=blue>{ContentGun[ev.Shooter].First - ContentGun[ev.Shooter].Second} ragdolls left</color>",1);
+					ev.Player.ShowCenterDownHint($"<color=blue>{ContentGun[ev.Player].First - ContentGun[ev.Player].Second} ragdolls left</color>",1);
 				}
 				else
 				{
-					if (ContentGun[ev.Shooter].First != -1)
+					if (ContentGun[ev.Player].First != -1)
 					{
-						ev.Shooter.Broadcast(5, "<i>You have run out of content gun rounds!</i>");
-						ContentGun[ev.Shooter].First = -1;
-						ContentGun[ev.Shooter].Second = -1;
+						ev.Player.Broadcast(5, "<i>You have run out of content gun rounds!</i>");
+						ContentGun[ev.Player].First = -1;
+						ContentGun[ev.Player].Second = -1;
 					}
 				}
 			}
@@ -3072,60 +2738,55 @@ namespace PlayhousePlugin
 
 		public void OnSetClass(ChangingRoleEventArgs ev)
 		{
-			ev.Player.IsGodModeEnabled = ev.NewRole == RoleType.Tutorial;
+			ev.Player.IsGodModeEnabled = ev.NewRole == RoleTypeId.Tutorial;
 			
-			if(ev.NewRole != RoleType.Tutorial && ev.Player.Role.Type != RoleType.Tutorial)
+			if(ev.NewRole != RoleTypeId.Tutorial && ev.Player.Role.Type != RoleTypeId.Tutorial)
 				ev.Player.CustomClassManager().DisposeCustomClass();
 
 			switch (ev.NewRole)
 			{
-				case RoleType.Scp049:
+				case RoleTypeId.Scp049:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP049CustomClass(ev.Player);
 					break;
 				
-				case RoleType.Scp079:
+				case RoleTypeId.Scp079:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP079CustomClass(ev.Player);
 					break;
 				
-				case RoleType.Scp106:
+				case RoleTypeId.Scp106:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP106CustomClass(ev.Player);
 					break;
 				
-				case RoleType.Scp096:
+				case RoleTypeId.Scp096:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP096CustomClass(ev.Player);
 					break;
 				
-				case RoleType.Scp173:
+				case RoleTypeId.Scp173:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP173CustomClass(ev.Player);
 					break;
 				
-				case RoleType.Scp93953:
+				case RoleTypeId.Scp939:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP93953CustomClass(ev.Player);
 					break;
-				
-				case RoleType.Scp93989:
-					ev.Player.CustomClassManager().DisposeCustomClass();
-					ev.Player.CustomClassManager().CustomClass = new SCP93989CustomClass(ev.Player);
-					break;
-				
-				case RoleType.NtfSergeant:
+
+				case RoleTypeId.NtfSergeant:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new NTFSergeant(ev.Player);
 					break;
 				
-				case RoleType.NtfCaptain:
+				case RoleTypeId.NtfCaptain:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new NTFCaptain(ev.Player);
 					break;
 			}
 
-			if (ev.NewRole == RoleType.Scp0492 && SillySunday)
+			if (ev.NewRole == RoleTypeId.Scp0492 && SillySunday)
 			{
 				ev.Player.Broadcast(12, "<b>Type in 'cmdbind f.zfe' in console.\nThen press F to explode!!</b>");
 			}
@@ -3133,12 +2794,12 @@ namespace PlayhousePlugin
 
 		public void OnDied(DiedEventArgs ev)
 		{
-			if (!ev.Target.IsVerified)
+			if (!ev.Player.IsVerified)
 				return;
 
 			if (SillySundayEventHandler.ohfiverescuemode)
 			{
-				if(ev.Target == SillySundayEventHandler.OhFivePlayer)
+				if(ev.Player == SillySundayEventHandler.OhFivePlayer)
 				{
 					Map.Broadcast(10, "The 05 has died. Chaos wins! Facility wipe initiated!");
 					Warhead.Start();
@@ -3149,12 +2810,12 @@ namespace PlayhousePlugin
 
 				if (SillySundayEventHandler.ohfivedied)
 				{
-					ev.Target.Broadcast(10, "<i>Respawning in 10 seconds...</i>");
+					ev.Player.Broadcast(10, "<i>Respawning in 10 seconds...</i>");
 					Timing.CallDelayed(10, () =>
 					{
-						ev.Target.ClearBroadcasts();
-						ev.Target.Role.Type = RoleType.ChaosConscript;
-						ev.Target.ClearInventory();
+						ev.Player.ClearBroadcasts();
+						ev.Player.Role.Set(RoleTypeId.ChaosConscript);
+						ev.Player.ClearInventory();
 						/*
 						ev.Target.AddItem(ItemType.GunLogicer);
 						ev.Target.AddItem(ItemType.Medkit);
@@ -3162,40 +2823,40 @@ namespace PlayhousePlugin
 						ev.Target.AddItem(ItemType.KeycardChaosInsurgency);
 						ev.Target.Ammo[ItemType.Ammo762x39] = 450;
 						*/
-						ev.Target.Broadcast(6, "<color=yellow><i>Welcome back...</i>\n<b>Kill the remaining foundation personnel.</b></color>");
+						ev.Player.Broadcast(6, "<color=yellow><i>Welcome back...</i>\n<b>Kill the remaining foundation personnel.</b></color>");
 					});
 				}
 			}
 
 			if (SillySundayInfectionController.InfectionEnabled)
 			{
-				if (ev.Killer.Role.Type == SillySundayInfectionController.InfectedRole)
+				if (ev.Attacker.Role.Type == SillySundayInfectionController.InfectedRole)
 				{
-					ev.Target.Role.Type = ev.Killer.Role.Type;
+					ev.Player.Role.Set(ev.Attacker.Role.Type);
 					Timing.CallDelayed(0.5f, () =>
 					{
-						ev.Target.Position = ev.Killer.Position;
+						ev.Player.Position = ev.Attacker.Position;
 					});
 				}				
 			}
 			
-			if (InfectedPlayers.Contains(ev.Target))
+			if (InfectedPlayers.Contains(ev.Player))
 			{
-				if (ev.Killer != null && ev.Killer != ev.Target) // If its not a suicide
+				if (ev.Attacker != null && ev.Attacker != ev.Player) // If its not a suicide
 				{
-					InfectedPlayers.Remove(ev.Target);
-					Timing.RunCoroutine(ChangeToSCP(ev.Target, ev.Killer, false));
+					InfectedPlayers.Remove(ev.Player);
+					Timing.RunCoroutine(ChangeToSCP(ev.Player, ev.Attacker, false));
 				}
 				else // This was a suicide
 				{
 					// Lets see if 049 is alive
 					foreach (Player Ply in Player.List)
 					{
-						if (Ply.Role.Type == RoleType.Scp049)
+						if (Ply.Role.Type == RoleTypeId.Scp049)
 						{
-							InfectedPlayers.Remove(ev.Target);
+							InfectedPlayers.Remove(ev.Player);
 
-							Timing.RunCoroutine(ChangeToSCP(ev.Target, Ply, false));
+							Timing.RunCoroutine(ChangeToSCP(ev.Player, Ply, false));
 							return;
 						}
 					}
@@ -3203,34 +2864,34 @@ namespace PlayhousePlugin
 					// 049 wasn't alive let's see if ANY zombies are alive
 					foreach (Player Ply in Player.List)
 					{
-						if (Ply.Role.Type == RoleType.Scp0492)
+						if (Ply.Role.Type == RoleTypeId.Scp0492)
 						{
-							InfectedPlayers.Remove(ev.Target);
+							InfectedPlayers.Remove(ev.Player);
 
-							Timing.RunCoroutine(ChangeToSCP(ev.Target, Ply, false));
+							Timing.RunCoroutine(ChangeToSCP(ev.Player, Ply, false));
 							return;
 						}
 					}
 					
 					// Welp no zombies or 049 is alive. Put the poor guy on surface.
-					InfectedPlayers.Remove(ev.Target);
-					Timing.RunCoroutine(ChangeToSCP(ev.Target, ev.Killer, true));
+					InfectedPlayers.Remove(ev.Player);
+					Timing.RunCoroutine(ChangeToSCP(ev.Player, ev.Attacker, true));
 				}
 			}
 
-			if (!DoNotSpawn.Contains(ev.Target.UserId) && ev.Target.IsVerified && ev.Handler.Type == DamageType.Unknown)
+			if (!DoNotSpawn.Contains(ev.Player.UserId) && ev.Player.IsVerified && ev.DamageHandler.Type == DamageType.Unknown)
 			{
-				if (ev.Killer == null || ev.Killer.Role.Team == Team.SCP)
+				if (ev.Attacker == null || ev.Attacker.Role.Team == Team.SCPs)
 				{
-					DoNotSpawn.Add(ev.Target.UserId);
+					DoNotSpawn.Add(ev.Player.UserId);
 				}
 			}
 
 			if (IsDeathMatchServer)
 			{
-				if (ev.Killer != null)
+				if (ev.Attacker != null)
 				{
-					int index = KingAndCompetitor.GetIndex(ev.Killer);
+					int index = KingAndCompetitor.GetIndex(ev.Attacker);
 					var obj = KingAndCompetitor.GetAtIndex(index);
 					Timing.KillCoroutines(obj.StalemateChecker);
 					Timing.KillCoroutines(obj.Unfreezer);
@@ -3243,15 +2904,15 @@ namespace PlayhousePlugin
 						return;
 					}
 
-					if ((KingAndCompetitor.IsKing(ev.Killer) || KingAndCompetitor.IsKing(ev.Target)) && ev.Killer != ev.Target)
+					if ((KingAndCompetitor.IsKing(ev.Attacker) || KingAndCompetitor.IsKing(ev.Player)) && ev.Attacker != ev.Player)
 					{
-						if (Deathmatch.playerAndWins.ContainsKey(ev.Killer.UserId))
+						if (Deathmatch.playerAndWins.ContainsKey(ev.Attacker.UserId))
 						{
-							Deathmatch.playerAndWins[ev.Killer.UserId] += 1;
+							Deathmatch.playerAndWins[ev.Attacker.UserId] += 1;
 						}
 						else
 						{
-							Deathmatch.playerAndWins.Add(ev.Killer.UserId, 1);
+							Deathmatch.playerAndWins.Add(ev.Attacker.UserId, 1);
 						}
 
 						//RespawnEffectsController.ClearQueue();
@@ -3261,33 +2922,33 @@ namespace PlayhousePlugin
 						//ev.Killer.PlayCassieAnnouncement("pitch_0.3 .g5 .g5 .g5", false, false);
 						//ev.Target.PlayCassieAnnouncement("pitch_0.3 .g5 .g5 .g5", false, false);
 
-						ev.Killer.Broadcast(10, $"{ev.Killer.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Killer.UserId]} total wins!");
-						ev.Target.Broadcast(10, $"{ev.Killer.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Killer.UserId]} total wins!");
+						ev.Attacker.Broadcast(10, $"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
+						ev.Player.Broadcast(10, $"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
 
 						// Giving notifications to global players who are not actively playing
 						foreach(Player p in Player.List)
 						{
-							if(p.Role.Type == RoleType.Tutorial || p.Role.Type == RoleType.Spectator && p != ev.Target)
-								p.Broadcast(3, $"{ev.Killer.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Killer.UserId]} total wins!");
+							if(p.Role.Type == RoleTypeId.Tutorial || p.Role.Type == RoleTypeId.Spectator && p != ev.Player)
+								p.Broadcast(3, $"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
 						}
 
-						if (!ev.Killer.DoNotTrack)
+						if (!ev.Attacker.DoNotTrack)
 						{
-							if (dmWins.ContainsKey(ev.Killer))
-								dmWins[ev.Killer] += 1;
+							if (dmWins.ContainsKey(ev.Attacker))
+								dmWins[ev.Attacker] += 1;
 							else
-								dmWins.Add(ev.Killer, 1);
+								dmWins.Add(ev.Attacker, 1);
 						}
-						if (!ev.Target.DoNotTrack)
+						if (!ev.Player.DoNotTrack)
 						{
-							if (dmLosses.ContainsKey(ev.Target))
-								dmLosses[ev.Target] += 1;
+							if (dmLosses.ContainsKey(ev.Player))
+								dmLosses[ev.Player] += 1;
 							else
-								dmLosses.Add(ev.Target, 1);
+								dmLosses.Add(ev.Player, 1);
 						}
 
 						// King lost
-						if (!KingAndCompetitor.IsKing(ev.Killer))
+						if (!KingAndCompetitor.IsKing(ev.Attacker))
 						{
 							Player newKing = obj.Competitor;
 							Player oldKing = obj.King;
@@ -3321,7 +2982,7 @@ namespace PlayhousePlugin
 
 						Timing.CallDelayed(5, () =>
 						{
-							ev.Killer.Role.Type = RoleType.Spectator;
+							ev.Attacker.Role.Set(RoleTypeId.Spectator);
 						});
 
 						Timing.CallDelayed(7, () =>
@@ -3331,57 +2992,57 @@ namespace PlayhousePlugin
 					}
 				}
 			}
-			if (ev.Killer != null && !ev.Killer.DoNotTrack)
+			if (ev.Attacker != null && !ev.Attacker.DoNotTrack)
 			{
-				if (ev.Handler.Base is UniversalDamageHandler universalDamageHandler1)
+				if (ev.DamageHandler.Base is UniversalDamageHandler universalDamageHandler1)
 				{
 					if (universalDamageHandler1.TranslationId == DeathTranslations.PocketDecay.Id)
 					{
-						IEnumerable<Player> player106 = Player.List.Where(ply => ply.Role.Type == RoleType.Scp106);
+						IEnumerable<Player> player106 = Player.List.Where(ply => ply.Role.Type == RoleTypeId.Scp106);
 						foreach (Player ply in player106)
 						{
 							if (!ply.DoNotTrack)
 							{
 								if (damageDealt.ContainsKey(ply))
 								{
-									damageDealt[ply] += (int) Math.Ceiling(ev.Target.Health);
+									damageDealt[ply] += (int) Math.Ceiling(ev.Player.Health);
 								}
 								else
 								{
-									damageDealt.Add(ply, (int) Math.Ceiling(ev.Target.Health));
+									damageDealt.Add(ply, (int) Math.Ceiling(ev.Player.Health));
 								}
 							}
 						}
 					}
 				}
-				if (kills.ContainsKey(ev.Killer))
+				if (kills.ContainsKey(ev.Attacker))
 				{
-					kills[ev.Killer] += 1;
+					kills[ev.Attacker] += 1;
 				}
 				else
 				{
 
-					kills.Add(ev.Killer, 1);
+					kills.Add(ev.Attacker, 1);
 				}
 			}
-			if (!ev.Target.DoNotTrack)
+			if (!ev.Player.DoNotTrack)
 			{
-				if (deaths.ContainsKey(ev.Target))
+				if (deaths.ContainsKey(ev.Player))
 				{
-					deaths[ev.Target] += 1;
+					deaths[ev.Player] += 1;
 				}
 				else
 				{
 
-					deaths.Add(ev.Target, 1);
+					deaths.Add(ev.Player, 1);
 				}
 			}
 
-			if (ev.Handler.Base is UniversalDamageHandler universalDamageHandler2)
+			if (ev.DamageHandler.Base is UniversalDamageHandler universalDamageHandler2)
 			{
 				if (universalDamageHandler2.TranslationId == DeathTranslations.PocketDecay.Id)
 				{
-					Player ply = Player.List.Where(x => x.Role.Type == RoleType.Scp106).FirstOrDefault();
+					Player ply = Player.List.Where(x => x.Role.Type == RoleTypeId.Scp106).FirstOrDefault();
 					if (ply != null)
 					{
 						AddGeneralKills(ply);
@@ -3393,29 +3054,29 @@ namespace PlayhousePlugin
 					return;
 			}
 
-			if (ev.Killer == null || ev.Killer == ev.Target) return;
-			switch (ev.Killer.Role.Team)
+			if (ev.Attacker == null || ev.Attacker == ev.Player) return;
+			switch (ev.Attacker.Role.Team)
 			{
-				case Team.SCP:
-					AddGeneralKills(ev.Killer);
-					AddSCPKills(ev.Killer);
+				case Team.SCPs:
+					AddGeneralKills(ev.Attacker);
+					AddSCPKills(ev.Attacker);
 					break;
-				case Team.MTF:
-					AddGeneralKills(ev.Killer);
-					AddSquadKills(ev.Killer);
-					AddHumanKills(ev.Killer);
+				case Team.FoundationForces:
+					AddGeneralKills(ev.Attacker);
+					AddSquadKills(ev.Attacker);
+					AddHumanKills(ev.Attacker);
 					break;
-				case Team.CDP:
-					AddGeneralKills(ev.Killer);
-					AddHumanKills(ev.Killer);
+				case Team.ClassD:
+					AddGeneralKills(ev.Attacker);
+					AddHumanKills(ev.Attacker);
 					break;
-				case Team.RSC:
-					AddGeneralKills(ev.Killer);
-					AddHumanKills(ev.Killer);
+				case Team.Scientists:
+					AddGeneralKills(ev.Attacker);
+					AddHumanKills(ev.Attacker);
 					break;
-				case Team.CHI:
-					AddGeneralKills(ev.Killer);
-					AddHumanKills(ev.Killer);
+				case Team.ChaosInsurgency:
+					AddGeneralKills(ev.Attacker);
+					AddHumanKills(ev.Attacker);
 					break;
 			}
 		}
@@ -3515,7 +3176,7 @@ namespace PlayhousePlugin
 
 			foreach (ItemPickupBase item in UnityEngine.Object.FindObjectsOfType<ItemPickupBase>())
 			{
-				var pickup = new Pickup(item);
+				var pickup = new ItemPickup(item);
 
 				if(pickup.Type.IsAmmo())
 					if (Vector3.Distance(new Vector3(179, 993, -59), pickup.Position) <= 9.4)
@@ -3533,7 +3194,7 @@ namespace PlayhousePlugin
 				yield return Timing.WaitForSeconds(0.5f);
 				foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, new Vector3(-9f, 1004, -59)) <= 80))
 				{
-					if (ply.Role.Team != Team.CDP && ply.Role.Team != Team.CHI && ply.Role.Type != RoleType.Scp079 && ply.Role.Type != RoleType.Tutorial)
+					if (ply.Role.Team != Team.ClassD && ply.Role.Team != Team.ChaosInsurgency && ply.Role.Type != RoleTypeId.Scp079 && ply.Role.Type != RoleTypeId.Tutorial)
 					{
 						ply.EnableEffect<Flashed>(7);
 					}
@@ -3544,9 +3205,9 @@ namespace PlayhousePlugin
 			
 			if (ev.NextKnownTeam == SpawnableTeamType.NineTailedFox)
 			{
-				List<Player> Cadets = playersToSpawn.Where(r => r.Role.Type == RoleType.NtfPrivate).ToList();
-				List<Player> Lieutenants = playersToSpawn.Where(r => r.Role.Type == RoleType.NtfSergeant).ToList();
-				List<Player> Commanders = playersToSpawn.Where(r => r.Role.Type == RoleType.NtfCaptain).ToList();
+				List<Player> Cadets = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.NtfPrivate).ToList();
+				List<Player> Lieutenants = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.NtfSergeant).ToList();
+				List<Player> Commanders = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.NtfCaptain).ToList();
 
 				if (Cadets.Count != 0)
 				{
@@ -3611,9 +3272,9 @@ namespace PlayhousePlugin
 			}
 			else if (ev.NextKnownTeam.ToString() == "ChaosInsurgency")
 			{
-				List<Player> Shotguns = playersToSpawn.Where(r => r.Role.Type == RoleType.ChaosMarauder).ToList();
-				List<Player> Logicers = playersToSpawn.Where(r => r.Role.Type == RoleType.ChaosRepressor).ToList();
-				List<Player> Riflemen = playersToSpawn.Where(r => r.Role.Type == RoleType.ChaosRifleman).ToList();
+				List<Player> Shotguns = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.ChaosMarauder).ToList();
+				List<Player> Logicers = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.ChaosRepressor).ToList();
+				List<Player> Riflemen = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.ChaosRifleman).ToList();
 				
 				Player Ply;
 				foreach (var player in Shotguns)
@@ -3687,9 +3348,9 @@ namespace PlayhousePlugin
 		private IEnumerator<float> PromotePlayers()
 		{
 			yield return Timing.WaitForSeconds(3f);
-			List<Player> Guards = Player.List.Where(r => r.Role.Type == RoleType.FacilityGuard).ToList();
-			List<Player> Scientists = Player.List.Where(r => r.Role.Type == RoleType.Scientist).ToList();
-			List<Player> ClassD = Player.List.Where(r => r.Role.Type == RoleType.ClassD).ToList();
+			List<Player> Guards = Player.List.Where(r => r.Role.Type == RoleTypeId.FacilityGuard).ToList();
+			List<Player> Scientists = Player.List.Where(r => r.Role.Type == RoleTypeId.Scientist).ToList();
+			List<Player> ClassD = Player.List.Where(r => r.Role.Type == RoleTypeId.ClassD).ToList();
 
 			List<Player> GuardsMessaged = new List<Player> { };
 
@@ -3823,22 +3484,22 @@ namespace PlayhousePlugin
 
 				if (chance < 20)
 				{
-					Ply.Role.Type = RoleType.FacilityGuard;
-					Ply.Position = RoleExtensions.GetRandomSpawnProperties(RoleType.FacilityGuard).Item1;
+					Ply.Role.Set(RoleTypeId.FacilityGuard);
+					Ply.Position = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.FacilityGuard).Position;
 					Ply.MaxHealth = 100;
 					Ply.Health = 100;
 				}
 				else if (chance < 50)
 				{
-					Ply.Role.Type = RoleType.Scientist;
-					Ply.Position = RoleExtensions.GetRandomSpawnProperties(RoleType.Scientist).Item1;
+					Ply.Role.Set(RoleTypeId.Scientist);
+					Ply.Position = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.Scientist).Position;
 					Ply.MaxHealth = 100;
 					Ply.Health = 100;
 				}
 				else
 				{
-					Ply.Role.Type = RoleType.ClassD;
-					Ply.Position = RoleExtensions.GetRandomSpawnProperties(RoleType.ClassD).Item1;
+					Ply.Role.Set(RoleTypeId.ClassD);
+					Ply.Position = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.ClassD).Position;
 					Ply.MaxHealth = 100;
 					Ply.Health = 100;
 				}
@@ -3911,7 +3572,7 @@ namespace PlayhousePlugin
 			Vector3 pos = Killer.Position;
 			yield return Timing.WaitForSeconds(1f);
 			
-			Ply.Role.Type = RoleType.Scp0492;
+			Ply.Role.Set(RoleTypeId.Scp0492);
 			Ply.Scale = new Vector3(1, 1, 1);
 			SCP0492.Overclocker(Ply);
 			
@@ -3919,7 +3580,7 @@ namespace PlayhousePlugin
 			
 			if (Fallback)
 			{
-				Ply.Position = RoleExtensions.GetRandomSpawnProperties(RoleType.NtfCaptain).Item1;
+				Ply.Position = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.NtfCaptain).Position;
 			}
 			else
 			{
@@ -3950,12 +3611,12 @@ namespace PlayhousePlugin
 
 						switch (ply.Role.Team)
 						{
-							case Team.MTF:
-								ply.Role.Type = RoleType.ChaosRifleman;
+							case Team.FoundationForces:
+								ply.Role.Set(RoleTypeId.ChaosRifleman);
 								PlayersAffected.Add(ply);
 								break;
-							case Team.CHI:
-								ply.Role.Type = RoleType.NtfSergeant;
+							case Team.ChaosInsurgency:
+								ply.Role.Set(RoleTypeId.NtfSergeant);
 								PlayersAffected.Add(ply);
 								break;
 						}
@@ -3990,14 +3651,14 @@ namespace PlayhousePlugin
 
 				if (Respawn.IsSpawning)
 				{
-					text.Replace("{minutes}", (Respawn.TimeUntilRespawn / 60).ToString());
-					text.Replace("{seconds}", ((Respawn.TimeUntilRespawn % 60)).ToString());
+					text.Replace("{minutes}", (Respawn.TimeUntilSpawnWave).ToString());
+					text.Replace("{seconds}", (Respawn.TimeUntilSpawnWave).ToString());
 
 				}
 				else
 				{
-					text.Replace("{minutes}", ((Respawn.TimeUntilRespawn + 15) / 60).ToString());
-					text.Replace("{seconds}", ((Respawn.TimeUntilRespawn + 15) % 60).ToString());
+					text.Replace("{minutes}", (Respawn.TimeUntilSpawnWave).ToString());
+					text.Replace("{seconds}", (Respawn.TimeUntilSpawnWave).ToString());
 				}
 
 
@@ -4045,7 +3706,7 @@ namespace PlayhousePlugin
 
 				foreach (Player ply in Player.List)
 				{
-					if (ply.Role.Team == Team.RIP)
+					if (ply.Role.Team == Team.Dead)
 					{
 						ply.ShowCenterDownHint(text.ToString(), 1);
 					}

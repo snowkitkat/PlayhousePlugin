@@ -19,13 +19,6 @@ namespace PlayhousePlugin.CustomClass
             Ply.Scale = Vector3.one;
             base.Dispose();
         }
-        
-        public override void Escape()
-        {
-            Ply.Role.Set(RoleTypeId.ChaosRepressor);
-            Ply.CustomClassManager().DisposeCustomClass();
-            Ply.CustomClassManager().CustomClass = new ChaosHunter(Ply);
-        }
 
         public override void Replace(Player ply)
         {

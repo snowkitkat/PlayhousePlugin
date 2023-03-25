@@ -50,7 +50,7 @@ namespace PlayhousePlugin.Commands
         {
             var gameObject = UnityEngine.Object.Instantiate<GameObject>(
                 LiteNetLib4MirrorNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name == "TantrumObj"));
-            gameObject.transform.position = Ply.ReferenceHub.playerMovementSync.RealModelPosition;
+            gameObject.transform.position = Ply.ReferenceHub.;
             NetworkServer.Spawn(gameObject);
 
             yield return Timing.WaitForSeconds(1f);

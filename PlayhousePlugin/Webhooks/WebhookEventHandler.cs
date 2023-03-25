@@ -132,11 +132,11 @@ namespace PlayhousePlugin.Webhooks
                 $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.GeneratorEjected, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type)}");
         }
 
-        public void OnGainingLevel(GainingLevelEventArgs ev)
+        /*public void OnGainingLevel(GainingLevelEventArgs ev)
         {
             PlayhousePlugin.Singleton.GameLogsQueue.Add(
                 $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.GainedLevel, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type, ev.Player.ReferenceHub.scp079PlayerScript._curLvl, ev.NewLevel)}");
-        }
+        }*/
 
         public void OnEscapingPocketDimension(EscapingPocketDimensionEventArgs ev)
         {
@@ -165,7 +165,7 @@ namespace PlayhousePlugin.Webhooks
         public void OnThrowingGrenade(ThrownProjectileEventArgs ev)
         {
             PlayhousePlugin.Singleton.GameLogsQueue.Add(
-                $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.ThrewAGrenade, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type, ev.Item.Type)}");
+                $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.ThrewAGrenade, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type, ev.Projectile.Type)}");
         }
 
         public void OnHurting(HurtingEventArgs ev)
@@ -209,13 +209,13 @@ namespace PlayhousePlugin.Webhooks
         public void OnHandcuffing(HandcuffingEventArgs ev)
         {
             PlayhousePlugin.Singleton.GameLogsQueue.Add(
-                $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasBeenHandcuffedBy, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role.Type, ev.Cuffer.Nickname, ev.Cuffer.UserId, ev.Cuffer.Role.Type)}");
+                $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasBeenHandcuffedBy, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role.Type, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type)}");
         }
 
         public void OnRemovingHandcuffs(RemovingHandcuffsEventArgs ev)
         {
             PlayhousePlugin.Singleton.GameLogsQueue.Add(
-                $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasBeenFreedBy, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role.Type, ev.Cuffer.Nickname, ev.Cuffer.UserId, ev.Cuffer.Role.Type)}");
+                $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.HasBeenFreedBy, ev.Target.Nickname, ev.Target.UserId, ev.Target.Role.Type, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type)}");
         }
 
         public void OnTeleporting(TeleportingEventArgs ev)
@@ -259,12 +259,6 @@ namespace PlayhousePlugin.Webhooks
         {
             PlayhousePlugin.Singleton.GameLogsQueue.Add(
                 $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.Scp914HasBeenActivated, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type, Exiled.API.Features.Scp914.KnobStatus)}");
-        }
-
-        public void OnContaining(ContainingEventArgs ev)
-        {
-            PlayhousePlugin.Singleton.GameLogsQueue.Add(
-                $"{Date} {string.Format(PlayhousePlugin.Singleton.Translation.Scp106WasContained, ev.Player.Nickname, ev.Player.UserId, ev.Player.Role.Type)}");
         }
 
         private string Date => $"[{DateTime.Now:HH:mm:ss}]";

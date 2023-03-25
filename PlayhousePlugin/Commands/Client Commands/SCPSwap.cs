@@ -4,6 +4,7 @@ using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using RemoteAdmin;
 
 namespace PlayhousePlugin.Commands
@@ -32,7 +33,7 @@ namespace PlayhousePlugin.Commands
 				return true;
 			}
 
-			if (p.Role.Team != Team.SCP)
+			if (p.Role.Team != Team.SCPs)
 			{
 				response = "<color=red>You're not an SCP, why did you think that would work?</color>";
 				return true;

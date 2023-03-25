@@ -31,16 +31,16 @@ namespace PlayhousePlugin.Controllers
 
         private Dictionary<int, bool[]> _digitsMap = new Dictionary<int, bool[]>
         {
-            { 0, new[]{true, true, true, false, true, true, true} },
-            { 1, new[]{false, true, false, false, true, false, false} },
-            { 2, new[]{true, false, true, true, true, false, true} },
-            { 3, new[]{true, true, false, true, true, false, true} },
-            { 4, new[]{false, true, false, true, true, true, false} },
-            { 5, new[]{true, true, false, true, false, true, true} },
-            { 6, new[]{true, true, true, true, false, true, true} },
-            { 7, new[]{false, true, false, false, true, false, true} },
-            { 8, new[]{true, true, true, true, true, true, true} },
-            { 9, new[]{true, true, false, true, true, true, true} }
+            { 0, new[] { true, true, true, false, true, true, true } },
+            { 1, new[] { false, true, false, false, true, false, false } },
+            { 2, new[] { true, false, true, true, true, false, true } },
+            { 3, new[] { true, true, false, true, true, false, true } },
+            { 4, new[] { false, true, false, true, true, true, false } },
+            { 5, new[] { true, true, false, true, false, true, true } },
+            { 6, new[] { true, true, true, true, false, true, true } },
+            { 7, new[] { false, true, false, false, true, false, true } },
+            { 8, new[] { true, true, true, true, true, true, true } },
+            { 9, new[] { true, true, false, true, true, true, true } }
         };
 
         private class DigitDisplay
@@ -70,12 +70,12 @@ namespace PlayhousePlugin.Controllers
         {
             new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.Painkillers },
             new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.None, ItemName = "M&Ms" },
-            new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.None, ItemName = "Layz"},
-            new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.None, ItemName = "Conk"},
+            new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.None, ItemName = "Layz" },
+            new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.None, ItemName = "Conk" },
             new VendingMachineItem { RequiredCoins = 2, ItemType = ItemType.Medkit },
-            new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.None, ItemName = "Bepis"},
+            new VendingMachineItem { RequiredCoins = 1, ItemType = ItemType.None, ItemName = "Bepis" },
             new VendingMachineItem { RequiredCoins = 2, ItemType = ItemType.Ammo9x19 },
-            new VendingMachineItem { RequiredCoins = 4, ItemType = ItemType.None, ItemName = "MysteryBox"},
+            new VendingMachineItem { RequiredCoins = 4, ItemType = ItemType.None, ItemName = "MysteryBox" },
             new VendingMachineItem { RequiredCoins = 2, ItemType = ItemType.Ammo556x45 },
         };
 
@@ -85,11 +85,11 @@ namespace PlayhousePlugin.Controllers
             ItemType.Adrenaline,
             ItemType.SCP2176,
             ItemType.SCP500,
-            
+
             // EZ Specific
             ItemType.KeycardNTFOfficer,
             ItemType.ArmorHeavy,
-            
+
         };
 
         private List<ItemType> MysteryBoxLootLCZ = new List<ItemType>()
@@ -98,7 +98,7 @@ namespace PlayhousePlugin.Controllers
             ItemType.Adrenaline,
             ItemType.SCP2176,
             ItemType.SCP500,
-            
+
             // LCZ Specific
             ItemType.GunRevolver,
             ItemType.KeycardZoneManager,
@@ -113,9 +113,9 @@ namespace PlayhousePlugin.Controllers
         {
             // Spawn Vending Machines
             // 2 in LCZ, 2 EZ
-            
+
             List<Room> LocationsPicked = new List<Room>();
-            
+
             Dictionary<Room, List<Utils.PosRot>> LocationsLight = new Dictionary<Room, List<Utils.PosRot>>();
             Dictionary<Room, List<Utils.PosRot>> LocationsEntrance = new Dictionary<Room, List<Utils.PosRot>>();
 
@@ -132,8 +132,8 @@ namespace PlayhousePlugin.Controllers
                         LocationsEntrance.Add(room, Utils.EZVendingLocations[room.Type]);
                 }
             }
-            
-            while(VendingMachines.Count != 2)
+
+            while (VendingMachines.Count != 2)
             {
                 var value = LocationsEntrance.ElementAt(EventHandler.random.Next(0, LocationsEntrance.Count));
                 if (LocationsPicked.Contains(value.Key))
@@ -143,28 +143,28 @@ namespace PlayhousePlugin.Controllers
                 LocationsPicked.Add(value.Key);
 
                 var posRot = value.Value.PickRandom();
-                
+
                 var vendingMachine = MapUtils.GetSchematicDataByName("Vending_Machine");
                 var vendingMachineObj = ObjectSpawner.SpawnSchematic("Vending_Machine",
                     value.Key.Transform.TransformPoint(posRot.Pos),
                     value.Key.Transform.rotation * Quaternion.Euler(posRot.Rot), Vector3.one, vendingMachine);
-                
+
                 vendingMachineObj.gameObject.AddComponent<VendingMachineController>().Init(vendingMachineObj);
                 VendingMachines.Add(vendingMachineObj.GetComponent<VendingMachineController>());
                 Log.Info($"Spawned vending machine in {value.Key}");
             }
-            
-            while(VendingMachines.Count != 4)
+
+            while (VendingMachines.Count != 4)
             {
                 var value = LocationsLight.ElementAt(EventHandler.random.Next(0, LocationsLight.Count));
                 if (LocationsPicked.Contains(value.Key))
                     continue;
-                
+
                 LocationsLight.Remove(value.Key);
                 LocationsPicked.Add(value.Key);
 
                 var posRot = value.Value.PickRandom();
-                    
+
                 var vendingMachine = MapUtils.GetSchematicDataByName("Vending_Machine");
                 var vendingMachineObj = ObjectSpawner.SpawnSchematic("Vending_Machine",
                     value.Key.Transform.TransformPoint(posRot.Pos),
@@ -175,10 +175,10 @@ namespace PlayhousePlugin.Controllers
                 Log.Info($"Spawned vending machine in {value.Key}");
             }
         }
-        
+
         public void Init(SchematicObject obj)
         {
-            Exiled.Events.Handlers.Player.PickingUpItem += OnPickingUpArmor(PickingUpItemEventArgs);
+            Exiled.Events.Handlers.Player.PickingUpItem += OnPick;
             Buttons = new List<Pickup>();
             vendingMachineType = Map.FindParentRoom(gameObject).Zone == ZoneType.Entrance
                 ? VendingMachineType.EntranceZone
@@ -191,7 +191,7 @@ namespace PlayhousePlugin.Controllers
                     var Button = Item.Create(ItemType.ArmorLight).CreatePickup(
                         gameObject.transform.TransformPoint(_basePosition + new Vector3(step * -j, step * i, 0)));
                     Button.Scale = Vector3.one * 0.1f;
-                    Button.Rotation = gameObject.transform.rotation * Quaternion.Euler(0,-90,0);
+                    Button.Rotation = gameObject.transform.rotation * Quaternion.Euler(0, -90, 0);
 
                     var rigidBody1 = Button.Base.gameObject.GetComponent<Rigidbody>();
                     var collider1 = Button.Base.gameObject.GetComponents<Collider>();
@@ -216,9 +216,10 @@ namespace PlayhousePlugin.Controllers
                 }
             }
 
-            var RefundButton = Item.Create(ItemType.ArmorLight).CreatePickup(gameObject.transform.TransformPoint(_refundPosition));
+            var RefundButton = Item.Create(ItemType.ArmorLight)
+                .CreatePickup(gameObject.transform.TransformPoint(_refundPosition));
             RefundButton.Scale = new Vector3(0.1f, 0.1f, 0.2f);
-            RefundButton.Rotation = gameObject.transform.rotation * Quaternion.Euler(0,-90,0);
+            RefundButton.Rotation = gameObject.transform.rotation * Quaternion.Euler(0, -90, 0);
 
             var rigidBody = RefundButton.Base.gameObject.GetComponent<Rigidbody>();
             var collider = RefundButton.Base.gameObject.GetComponents<Collider>();
@@ -241,16 +242,11 @@ namespace PlayhousePlugin.Controllers
 
             Buttons.Add(RefundButton);
 
-            foreach (var button in Buttons)
-            {
-                BreakoutBlitz.PickupsToNotClear.Add(button);
-            }
-            
             foreach (var block in obj.AttachedBlocks)
             {
                 if (block.name.Contains("DIGIT") || block.name.Contains("DECIMAL_POINT"))
                 {
-                    if(!block.name.Contains("DECIMAL_POINT"))
+                    if (!block.name.Contains("DECIMAL_POINT"))
                         _digits.Add(block.GetComponent<PrimitiveObject>());
                     else
                     {
@@ -261,37 +257,38 @@ namespace PlayhousePlugin.Controllers
                 if (block.name.Contains("LightSource"))
                 {
                     block.gameObject.AddComponent<Components.LightBlink>();
-                    
+
                     _lightSources.Add(block.GetComponent<LightSourceObject>());
-                    
+
                 }
             }
 
             for (int i = 0; i < 4; i++)
                 _digitDisplays.Add(new DigitDisplay());
 
-            _digits = _digits.OrderBy(x=>x.name).ToList();
+            _digits = _digits.OrderBy(x => x.name).ToList();
 
             int counter = 0;
             int displayCounter = 0;
-            
+
             for (int i = 0; i < 28; i++)
             {
-                if(counter == 7)
+                if (counter == 7)
                 {
                     counter = 0;
                     displayCounter++;
                 }
-                
+
                 _digitDisplays[displayCounter].Segments.Add(_digits[i]);
                 counter++;
             }
-            
-            foreach(var display in _digitDisplays)
+
+            foreach (var display in _digitDisplays)
             {
                 for (int i = 0; i < 7; i++)
                 {
-                    display.Segments[i].Primitive.Base.NetworkMaterialColor = _digitsMap[0][i] ? Color.red : Color.black;
+                    display.Segments[i].Primitive.Base.NetworkMaterialColor =
+                        _digitsMap[0][i] ? Color.red : Color.black;
                 }
             }
 
@@ -302,4 +299,5 @@ namespace PlayhousePlugin.Controllers
                 Item.Create(ItemType.Coin).CreatePickup(gameObject.transform.TransformPoint(0, 0.3f, 0.5f));
             }
         }
-
+    }
+}

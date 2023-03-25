@@ -135,22 +135,7 @@ namespace PlayhousePlugin
 		{
 			player.ReferenceHub.hints.Show(new TextHint(text, new HintParameter[] { new StringHintParameter(string.Empty) }, null, time));
 		}
-
-		public static void ShowCenterHint(this Player player, string text, ulong time = 1)
-		{
-			player.GameObject.GetComponent<PlayhousePluginComponent>().AddHudCenterText(text, time);
-		}
 		
-		public static void ShowCenterUpHint(this Player player, string text, ulong time = 1)
-		{
-			player.GameObject.GetComponent<PlayhousePluginComponent>().AddHudCenterUpText(text, time);
-		}
-		
-		public static void ShowCenterDownHint(this Player player, string text, ulong time = 1)
-		{
-			player.GameObject.GetComponent<PlayhousePluginComponent>().AddHudCenterDownText(text, time);
-		}
-
 		public static int GetHealthAmountPercent(this Player player)
 		{
 			return (int)Math.Round(player.Health/player.MaxHealth, 0);

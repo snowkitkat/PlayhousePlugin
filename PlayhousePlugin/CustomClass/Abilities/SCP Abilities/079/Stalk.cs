@@ -4,6 +4,7 @@ using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
 using PlayerRoles;
+using Exiled.API.Features.Roles;
 
 namespace PlayhousePlugin.CustomClass.Abilities
 {
@@ -19,7 +20,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 
         public override string GenerateHud()
         {
-            if(Ply.ReferenceHub.scp079PlayerScript.Lvl < 1)
+            if(Player. .Lvl < 1)
                 return $"Selected: {Name} (You need to be at least Tier 2 to use this ability)";
             
             return $"Selected: {Name} (Ready)";

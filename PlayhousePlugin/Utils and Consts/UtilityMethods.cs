@@ -94,7 +94,7 @@ namespace PlayhousePlugin
 		}
 		
 		// Spawns an actual grenade that gets spit from the players view
-		public static Pickup SpawnGrenadeOnPlayer(Player player, ItemType grenadeType, float timer, float velocity = 1f)
+		/*public static Pickup SpawnGrenadeOnPlayer(Player player, ItemType grenadeType, float timer, float velocity = 1f)
 		{
 			var nade = (ExplosiveGrenade) ExplosiveGrenade.Create(grenadeType, player);
 			nade.FuseTime = 99999;
@@ -102,7 +102,7 @@ namespace PlayhousePlugin
 			nade.Base.ServerThrow(10, 1, Vector3.one, player.CameraTransform.forward*2);
 			//nade.SpawnActive(player.Position, player);
 			return pickup;
-		}
+		}*/
 
 		public static void ApplyAmmoRegen(Player p, ushort ammoCount, bool displayHint, Player Ammo)
 		{
@@ -146,8 +146,8 @@ namespace PlayhousePlugin
 
 			if (displayHint && ammoGiven)
 			{
-				Ammo.ShowCenterDownHint("<color=red>You are providing ammo!</color>", 1);
-				p.ShowCenterDownHint($"<color=red>Ammo Replenished</color>", 1);
+				Ammo.ShowHint("<color=red>You are providing ammo!</color>", 1);
+				p.ShowHint($"<color=red>Ammo Replenished</color>", 1);
 
 			}
 		}
@@ -164,7 +164,7 @@ namespace PlayhousePlugin
 				{
 					p.Hurt(4f, "Military Grade Bio-Weapon");
 					//p.Hurt(7.5f, Exterminator, damageType: DamageTypes.Poison);
-					p.ShowCenterDownHint("<color=yellow>You are being poisoned by a military grade Bio-Weapon</color>");
+					p.ShowHint("<color=yellow>You are being poisoned by a military grade Bio-Weapon</color>");
 				}
 			}
 		}
@@ -204,12 +204,12 @@ namespace PlayhousePlugin
 			}
 			if (displayHint && HpGiven != 0)
 			{
-				Medic.ShowCenterDownHint("<color=red>You are healing!</color>", 1);
-				p.ShowCenterDownHint($"<color=red>+HP</color>");
+				Medic.ShowHint("<color=red>You are healing!</color>", 1);
+				p.ShowHint($"<color=red>+HP</color>");
 			}
 			if (displayHint && AHPGiven > 1)
 			{
-				p.ShowCenterDownHint($"<color=red>+AHP</color>");
+				p.ShowHint($"<color=red>+AHP</color>");
 			}
 		}
 
@@ -230,8 +230,8 @@ namespace PlayhousePlugin
 			
 			if (displayHint && HpGiven > 1)
 			{
-				Healer.ShowCenterDownHint("<color=red>You are healing!</color>", 1);
-				p.ShowCenterDownHint($"<color=red>+HP</color>");
+				Healer.ShowHint("<color=red>You are healing!</color>", 1);
+				p.ShowHint($"<color=red>+HP</color>");
 			}
 		}
 
@@ -257,8 +257,8 @@ namespace PlayhousePlugin
 			
 			if (displayHint && HpGiven > 1)
 			{
-				Healer.ShowCenterDownHint("<color=red>You are overhealing!</color>", 1);
-				p.ShowCenterDownHint($"<color=red>+AHP</color>");
+				Healer.ShowHint("<color=red>You are overhealing!</color>", 1);
+				p.ShowHint($"<color=red>+AHP</color>");
 			}
 		}
 
@@ -310,8 +310,8 @@ namespace PlayhousePlugin
 
 				foreach (Player ply in Player.List)
 				{
-					ply.ShowCenterUpHint(messageUp.ToString());
-					ply.ShowCenterDownHint(messageDown.ToString());
+					ply.ShowHint(messageUp.ToString());
+					ply.ShowHint(messageDown.ToString());
 					//ply.ShowCenterHint(message.ToString(), 1);
 					//ply.Broadcast(1, message.ToString());
 				}
@@ -320,562 +320,17 @@ namespace PlayhousePlugin
 			}
 		}
 
-		public static void SpawnRagdoll(Vector3 pos, Quaternion rot, RoleTypeId roleType, string deathCause, Player owner = null)
+		// FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!! - snow :D
+		/*public static void SpawnRagdoll(Vector3 pos, Quaternion rot, RoleTypeId roleType, string deathCause, Player owner = null)
 		{
 			ReferenceHub target = owner?.ReferenceHub ?? ReferenceHub.HostHub;
-			Exiled.API.Features.Ragdoll.Spawn(new RagdollInfo(target, new CustomReasonDamageHandler(deathCause), pos, rot));
-		}
-
-		/// <summary>
-		/// Cleans up both all the Ragdolls and all the items in the Map.
-		/// </summary>
-		public static void CleanupRagdollsAndItems()
-		{
-			// Cleans all the items
-			foreach (ItemPickupBase item in UnityEngine.Object.FindObjectsOfType<ItemPickupBase>())
-				item.DestroySelf();
-
-			// Cleans all the ragdolls
-			foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
-				NetworkServer.Destroy(doll.GameObject);
-		}
-
-		/// <summary>
-		/// Cleans up all the items in the Map.
-		/// </summary>
+			Exiled.API.Features.Ragdoll.Spawn(new RagdollData(target, new CustomReasonDamageHandler(deathCause), pos, rot));
+		}*/
 		public static void CleanupItems()
 		{
 			// Cleans all the items
 			foreach (ItemPickupBase item in UnityEngine.Object.FindObjectsOfType<ItemPickupBase>())
 				item.DestroySelf();
-		}
-
-		/// <summary>
-		/// Cleans all the Ragdolls in the Map.
-		/// </summary>
-		public static void CleanupRagdolls()
-		{
-			// Cleans all the ragdolls
-			foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
-				NetworkServer.Destroy(doll.GameObject);
-		}
-
-		/// <summary>
-		/// Cleans %50 of common items
-		/// </summary>
-		public static IEnumerator<float> SoftCleanItems()
-		{
-			List<Pickup> Radios = new List<Pickup>();
-			List<Pickup> Keycards = new List<Pickup>();
-			List<Pickup> Armor = new List<Pickup>();
-
-			foreach (var p in Map.Pickups)
-			{
-				switch (p.Type)
-				{
-					case ItemType.ArmorCombat:
-						Armor.Add(p);
-						break;
-					case ItemType.Radio:
-						Radios.Add(p);
-						break;
-					case ItemType.KeycardNTFLieutenant:
-						Keycards.Add(p);
-						break;
-				}
-			}
-
-			if(Radios.Count > 10)
-			{
-				for (int i = 0; i < 3 + Radios.Count/2; i++)
-				{
-					var item = Radios.PickRandom();
-					Radios.Remove(item);
-					item.Destroy();
-					Log.Info(i);
-					yield return Timing.WaitForSeconds(0.1f);
-				}
-			}
-			
-			if(Keycards.Count > 10)
-			{
-				for (int i = 0; i < 3 + Keycards.Count/2; i++)
-				{
-					var item = Keycards.PickRandom();
-					Keycards.Remove(item);
-					item.Destroy();
-					yield return Timing.WaitForSeconds(0.1f);
-				}
-			}
-			
-			if(Armor.Count > 10)
-			{
-				for (int i = 0; i < 3 + Armor.Count/2; i++)
-				{
-					var item = Armor.PickRandom();
-					Armor.Remove(item);
-					item.Destroy();
-					yield return Timing.WaitForSeconds(0.1f);
-				}
-			}
-
-			yield return Timing.WaitForSeconds(1);
-		}
-
-		public static IEnumerator<float> DensifyAmmoBoxes(SpawningRagdollEventArgs ev)
-		{
-			yield return Timing.WaitForSeconds(0.2f);
-			
-			bool AmmoBoxes = true;
-			List<Pickup> Ammo9 = new List<Pickup>();
-			List<Pickup> Ammo556 = new List<Pickup>();
-			List<Pickup> Ammo762 = new List<Pickup>();
-			List<Pickup> Ammo44 = new List<Pickup>();
-			List<Pickup> Ammo12 = new List<Pickup>();
-
-
-			foreach (var pickup in Map.Pickups)
-			{
-				if (Vector3.Distance(ev.Position, pickup.Position) < 4)
-				{
-					switch (pickup.Type)
-					{
-						case ItemType.Ammo9x19:
-							Ammo9.Add(pickup);
-							AmmoBoxes = true;
-							break;
-							
-						case ItemType.Ammo12gauge:
-							Ammo12.Add(pickup);
-							AmmoBoxes = true;
-							break;
-							
-						case ItemType.Ammo44cal:
-							Ammo44.Add(pickup);
-							AmmoBoxes = true;
-							break;
-							
-						case ItemType.Ammo556x45:
-							Ammo556.Add(pickup);
-							AmmoBoxes = true;
-							break;
-							
-						case ItemType.Ammo762x39:
-							Ammo762.Add(pickup);
-							AmmoBoxes = true;
-							break;
-					}
-				}
-			}
-
-			if (!AmmoBoxes) yield break;
-			// 9mm
-			if (Ammo9.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo9)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo9.Count;
-
-
-				Pickup AuthorityBox = Ammo9[0];
-				foreach (var box in Ammo9)
-					if (Vector3.Distance(box.Position, MeanVector) < Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;	
-
-				Ammo9.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo9)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo9)
-				{
-					box.Destroy();
-				}
-			}
-			
-			// 5.56mm
-			if (Ammo556.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo556)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo9.Count;
-
-
-				Pickup AuthorityBox = Ammo556[0];
-				foreach (var box in Ammo556)
-					if (Vector3.Distance(box.Position, MeanVector) < Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;	
-
-				Ammo556.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo556)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo556)
-				{
-					box.Destroy();
-				}
-			}
-			
-			// 7.62mm
-			if (Ammo762.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo762)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo762.Count;
-
-
-				Pickup AuthorityBox = Ammo762[0];
-				foreach (var box in Ammo762)
-					if (Vector3.Distance(box.Position, MeanVector) < Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;	
-
-				Ammo762.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo762)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo762)
-				{
-					box.Destroy();
-				}
-			}
-			
-			// .44 cal
-			if (Ammo44.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo44)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo44.Count;
-
-
-				Pickup AuthorityBox = Ammo44[0];
-				foreach (var box in Ammo44)
-					if (Vector3.Distance(box.Position, MeanVector) < Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;	
-
-				Ammo44.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo44)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo44)
-				{
-					box.Destroy();
-				}
-			}
-			
-			// 12 Guage
-			if (Ammo12.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo12)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo12.Count;
-
-
-				Pickup AuthorityBox = Ammo12[0];
-				foreach (var box in Ammo12)
-					if (Vector3.Distance(box.Position, MeanVector) < Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;	
-
-				Ammo12.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo12)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo12)
-				{
-					box.Destroy();
-				}
-			}
-		}
-		
-		public static IEnumerator<float> DensifyAmmoBoxes(DroppingAmmoEventArgs ev)
-		{
-			yield return Timing.WaitForSeconds(0.2f);
-			
-			bool AmmoBoxes = false;
-			List<Pickup> Ammo9 = new List<Pickup>();
-			List<Pickup> Ammo556 = new List<Pickup>();
-			List<Pickup> Ammo762 = new List<Pickup>();
-			List<Pickup> Ammo44 = new List<Pickup>();
-			List<Pickup> Ammo12 = new List<Pickup>();
-
-
-			foreach (var pickup in Map.Pickups)
-			{
-				if (Vector3.Distance(ev.Player.Position, pickup.Position) < 4)
-				{
-					switch (pickup.Type)
-					{
-						case ItemType.Ammo9x19:
-							Ammo9.Add(pickup);
-							AmmoBoxes = true;
-							Log.Info("9 mm");
-							break;
-
-						case ItemType.Ammo12gauge:
-							Ammo12.Add(pickup);
-							AmmoBoxes = true;
-							Log.Info("12 gauge");
-							break;
-
-						case ItemType.Ammo44cal:
-							Ammo44.Add(pickup);
-							AmmoBoxes = true;
-							Log.Info("44 cal");
-							break;
-
-						case ItemType.Ammo556x45:
-							Ammo556.Add(pickup);
-							AmmoBoxes = true;
-							Log.Info("556 ammo");
-							break;
-
-						case ItemType.Ammo762x39:
-							Ammo762.Add(pickup);
-							AmmoBoxes = true;
-							Log.Info("762 ammo");
-							break;
-					}
-				}
-			}
-
-			if (!AmmoBoxes) yield break;
-			// 9mm
-			if (Ammo9.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo9)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo9.Count;
-
-
-				Pickup AuthorityBox = Ammo9[0];
-				foreach (var box in Ammo9)
-					if (Vector3.Distance(box.Position, MeanVector) <
-					    Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;
-
-				Ammo9.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo9)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo9)
-				{
-					box.Destroy();
-				}
-			}
-
-			// 5.56mm
-			if (Ammo556.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo556)
-					MeanVector += box.Position;
-
-				MeanVector /= Ammo9.Count;
-
-
-				Pickup AuthorityBox = Ammo556[0];
-				foreach (var box in Ammo556)
-					if (Vector3.Distance(box.Position, MeanVector) <
-					    Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;
-
-				Ammo556.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo556)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo556)
-				{
-					box.Destroy();
-				}
-			}
-
-			// 7.62mm
-			if (Ammo762.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo762)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo762.Count;
-
-
-				Pickup AuthorityBox = Ammo762[0];
-				foreach (var box in Ammo762)
-					if (Vector3.Distance(box.Position, MeanVector) <
-					    Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;
-
-				Ammo762.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo762)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo762)
-				{
-					box.Destroy();
-				}
-			}
-
-			// .44 cal
-			if (Ammo44.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo44)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo44.Count;
-
-
-				Pickup AuthorityBox = Ammo44[0];
-				foreach (var box in Ammo44)
-					if (Vector3.Distance(box.Position, MeanVector) <
-					    Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;
-
-				Ammo44.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo44)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo44)
-				{
-					box.Destroy();
-				}
-			}
-
-			// 12 Guage
-			if (Ammo12.Count > 1)
-			{
-				Vector3 MeanVector = Vector3.zero;
-
-				foreach (var box in Ammo12)
-					MeanVector += box.Position;
-
-				MeanVector = MeanVector / Ammo12.Count;
-
-
-				Pickup AuthorityBox = Ammo12[0];
-				foreach (var box in Ammo12)
-					if (Vector3.Distance(box.Position, MeanVector) <
-					    Vector3.Distance(AuthorityBox.Position, MeanVector))
-						AuthorityBox = box;
-
-				Ammo12.Remove(AuthorityBox);
-
-				AmmoPickup AuthorityAmmoPickup = (AmmoPickup) AuthorityBox.Base;
-
-				ushort Amount = 0;
-				foreach (var box in Ammo12)
-				{
-					var a = (AmmoPickup) box.Base;
-					Amount += a.NetworkSavedAmmo;
-				}
-
-				AuthorityAmmoPickup.NetworkSavedAmmo += Amount;
-
-				foreach (var box in Ammo12)
-				{
-					box.Destroy();
-				}
-			}
 		}
 		
 		/// <summary>
@@ -946,7 +401,7 @@ namespace PlayhousePlugin
 
 			yield return Timing.WaitForSeconds(1f);
 			player.ClearInventory(false);
-			player.Role.Type = RoleType.Tutorial;
+			player.Role.Set(RoleTypeId.Tutorial);
 			player.Position = new Vector3(53f, 1020f, -44f);
 		}
 
@@ -961,7 +416,7 @@ namespace PlayhousePlugin
 			Jailed jail = EventHandler.JailedPlayers.Find(j => j.Userid == player.UserId);
 			if (jail.CurrentRound)
 			{
-				player.SetRole(jail.Role, SpawnReason.ForceClass, true);
+				player.Role.Set(jail.Role);
 				yield return Timing.WaitForSeconds(0.5f);
 				player.ResetInventory(jail.Items);
 				player.Health = jail.Health;
@@ -969,11 +424,11 @@ namespace PlayhousePlugin
 				foreach (KeyValuePair<AmmoType, ushort> kvp in jail.Ammo)
 					player.Ammo[kvp.Key.GetItemType()] = kvp.Value;
 
-				player.ReferenceHub.playerEffectsController.ChangeEffectIntensity<Scp207>(jail.SCP207Intensity);
+				player.ReferenceHub.playerEffectsController.ChangeState<Scp207>(jail.SCP207Intensity);
 			}
 			else
 			{
-				player.Role.Type = RoleType.Spectator;
+				player.Role.Set(RoleTypeId.Spectator);
 			}
 			EventHandler.JailedPlayers.Remove(jail);
 		}
@@ -996,19 +451,6 @@ namespace PlayhousePlugin
 		/// </summary>
 		/// <param name="Ply"></param>
 		/// <returns></returns>
-		public static ItemType FindPreference(Player Ply)
-		{
-			try
-			{
-				string text = System.IO.File.ReadAllText($@"/home/ubuntu/.config/EXILED/Configs/Pets/PetPreference/{Ply.UserId}");
-				return Commands.Pets.Items[text];
-			}
-			catch
-			{
-				return ItemType.None;
-			}
-
-		}
 
 		/// <summary>
 		/// Finds the preference of a certain player
@@ -1051,80 +493,7 @@ namespace PlayhousePlugin
 		{
 			Hat.KillHat(Player.Get(UserId));
 		}
-
-
-		/// <summary>
-		/// Checks if a given UserId has a pet, if so kill the coroutine responsible for it.
-		/// </summary>
-		/// <param name="UserId"></param>
-		public static void CheckExistingPetAndKill(string UserId)
-		{
-			if (PetFollow.Coroutines.ContainsKey(UserId))
-			{
-				PetFollow.KillPet(Player.Get(UserId));
-			}
-		}
-
-		public static void SpawnDummyModel(Player Ply, Vector3 position, Quaternion rotation, RoleType role, float x, float y, float z)
-		{
-			GameObject obj = UnityEngine.Object.Instantiate(
-										LiteNetLib4MirrorNetworkManager.singleton.playerPrefab);
-			CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
-			if (ccm == null)
-				Log.Error("CCM is null, this can cause problems!");
-			ccm.CurClass = role;
-			ccm.GodMode = true;
-			//ccm.OldRefreshPlyModel(PlayerManager.localPlayer);
-			obj.GetComponent<NicknameSync>().Network_myNickSync = "Dummy";
-			obj.GetComponent<QueryProcessor>().PlayerId = 9999;
-			obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-			obj.transform.localScale = new Vector3(x, y, z);
-
-			obj.transform.position = position;
-			obj.transform.rotation = rotation;
-
-			NetworkServer.Spawn(obj);
-			/*
-			if (Plugin.DumHubs.TryGetValue(Ply, out List<GameObject> objs))
-			{
-				objs.Add(obj);
-			}
-			else
-			{
-				Plugin.DumHubs.Add(Ply, new List<GameObject>());
-				Plugin.DumHubs[Ply].Add(obj);
-				DummyIndex = Plugin.DumHubs[Ply].Count();
-			}
-			if (DummyIndex != 1)
-				DummyIndex = objs.Count();*/
-		}
 		
-		public static void SpawnTempDummy(Player Ply, Vector3 position, Quaternion rotation, RoleType role, float x, float y, float z)
-		{
-			GameObject obj = UnityEngine.Object.Instantiate(
-				LiteNetLib4MirrorNetworkManager.singleton.playerPrefab);
-			CharacterClassManager ccm = obj.GetComponent<CharacterClassManager>();
-			if (ccm == null)
-				Log.Error("CCM is null, this can cause problems!");
-			ccm.CurClass = role;
-			ccm.GodMode = true;
-			//ccm.OldRefreshPlyModel(PlayerManager.localPlayer);
-			obj.GetComponent<NicknameSync>().Network_myNickSync = "Dummy";
-			obj.GetComponent<QueryProcessor>().PlayerId = 9999;
-			obj.GetComponent<QueryProcessor>().NetworkPlayerId = 9999;
-			obj.transform.localScale = new Vector3(x, y, z);
-
-			obj.transform.position = position;
-			obj.transform.rotation = rotation;
-
-			NetworkServer.Spawn(obj);
-			Timing.CallDelayed(3, () => { NetworkServer.Destroy(obj); });
-		}
-
-		/// <summary>
-		/// Spawns a grenade with a very short fuse to explode, kill and damage enviroment
-		/// </summary>
-		/// <param name="player"></param>
 		public static void Explode(Player player)
 		{
 			var grenade = (ExplosiveGrenade) ExplosiveGrenade.Create(ItemType.GrenadeHE, player);
@@ -1142,17 +511,6 @@ namespace PlayhousePlugin
 		public static bool RandomChance(int chance)
 		{
 			return chance == EventHandler.random.Next(chance)+1;
-		}
-		
-		public static void SpawnDebugPrimitive(Vector3 pos)
-		{
-			var circle = UnityEngine.Object.Instantiate(Utils.PrimitiveBaseObject);
-			circle.NetworkPrimitiveType = PrimitiveType.Cylinder;
-			circle.NetworkMaterialColor = new Color(1, 0, 0 );
-			circle.NetworkMovementSmoothing = 60;
-			circle.transform.position = pos;
-			NetworkServer.Spawn(circle.gameObject);
-			circle.UpdatePositionServer();
 		}
 
 		/// <summary>
@@ -1175,67 +533,6 @@ namespace PlayhousePlugin
 		/// Spawns a fake grenade or flashbang for cosmetic effects
 		/// </summary>
 		/// <param name="player"></param>
-		public static void FakeExplodeAtPosition(Vector3 pos, bool flash = false)
-		{
-			if (flash)
-			{
-				var flashGren = (FlashGrenade)FlashGrenade.Create(ItemType.GrenadeFlash);
-				flashGren.PinPullTime = 0.1f;
-				flashGren.FuseTime = 0.2f;
-				flashGren.BlindCurve = AnimationCurve.Constant(0f, float.MaxValue, 0f);
-				EventHandler.GrenadesToFake.Add(flashGren.Base.Projectile);
-				flashGren.SpawnActive(pos);
-
-			}
-			else
-			{
-				var grenade = (ExplosiveGrenade) ExplosiveGrenade.Create(ItemType.GrenadeHE);
-				grenade.PinPullTime = 0.1f;
-				grenade.FuseTime = 0.2f;
-				grenade.MaxRadius = 0f;
-				EventHandler.GrenadesToFake.Add(grenade.Base.Projectile);
-				grenade.SpawnActive(pos);
-			}
-		}
-		
-		public static IEnumerator<float> DeathSequence(Player boss)
-		{
-			boss.NoClipEnabled = true;
-			
-			yield return Timing.WaitForSeconds(0.5f);
-
-			FakeExplode(boss);
-
-			yield return Timing.WaitForSeconds(1f);
-
-			FakeExplode(boss);
-
-			Timing.RunCoroutine(SinkInGround(boss));
-
-			while (boss.IsAlive)
-			{
-				yield return Timing.WaitForSeconds(Convert.ToSingle(EventHandler.random.NextDouble()) + 0.4f);
-				FakeExplode(boss);
-			}
-		}
-
-		public static IEnumerator<float> SinkInGround(Player boss)
-		{
-			while (boss.IsAlive)
-			{
-				boss.Position += Vector3.down*0.2f;
-				yield return Timing.WaitForSeconds(0.1f);
-			}
-		}
-		
-		public static bool IsAlphaWarheadCountdown()
-		{
-			return AlphaWarheadController.Host.timeToDetonation < 
-			       AlphaWarheadController.Host.RealDetonationTime() - 
-			       ((AlphaWarheadController._resumeScenario >= 0) 
-				       ? AlphaWarheadController.Host.scenarios_resume[AlphaWarheadController._resumeScenario].additionalTime 
-				       : AlphaWarheadController.Host.scenarios_start[AlphaWarheadController._startScenario].additionalTime);
-		}
 
 		public static void RewardPlayers()
 		{

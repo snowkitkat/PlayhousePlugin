@@ -4,6 +4,7 @@ using CommandSystem;
 using Exiled.API.Features;
 using Exiled.Permissions.Extensions;
 using MEC;
+using PlayerRoles;
 using RemoteAdmin;
 using UnityEngine;
 
@@ -66,30 +67,30 @@ namespace PlayhousePlugin.Commands
         private IEnumerator<float> SetClassAsTutorial(Player Ply)
         {
             Vector3 OldPos;
-            if (Ply.Role.Type == RoleType.Spectator)
+            if (Ply.Role.Type == RoleTypeId.Spectator)
             {
                 OldPos = new Vector3(48.2f, 991, -59);
             }
             else
                 OldPos = Ply.Position;
             
-            Ply.Role.Type = RoleType.Tutorial;
+            Ply.Role.Set(RoleTypeId.Tutorial);
             yield return Timing.WaitForSeconds(0.5f);
             Ply.Position = OldPos;
-            Ply.NoClipEnabled = true;
+            Ply.IsNoclipPermitted = true;
         }
 
         private void DoTutorialFunction(Player Ply, out string response)
         {
-            if (Ply.Role.Type != RoleType.Tutorial)
+            if (Ply.Role.Type != RoleTypeId.Tutorial)
             {
                 Timing.RunCoroutine(SetClassAsTutorial(Ply));
                 response = $"Player {Ply.Nickname} is now set to tutorial";
             }
             else
             {
-                Ply.Role.Type = RoleType.Spectator;
-                Ply.NoClipEnabled = false;
+                Ply.Role.Set(RoleTypeId.Spectator);
+                Ply.IsNoclipPermitted = false;
                 response = $"Player {Ply.Nickname} is now set to spectator";
             }
         }

@@ -37,20 +37,12 @@ namespace PlayhousePlugin.CustomClass
         {
             var dispenser = ((Dispenser)ActiveAbilities[0]).BuildingMapObject;
             var speedpad = ((Speedpad)ActiveAbilities[1]).BuildingMapObject;
-            var tpentrance = ((TeleporterEntrance)ActiveAbilities[2]).BuildingMapObject;
-            var tpexit = ((TeleporterExit)ActiveAbilities[3]).BuildingMapObject;
-            
+
             if (dispenser != null && dispenser.gameObject != null)
                 dispenser.Destroy();
             
             if (speedpad != null && speedpad.gameObject != null)
                 speedpad.Destroy();
-            
-            if (tpentrance != null && tpentrance.gameObject != null)
-                tpentrance.Destroy();
-            
-            if (tpexit != null && tpexit.gameObject != null)
-                tpexit.Destroy();
 
             base.Dispose();
         }
@@ -63,8 +55,6 @@ namespace PlayhousePlugin.CustomClass
             {
                 new Dispenser(ply),
                 new Speedpad(ply),
-                new TeleporterEntrance(ply),
-                new TeleporterExit(ply)
             };
             ply.CustomClassManager().AbilityIndex = 0;
 

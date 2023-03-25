@@ -2,6 +2,7 @@ using System;
 using CommandSystem;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using RemoteAdmin;
 
 namespace PlayhousePlugin.Commands
@@ -43,7 +44,7 @@ namespace PlayhousePlugin.Commands
 			Timing.CallDelayed(12, () =>
 			{
 				p.Kill("too much cringe");
-				p.Role.Type = RoleType.Spectator;
+				p.Role.Set(RoleTypeId.Spectator);
 				Round.IsLocked = false;
 			});
 

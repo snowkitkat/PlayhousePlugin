@@ -24,7 +24,7 @@ namespace PlayhousePlugin.Commands
 				case "body":
 				case "ragdoll":
 				case "ragdolls":
-					UtilityMethods.CleanupRagdolls();
+					RemoteAdmin.
 					response = "Cleaned up Ragdolls!";
 					return true;
 

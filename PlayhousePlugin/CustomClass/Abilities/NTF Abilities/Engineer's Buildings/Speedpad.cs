@@ -32,25 +32,25 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        
             if (!Ply.ReferenceHub.IsGrounded())
             {
-                Ply.ShowCenterDownHint("<color=red>You are not on the ground</color>", 3);
+                Ply.ShowHint("<color=red>You are not on the ground</color>", 3);
                 return false;
             }
 
             if (Ply.CurrentRoom.Type == RoomType.Pocket)
             {
-                Ply.ShowCenterDownHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
+                Ply.ShowHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
                 return false;
             }
 	        
             if (!IsBuilt)
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Speedpad goin' up!</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Speedpad goin' up!</color>", 3);
                 BuildingCoroutine = Timing.RunCoroutine(SpeedPad());
                 return true;
             }
             else
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Speedpad destroyed</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Speedpad destroyed</color>", 3);
                 Timing.KillCoroutines(BuildingCoroutine);
                 BuildingMapObject.Destroy();
                 IsBuilt = false;
@@ -92,7 +92,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        {
 		        p.EnableEffect(EffectType.MovementBoost, 10);
 		        p.GetEffect(EffectType.MovementBoost).Intensity = 15;
-		        p.ShowCenterDownHint("<color=red>Given 10s speed boost!</color>");
+		        p.ShowHint("<color=red>Given 10s speed boost!</color>");
 	        }
         }
     }

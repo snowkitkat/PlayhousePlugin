@@ -52,7 +52,7 @@ namespace PlayhousePlugin.Commands
                     
                     g.transform.localPosition = originalHit1.point;
                     g.transform.localRotation = p.GameObject.transform.localRotation*Quaternion.Euler(0,-180,0);
-                    g.AddComponent<ObjectivePointComponent>();
+                    g.AddComponent<ObjectivePointController>();
                     
                     break;
                 

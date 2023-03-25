@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace PlayhousePlugin
+/*namespace PlayhousePlugin
 {
 	public class Sprays
 	{
@@ -224,7 +224,7 @@ namespace PlayhousePlugin
 				w.PlaceBullethole(r, hitinfo);
 			}*/
 
-			var up = -Vector3.Cross(ply.CameraTransform.transform.right, originalHit.normal) * 0.05f;
+			/*var up = -Vector3.Cross(ply.CameraTransform.transform.right, originalHit.normal) * 0.05f;
 			var right = ply.CameraTransform.right * 0.05f;
 
 			foreach (var point in points)
@@ -240,4 +240,5 @@ namespace PlayhousePlugin
 			}
 		}
 	}
-}
+}*/
+

@@ -1,6 +1,7 @@
 ﻿using System;
 using CommandSystem;
 using Exiled.API.Features;
+using PlayerRoles;
 using RemoteAdmin;
 
 namespace PlayhousePlugin.Commands
@@ -19,7 +20,7 @@ namespace PlayhousePlugin.Commands
 
 			if (p.RawUserId == "kognity")
 			{
-				UtilityMethods.SpawnDummyModel(p, p.Position, p.CameraTransform.rotation, RoleType.Scp096, float.Parse(arguments.At(0)), float.Parse(arguments.At(1)), float.Parse(arguments.At(2)));
+				UtilityMethods.SpawnDummyModel(p, p.Position, p.CameraTransform.rotation, RoleTypeId.Scp096, float.Parse(arguments.At(0)), float.Parse(arguments.At(1)), float.Parse(arguments.At(2)));
 			}
 
 			response = "lol";

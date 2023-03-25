@@ -18,7 +18,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
             Ply.ShowCenterDownHint($"<color=yellow>Infrared Vision Activated</color>", 3);
 
             Ply.ReferenceHub.playerEffectsController.EnableEffect<Visuals939>(duration: 10);
-            Ply.ReferenceHub.playerEffectsController.ChangeEffectIntensity<Visuals939>(3);
+            Ply.ReferenceHub.playerEffectsController.ChangeState<Visuals939>(3);
             return true;
         }
     }

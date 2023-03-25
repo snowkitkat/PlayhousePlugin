@@ -19,7 +19,7 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
                 // Disable ability
                 Ply.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
                 Ply.ReferenceHub.playerEffectsController.DisableEffect<Scp207>();
-                Ply.ShowCenterDownHint("<color=yellow>Overclock is now OFF</color>",2);
+                Ply.ShowHint("<color=yellow>Overclock is now OFF</color>",2);
 
                 Enabled = false;
                 return true;
@@ -30,7 +30,7 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
                 Ply.ReferenceHub.playerEffectsController.EnableEffect<Hemorrhage>();
                 Ply.ReferenceHub.playerEffectsController.EnableEffect<Scp207>();
                 Ply.ReferenceHub.playerEffectsController.ChangeState<Scp207>(2);
-                Ply.ShowCenterDownHint("<color=yellow>Overclock is now ON</color>",2);
+                Ply.ShowHint("<color=yellow>Overclock is now ON</color>",2);
                 Enabled = true;
                 return true;
             }

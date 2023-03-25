@@ -5,13 +5,14 @@ using AdminToys;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
+using Exiled.API.Features.Pickups;
 using Exiled.Events.EventArgs;
 using Interactables.Interobjects.DoorUtils;
 using MapEditorReborn.API.Features;
 using MapEditorReborn.API.Features.Objects;
 using Mirror;
 using Mirror.LiteNetLib4Mirror;
-using PlayhousePlugin.CustomGameMode;
+using PlayerRoles;
 using UnityEngine;
 
 namespace PlayhousePlugin.Components
@@ -23,7 +24,7 @@ namespace PlayhousePlugin.Components
         public Utils.ObjectiveStates _state = Utils.ObjectiveStates.Disabled;
         public float Radius = 2.5f;
         public bool AllowAllToCap = false;
-        public RoleType RoleToNotify = RoleType.None;
+        public RoleTypeId RoleToNotify = RoleTypeId.None;
         
         private float _decayRate = 0.5f;
         private float _capRate = 1.5f;
@@ -74,7 +75,7 @@ namespace PlayhousePlugin.Components
             _positionDisplay = _position + Vector3.up * 0.23f;
             
             // Registering Events
-            Exiled.Events.Handlers.Player.PickingUpArmor += OnPickup;
+            Exiled.Events.Handlers.Player.PickingUpItem += OnPickup;
 
             // Door beep sounds
             var doorPrefab = LiteNetLib4MirrorNetworkManager.singleton.spawnPrefabs.FirstOrDefault(x => x.name == "HCZ BreakableDoor");
@@ -94,12 +95,10 @@ namespace PlayhousePlugin.Components
                 _position, Quaternion.Euler(new Vector3(0, gameObject.transform.localEulerAngles.y, 0)), Vector3.one, schematicData);
 
             // Activate Button
-            _activateButton = Item.Create(ItemType.ArmorLight).Spawn(_position +Vector3.down*0.14f);
+            _activateButton = Item.Create(ItemType.ArmorLight).CreatePickup(_position +Vector3.down*0.14f);
             _activateButton.Scale = new Vector3(0.1f, 1f, 1f);
             _activateButton.Rotation = Quaternion.Euler(-90, -90 + gameObject.transform.localEulerAngles.y, 0);
             _activateButton.Weight = 0.01f;
-            
-            BreakoutBlitz.PickupsToNotClear.Add(_activateButton);
 
             var rigidBody1 = _activateButton.Base.gameObject.GetComponent<Rigidbody>();
             var collider1 = _activateButton.Base.gameObject.GetComponents<Collider>();
@@ -142,7 +141,7 @@ namespace PlayhousePlugin.Components
             NetworkServer.UnSpawn(_display.gameObject);
             _activateButton.Destroy();
             NetworkServer.Destroy(_door.Base.gameObject);
-            Exiled.Events.Handlers.Player.PickingUpArmor -= OnPickup;
+            Exiled.Events.Handlers.Player.PickingUpItem -= OnPickup;
         }
 
         private void FixedUpdate()

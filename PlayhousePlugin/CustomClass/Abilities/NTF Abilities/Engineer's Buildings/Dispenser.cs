@@ -37,25 +37,25 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        
 	        if (!Ply.ReferenceHub.IsGrounded())
 	        {
-		        Ply.ShowCenterDownHint("<color=red>You are not on the ground</color>", 3);
+		        Ply.ShowHint("<color=red>You are not on the ground</color>", 3);
 		        return false;
 	        }
 
 	        if (Ply.CurrentRoom.Type == RoomType.Pocket)
 	        {
-		        Ply.ShowCenterDownHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
+		        Ply.ShowHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
 		        return false;
 	        }
 	        
             if (!IsBuilt)
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Dispenser goin' up!</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Dispenser goin' up!</color>", 3);
 	            DispenserCoroutine = Timing.RunCoroutine(BuildDispenser());
 	            return true;
             }
             else
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Dispenser destroyed</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Dispenser destroyed</color>", 3);
 	            Timing.KillCoroutines(DispenserCoroutine);
 	            BuildingMapObject.Destroy();
 	            IsBuilt = false;
@@ -148,18 +148,18 @@ namespace PlayhousePlugin.CustomClass.Abilities
 
             if (hpGiven != 0 && ammoGiven)
         	{
-        		p.ShowCenterDownHint($"<color=red>+HP & Ammo Replenished</color>");
+        		p.ShowHint($"<color=red>+HP & Ammo Replenished</color>");
         		return;
         	}
         	
         	if (ammoGiven)
         	{
-        		p.ShowCenterDownHint($"<color=red>Ammo Replenished</color>", 1);
+        		p.ShowHint($"<color=red>Ammo Replenished</color>", 1);
         		return;
         	}
 
             if (hpGiven == 0) return;
-            p.ShowCenterDownHint($"<color=red>+HP</color>");
+            p.ShowHint($"<color=red>+HP</color>");
         }
     }
 }

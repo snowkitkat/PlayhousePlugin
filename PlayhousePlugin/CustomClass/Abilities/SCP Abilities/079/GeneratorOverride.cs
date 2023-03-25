@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp079;
 
 namespace PlayhousePlugin.CustomClass.Abilities
 {
@@ -26,7 +28,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
         
         public override bool UseCooldownAbility()
         {
-            if (Ply.ReferenceHub.scp079PlayerScript.Lvl < 2)
+            if (Ply.ReferenceHub.IsSCP(SCP079).Lvl < 2)
             {
                 Ply.ShowCenterDownHint("<color=yellow>You need to be at least Tier 3 to use this ability!</color>", 3);
                 return false;

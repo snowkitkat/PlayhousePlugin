@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CustomPlayerEffects;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
@@ -29,38 +30,16 @@ namespace PlayhousePlugin.CustomClass.Abilities
         }
         public override bool UseCooldownAbility()
         {
-            Ply.ChangeRunningSpeed(ServerConfigSynchronizer.Singleton.NetworkHumanSprintSpeedMultiplier);
+            Ply.EnableEffect<MovementBoost>();
+            Ply.ChangeEffectIntensity<MovementBoost>(2);
             Ply.MaxHealth = 125;
             Ply.Health = 100;
             Scp330Bag.AddSimpleRegeneration(Ply.ReferenceHub, 2, 20);
             Ply.EnableEffect(EffectType.MovementBoost, 20);
             Ply.EnableEffect(EffectType.Scp1853, 20);
             Ply.GetEffect(EffectType.MovementBoost).Intensity = 50;
-            _coroutineHandle = Timing.RunCoroutine(Debuff());
             Enabled = true;
             return true;
-        }
-
-        private IEnumerator<float> Debuff()
-        {
-            TimeElapsed = 0;
-            for (var i = 0; i < 20; i++)
-            {
-                TimeElapsed = i;
-                yield return Timing.WaitForSeconds(1);
-            }
-
-            Enabled = false;
-
-            if (multiplier <= 4)
-            {
-                Ply.ChangeRunningSpeed(1-(0.05f*multiplier));
-            }
-            
-            Ply.Health = 100 - 5 * multiplier;
-            Ply.MaxHealth = 100 - 5 * multiplier;
-            
-            multiplier += 1;
         }
     }
 }

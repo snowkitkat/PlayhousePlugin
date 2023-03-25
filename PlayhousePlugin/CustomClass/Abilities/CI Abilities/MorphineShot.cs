@@ -18,7 +18,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
         
         public override bool UseCooldownAbility()
         {
-            Ply.ShowCenterDownHint($"<color=yellow>Injecting Morphine</color>", 5);
+            Ply.ShowHint($"<color=yellow>Injecting Morphine</color>", 5);
 
             Ply.CurrentItem = null;
             EventHandler.Stunned.Add(Ply);

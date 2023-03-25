@@ -42,8 +42,6 @@ namespace PlayhousePlugin.CustomClass
         public ChaosHunter(Player ply)
         {
             Ply = ply;
-            ActiveAbilities = new AbilityBase[] {new InfraredVision(ply)};
-            PassiveAbilities = new CoroutineHandle[] { };
             ply.CustomClassManager().AbilityIndex = 0;
             
             ply.ClearInventory();

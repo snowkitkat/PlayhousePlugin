@@ -1,6 +1,7 @@
 ﻿using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs;
+using Exiled.Events.EventArgs.Player;
 using UnityEngine;
 
 namespace PlayhousePlugin
@@ -24,11 +25,11 @@ namespace PlayhousePlugin
 
         public void RunWhenPlayerShoots(ShootingEventArgs s)
         {
-            if (s.Shooter.ReferenceHub != Hub.ReferenceHub)
+            if (s.Player.ReferenceHub != Hub.ReferenceHub)
                 return;
 
             //ModifyAmmo(s.Shooter.ReferenceHub, 999);
-			var f = s.Shooter.CurrentItem as Firearm;
+			var f = s.Player.CurrentItem as Firearm;
 
 			f.Ammo = byte.MaxValue;
         }

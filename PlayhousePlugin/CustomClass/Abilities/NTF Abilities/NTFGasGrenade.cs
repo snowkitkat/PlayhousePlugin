@@ -28,11 +28,11 @@ namespace PlayhousePlugin.CustomClass.Abilities
                 GasAmount -= 30;
                 // Spawn gas grenade
                 Timing.RunCoroutine(ThrowGasGrenade());
-                Ply.ShowCenterDownHint($"<color=yellow>Throwing Gas Grenade...</color>",3);
+                Ply.ShowHint($"<color=yellow>Throwing Gas Grenade...</color>",3);
                 return true;
             }
 
-            Ply.ShowCenterDownHint($"<color=yellow>Gas is recharging...</color>",3);
+            Ply.ShowHint($"<color=yellow>Gas is recharging...</color>",3);
             return false;
         }
 
@@ -93,8 +93,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
             circle.transform.localScale = new Vector3(-8, -0.05f, -8);
             
             NetworkServer.Spawn(circle.gameObject);
-            circle.UpdatePositionServer();
-            
+
             int time = 0;
             List<Player> PlayersAlreadyAffected = new List<Player>();
             while (time != 30)

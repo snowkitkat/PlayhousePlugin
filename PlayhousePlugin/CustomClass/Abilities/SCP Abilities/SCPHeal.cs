@@ -24,7 +24,7 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
         {
 	        if (Ply.Health <= 200)
             {
-	            Ply.ShowCenterDownHint("<color=red>You don't have enough health to heal!</color>", 4);
+	            Ply.ShowHint("<color=red>You don't have enough health to heal!</color>", 4);
 	            return false;
             }
             				
@@ -34,7 +34,7 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
             var patient = Player.Get(raycastHit.rigidbody.gameObject);
             if (patient == null || (patient.Role.Team != Team.SCPs || patient.Role.Type == RoleTypeId.Scp0492))
             {
-	            Ply.ShowCenterDownHint("<color=red>There are no patients within range.</color>", 4);
+	            Ply.ShowHint("<color=red>There are no patients within range.</color>", 4);
 	            return false;
             }
             
@@ -75,7 +75,7 @@ namespace PlayhousePlugin.CustomClass.SCP_Abilities
             }
             
             Ply.Health -= 100;
-            Ply.ShowCenterDownHint($"<color=green>Healed {Math.Round(hpToGive, 1)}</color>", 4);
+            Ply.ShowHint($"<color=green>Healed {Math.Round(hpToGive, 1)}</color>", 4);
             return true;
         }
     }

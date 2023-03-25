@@ -35,25 +35,25 @@ namespace PlayhousePlugin.CustomClass.Abilities
 	        
             if (!Ply.ReferenceHub.IsGrounded())
             {
-                Ply.ShowCenterDownHint("<color=red>You are not on the ground</color>", 3);
+                Ply.ShowHint("<color=red>You are not on the ground</color>", 3);
                 return false;
             }
 
             if (Ply.CurrentRoom.Type == RoomType.Pocket)
             {
-                Ply.ShowCenterDownHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
+                Ply.ShowHint("<color=red>You can't build in the Pocket Dimension</color>", 3);
                 return false;
             }
 	        
             if (!IsBuilt)
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Relocator  goin' up!</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Relocator  goin' up!</color>", 3);
                 BuildingCoroutine = Timing.RunCoroutine(Teleporter());
                 return true;
             }
             else
             {
-	            Ply.ShowCenterDownHint($"<color=yellow>Relocator Destroyed</color>", 3);
+	            Ply.ShowHint($"<color=yellow>Relocator Destroyed</color>", 3);
                 Timing.KillCoroutines(BuildingCoroutine);
                 BuildingMapObject.Destroy();
                 IsBuilt = false;
@@ -97,7 +97,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 
 						if (p.Counter == 3) // 3) Freeze Player and adding a green light
 						{
-							ply.ShowCenterDownHint($"<color=#007808>You will be teleported to: <color=#00d90e>{RoomName[teleporterPlayers[ply].Room.Type]}</color></color>", 3);
+							ply.ShowHint($"<color=#007808>You will be teleported to: <color=#00d90e>{RoomName[teleporterPlayers[ply].Room.Type]}</color></color>", 3);
 							ply.EnableEffect(EffectType.Ensnared, 0);
 							var SpotLight = UnityEngine.Object.Instantiate(LiteNetLib4MirrorNetworkManager.singleton.spawnPrefabs.First(x => x.name == "LightSourceToy"));
 							SpotLight.GetComponent<LightSourceToy>().OnSpawned(Server.Host.ReferenceHub, new ArraySegment<string>());
@@ -124,7 +124,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 						
 						teleporterPlayers.Remove(ply);
 						RecentlyTeleported.Add(ply);
-						ply.ShowCenterDownHint($"", 1);
+						ply.ShowHint($"", 1);
 					}
 					else
 					{
@@ -151,7 +151,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 								new TeleporterPlayers(1,
 									true,
 									Rooms.PickRandom()));
-							ply.ShowCenterDownHint($"<color=#007808>Teleporter charging, stand still!</color>", 3);	
+							ply.ShowHint($"<color=#007808>Teleporter charging, stand still!</color>", 3);	
 						}
 						else
 						{
@@ -164,7 +164,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 								new TeleporterPlayers(1,
 									true,
 									Rooms.PickRandom()));
-							ply.ShowCenterDownHint($"<color=#007808>Teleporter charging, stand still!</color>", 3);
+							ply.ShowHint($"<color=#007808>Teleporter charging, stand still!</color>", 3);
 						}
 						
 					}
@@ -175,7 +175,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 				foreach (var p in playersToRemove)
 				{
 					teleporterPlayers.Remove(p);
-					p.ShowCenterDownHint($"", 1);
+					p.ShowHint($"", 1);
 				}
 
 				foreach (var p in teleporterPlayers)

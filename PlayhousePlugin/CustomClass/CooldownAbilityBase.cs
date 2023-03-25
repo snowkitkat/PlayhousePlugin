@@ -30,13 +30,13 @@ namespace PlayhousePlugin.CustomClass
         {
             if (Ply.IsCuffed)
             {
-                Ply.ShowCenterDownHint($"<color=yellow>You are detained!</color>", 2);
+                Ply.ShowHint($"<color=yellow>You are detained!</color>", 2);
                 return false;
             }
 
             if (IsCooldown())
             {
-                Ply.ShowCenterDownHint($"<color=yellow>You must wait {(Math.Round(Cooldown - _sw.Elapsed.TotalSeconds) < 1 ? 1 : Math.Round(Cooldown - _sw.Elapsed.TotalSeconds))} seconds until you can use your ability again!</color>", 2);
+                Ply.ShowHint($"<color=yellow>You must wait {(Math.Round(Cooldown - _sw.Elapsed.TotalSeconds) < 1 ? 1 : Math.Round(Cooldown - _sw.Elapsed.TotalSeconds))} seconds until you can use your ability again!</color>", 2);
                 return false;
             }
 

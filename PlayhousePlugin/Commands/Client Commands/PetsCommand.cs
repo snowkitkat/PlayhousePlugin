@@ -80,7 +80,7 @@ namespace PlayhousePlugin.Commands
 							UtilityMethods.CheckExistingPetAndKill(p.UserId);
 
 							PetFollow.Coroutines.Add(p.UserId,
-									Timing.RunCoroutine(PetFollow.FollowPlayer(p, Item.Create(Items[command]).Spawn(p.Position + Vector3.up * 2))));
+									Timing.RunCoroutine(PetFollow.FollowPlayer(p, Item.Create(Items[command]).CreatePickup(p.Position + Vector3.up * 2))));
 
 							UtilityMethods.UpdatePreference(p, command);
 							response = "Pet Equipped!";

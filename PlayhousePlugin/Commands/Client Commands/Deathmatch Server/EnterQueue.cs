@@ -2,6 +2,7 @@
 using CommandSystem;
 using Exiled.API.Features;
 using MEC;
+using PlayerRoles;
 using RemoteAdmin;
 
 namespace PlayhousePlugin.Commands
@@ -71,14 +72,14 @@ namespace PlayhousePlugin.Commands
 							Log.Info("U4");
 							Timing.KillCoroutines(kc.StalemateChecker);
 							Timing.KillCoroutines(kc.Unfreezer);
-							kc.King.Role.Type = RoleType.Spectator;
-							kc.Competitor.Role.Type = RoleType.Spectator;
+							kc.King.Role.Set(RoleTypeId.Spectator);
+							kc.Competitor.Role.Set(RoleTypeId.Spectator);
 							
 							kc.King = kc.Competitor;
 							kc.Competitor = kc.Queue[0];
 							kc.Queue.Remove(kc.Competitor);
 							
-							kc.King.ShowCenterHint("You have been set as the new King as the previous King has left the arena", 4);
+							kc.King.ShowHint("You have been set as the new King as the previous King has left the arena", 4);
 
 							Timing.CallDelayed(0.2f, () =>
 							{
@@ -93,11 +94,11 @@ namespace PlayhousePlugin.Commands
 							Timing.KillCoroutines(kc.Unfreezer);
 							Deathmatch.activeMatch[index] = false;
 							
-							kc.Competitor.Role.Type = RoleType.Spectator;
+							kc.Competitor.Role.Set(RoleTypeId.Spectator);
 							kc.Competitor.Broadcast(5, "Your opponent has left and you have been put into spectator.");
 							kc.King = kc.Competitor; // Set the competitor as the new king
 							kc.Competitor = null;
-							p.Role.Type = RoleType.Spectator;
+							p.Role.Set(RoleTypeId.Spectator);
 							
 							Log.Info("H2");
 						}
@@ -131,13 +132,13 @@ namespace PlayhousePlugin.Commands
 							Log.Info("U10");
 							Timing.KillCoroutines(kc.StalemateChecker); // Kill the coroutine
 							Timing.KillCoroutines(kc.Unfreezer);
-							kc.Competitor.Role.Type = RoleType.Spectator; // Set the competitor who left to spectator
+							kc.Competitor.Role.Set(RoleTypeId.Spectator); // Set the competitor who left to spectator
 							
 							// Replacing the competitor now
 							kc.Competitor = kc.Queue[0];
 							kc.Queue.Remove(kc.Competitor);
 							
-							kc.Competitor.ShowCenterHint("Your opponent has left you and has been replaced.", 4);
+							kc.Competitor.ShowHint("Your opponent has left you and has been replaced.", 4);
 							
 							Timing.CallDelayed(0.2f, () =>
 							{
@@ -152,9 +153,9 @@ namespace PlayhousePlugin.Commands
 							Timing.KillCoroutines(kc.Unfreezer);
 							Deathmatch.activeMatch[index] = false;
 							
-							kc.Competitor.Role.Type = RoleType.Spectator;
+							kc.Competitor.Role.Set(RoleTypeId.Spectator);
 							kc.Competitor = null;
-							kc.King.Role.Type = RoleType.Spectator;
+							kc.King.Role.Set(RoleTypeId.Spectator);
 							kc.King.Broadcast(5, "Your opponent has left and you have been put into spectator.");
 							
 							Log.Info("H5");							

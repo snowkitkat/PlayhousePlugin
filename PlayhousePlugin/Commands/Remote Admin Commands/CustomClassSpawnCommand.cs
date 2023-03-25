@@ -71,11 +71,6 @@ namespace PlayhousePlugin.Commands
 					CustomClass.CI.MakeChaosBulldozer(player);
 					break;
 
-				case "chaoshunter":
-				case "hunter":
-					CustomClass.CI.MakeChaosHunter(player);
-					break;
-				
 				case "chaosmachinist":
 				case "machinist":
 					CustomClass.CI.MakeChaosMachinist(player);

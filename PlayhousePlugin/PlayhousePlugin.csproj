@@ -48,6 +48,9 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Assembly-CSharp-Publicized.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
@@ -60,32 +63,29 @@
     <Reference Include="CommandSystem.Core">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
     </Reference>
-    <Reference Include="CommandSystem.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\CommandSystem.Core.dll</HintPath>
+    <Reference Include="Exiled.API, Version=6.1.0.0, Culture=neutral, processorArchitecture=Amd64">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.API.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.API, Version=6.0.2.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.API.dll</HintPath>
+    <Reference Include="Exiled.CreditTags, Version=6.1.0.0, Culture=neutral, processorArchitecture=Amd64">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.CreditTags.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.CreditTags, Version=6.0.2.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.CreditTags.dll</HintPath>
+    <Reference Include="Exiled.CustomItems, Version=6.1.0.0, Culture=neutral, processorArchitecture=Amd64">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.CustomItems.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.CustomItems, Version=6.0.2.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.CustomItems.dll</HintPath>
+    <Reference Include="Exiled.CustomRoles, Version=6.1.0.0, Culture=neutral, processorArchitecture=Amd64">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.CustomRoles.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.CustomRoles, Version=6.0.2.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.CustomRoles.dll</HintPath>
+    <Reference Include="Exiled.Events, Version=6.1.0.0, Culture=neutral, processorArchitecture=Amd64">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.Events.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Events, Version=6.0.2.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.Events.dll</HintPath>
+    <Reference Include="Exiled.Loader, Version=6.1.0.0, Culture=neutral, processorArchitecture=Amd64">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.Loader.dll</HintPath>
     </Reference>
-    <Reference Include="Exiled.Loader, Version=6.0.2.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.Loader.dll</HintPath>
-    </Reference>
-    <Reference Include="Exiled.Permissions, Version=6.0.2.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.Permissions.dll</HintPath>
+    <Reference Include="Exiled.Permissions, Version=6.1.0.0, Culture=neutral, processorArchitecture=Amd64">
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.Permissions.dll</HintPath>
     </Reference>
     <Reference Include="Exiled.Updater, Version=3.1.1.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\Exiled.Updater.dll</HintPath>
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\Exiled.Updater.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Steamworks.Win64">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
@@ -127,7 +127,7 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
     </Reference>
     <Reference Include="NorthwoodLib, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\NorthwoodLib.dll</HintPath>
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\NorthwoodLib.dll</HintPath>
     </Reference>
     <Reference Include="Novell.Directory.Ldap">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Novell.Directory.Ldap.dll</HintPath>
@@ -136,7 +136,7 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\PluginAPI.dll</HintPath>
     </Reference>
     <Reference Include="PluginAPI, Version=12.0.0.0, Culture=neutral, processorArchitecture=Amd64">
-      <HintPath>..\packages\EXILED.6.0.2\lib\net48\PluginAPI.dll</HintPath>
+      <HintPath>..\packages\EXILED.6.1.0-beta.1\lib\net48\PluginAPI.dll</HintPath>
     </Reference>
     <Reference Include="sc.posteffects.runtime">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\sc.posteffects.runtime.dll</HintPath>
@@ -534,6 +534,9 @@
     <Reference Include="UnityEngine.XRModule">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.XRModule.dll</HintPath>
     </Reference>
+    <Reference Include="websocket-sharp, Version=1.0.2.59611, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="YamlDotNet">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\YamlDotNet.dll</HintPath>
     </Reference>
@@ -542,7 +545,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\Client Commands\BossDeathCommand.cs" />
     <Compile Include="Commands\Client Commands\ClearBroadcast.cs" />
     <Compile Include="Commands\Client Commands\ContentGun.cs" />
     <Compile Include="Commands\Client Commands\Custom Class Active Abilities\Ability1.cs" />
@@ -553,22 +555,11 @@
     <Compile Include="Commands\Client Commands\Custom Class Active Abilities\ChangeAbility.cs" />
     <Compile Include="Commands\Client Commands\Deathmatch Server\EnterQueue.cs" />
     <Compile Include="Commands\Client Commands\Deathmatch Server\LeaveQueue.cs" />
-    <Compile Include="Commands\Client Commands\DeleteData.cs" />
     <Compile Include="Commands\Client Commands\Discord.cs" />
     <Compile Include="Commands\Client Commands\HatsCommand.cs" />
-    <Compile Include="Commands\Client Commands\RoundStats.cs" />
-    <Compile Include="Commands\Client Commands\SCPSwap.cs" />
-    <Compile Include="Commands\Client Commands\Shit.cs" />
-    <Compile Include="Commands\Client Commands\SprayCommand.cs" />
-    <Compile Include="Commands\Client Commands\Vaporize.cs" />
-    <Compile Include="Commands\Remote Admin Commands\Cleanup.cs" />
     <Compile Include="Commands\Remote Admin Commands\CustomClassSpawnCommand.cs" />
-    <Compile Include="Commands\Remote Admin Commands\DummyCommand.cs" />
     <Compile Include="Commands\Remote Admin Commands\DisableBulletHoles.cs" />
     <Compile Include="Commands\Remote Admin Commands\ForceReload.cs" />
-    <Compile Include="Commands\Client Commands\PetsCommand.cs" />
-    <Compile Include="Commands\Client Commands\SCPList.cs" />
-    <Compile Include="Commands\Client Commands\SuicideCommand.cs" />
     <Compile Include="Commands\Client Commands\ZFE.cs" />
     <Compile Include="Commands\Client Commands\CommandsHelp.cs" />
     <Compile Include="Commands\Remote Admin Commands\ContentGunClear.cs" />
@@ -578,57 +569,41 @@
     <Compile Include="Commands\Remote Admin Commands\Jail.cs" />
     <Compile Include="Commands\Remote Admin Commands\Location.cs" />
     <Compile Include="Commands\Remote Admin Commands\Mini Boss.cs" />
-    <Compile Include="Commands\Remote Admin Commands\PlayhousePluginCommand.cs" />
     <Compile Include="Commands\Remote Admin Commands\Position.cs" />
     <Compile Include="Commands\Remote Admin Commands\queueView.cs" />
     <Compile Include="Commands\Remote Admin Commands\RadioToggle.cs" />
     <Compile Include="Commands\Remote Admin Commands\SillySundayCommand.cs" />
     <Compile Include="Commands\Remote Admin Commands\SizeCommand.cs" />
-    <Compile Include="Commands\Remote Admin Commands\Ghost.cs" />
-    <Compile Include="Commands\Remote Admin Commands\spawnMovingTarget.cs" />
     <Compile Include="Commands\Remote Admin Commands\SundayEventsCommand.cs" />
     <Compile Include="Commands\Remote Admin Commands\TeleportX.cs" />
     <Compile Include="Commands\Remote Admin Commands\Tutorial.cs" />
     <Compile Include="Components\LightBlink.cs" />
-    <Compile Include="Components\ObjectivePointComponent.cs" />
     <Compile Include="Components\PlayhousePluginComponent.cs" />
     <Compile Include="Components\RainbowRoom.cs" />
     <Compile Include="Components\RainbowTagController.cs" />
     <Compile Include="Controllers\BoxController.cs" />
     <Compile Include="Controllers\GateAReworkController.cs" />
     <Compile Include="Controllers\GateBReworkController.cs" />
-    <Compile Include="Controllers\ObjectivePointController.cs" />
     <Compile Include="Controllers\RecyclingBinController.cs" />
-    <Compile Include="Controllers\VendingMachineController.cs" />
     <Compile Include="Cosmetics\PetFollow.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosDispenser.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosSpeedpad.cs" />
-    <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosTeleporterEntrance.cs" />
-    <Compile Include="CustomClass\Abilities\CI Abilities\Chaos Engineer Buildings\ChaosTeleporterExit.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\ChaosMedicRevive.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\GasGrenade.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\TonicShot.cs" />
-    <Compile Include="CustomClass\Abilities\CI Abilities\InfraredVision.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\MiniDispenser.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\MorphineShot.cs" />
     <Compile Include="CustomClass\Abilities\CI Abilities\RandomizerTPChaos.cs" />
     <Compile Include="CustomClass\Abilities\Class D Abilities\JanitorCleanup.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\Dispenser.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\Speedpad.cs" />
-    <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\TeleporterEntrance.cs" />
-    <Compile Include="CustomClass\Abilities\NTF Abilities\Engineer's Buildings\TeleporterExit.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\HotBullets.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\MiniDispenserNTF.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\NTFGasGrenade.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\NTFMedicRevive.cs" />
     <Compile Include="CustomClass\Abilities\NTF Abilities\RandomizerTPNTF.cs" />
     <Compile Include="CustomClass\Abilities\PassiveAbilities.cs" />
-    <Compile Include="CustomClass\Abilities\SCP Abilities\079\GeneratorOverride.cs" />
-    <Compile Include="CustomClass\Abilities\SCP Abilities\079\Neurotoxin.cs" />
-    <Compile Include="CustomClass\Abilities\SCP Abilities\079\Stalk.cs" />
-    <Compile Include="CustomClass\Abilities\SCP Abilities\079\WarheadJam.cs" />
     <Compile Include="CustomClass\Abilities\SCP Abilities\SCPHeal.cs" />
-    <Compile Include="CustomClass\Abilities\SCP Abilities\Vanish.cs" />
     <Compile Include="CustomClass\Abilities\SCP Abilities\Zombies\DrugDose.cs" />
     <Compile Include="CustomClass\Abilities\SCP Abilities\Zombies\OverclockToggle.cs" />
     <Compile Include="CustomClass\Abilities\SCP Abilities\Zombies\Sneeze.cs" />
@@ -647,7 +622,6 @@
     <Compile Include="CustomClass\CI\ChaosBulldozer.cs" />
     <Compile Include="CustomClass\CI\ChaosDemolitionsExpert.cs" />
     <Compile Include="CustomClass\CI\ChaosHeretic.cs" />
-    <Compile Include="CustomClass\CI\ChaosHunter.cs" />
     <Compile Include="CustomClass\CI\ChaosMachinist.cs" />
     <Compile Include="CustomClass\CI\CI.cs" />
     <Compile Include="CustomClass\CI\ChaosExterminator.cs" />
@@ -662,7 +636,6 @@
     <Compile Include="CustomClass\NTF\Alter Egos\NTFDemolitionsExpert.cs" />
     <Compile Include="CustomClass\NTF\Alter Egos\NTFExterminator.cs" />
     <Compile Include="CustomClass\NTF\Alter Egos\NTFHeretic.cs" />
-    <Compile Include="CustomClass\NTF\Alter Egos\NTFHunter.cs" />
     <Compile Include="CustomClass\NTF\Alter Egos\NTFMachinist.cs" />
     <Compile Include="CustomClass\NTF\Alter Egos\NTFManager.cs" />
     <Compile Include="CustomClass\NTF\NTF.cs" />
@@ -678,9 +651,7 @@
     <Compile Include="CustomClass\RSC\RSC.cs" />
     <Compile Include="CustomClass\SCPs\SCP0492.cs" />
     <Compile Include="CustomClass\SCPs\SCP049CustomClass.cs" />
-    <Compile Include="CustomClass\SCPs\SCP079CustomClass.cs" />
     <Compile Include="CustomClass\SCPs\SCP096CustomClass.cs" />
-    <Compile Include="CustomClass\SCPs\SCP106CustomClass.cs" />
     <Compile Include="CustomClass\SCPs\SCP173CustomClass.cs" />
     <Compile Include="CustomClass\SCPs\SCP93953CustomClass.cs" />
     <Compile Include="CustomClass\SCPs\SCP93989CustomClass.cs" />
@@ -691,11 +662,9 @@
     <Compile Include="CustomClass\SCPs\Zombie Custom Classes\Sprinter.cs" />
     <Compile Include="CustomGameMode\BreakoutBlitz.cs" />
     <Compile Include="DeathmatchServer\DeathmatchServer.cs" />
-    <Compile Include="Misc\Containment106ObjectiveController.cs" />
     <Compile Include="Misc\Cock.cs" />
     <Compile Include="Commands\Remote Admin Commands\InfAmmo\All.cs" />
     <Compile Include="Commands\Remote Admin Commands\InfAmmo\Clear.cs" />
-    <Compile Include="Misc\CommonUtilsStuff.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Cosmetics\Hats.cs" />
     <Compile Include="Misc\Sprays.cs" />
