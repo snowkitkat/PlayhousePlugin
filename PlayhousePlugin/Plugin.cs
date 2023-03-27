@@ -56,11 +56,8 @@ namespace PlayhousePlugin
 			Singleton = this;
 			
 			Handler = new EventHandler(this);
-			Handler.ConnectToServer();
-			Handler.SetUpWebsockets();
 			Exiled.Events.Handlers.Server.EndingRound += Handler.RoundEnding;
 			Exiled.Events.Handlers.Player.Destroying += Handler.OnDestroying;
-			Exiled.Events.Handlers.Server.WaitingForPlayers += Handler.WaitingForPlayers;
 			Exiled.Events.Handlers.Player.Verified += Handler.VerifiedPlayer;
 			Exiled.Events.Handlers.Player.Joined += Handler.PlayerJoined;
 			Exiled.Events.Handlers.Server.RoundStarted += Handler.OnRoundStart;
@@ -69,7 +66,6 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.Dying += Handler.OnDying;
 			Exiled.Events.Handlers.Player.Escaping += Handler.OnEscape;
 			Exiled.Events.Handlers.Player.PickingUpItem += Handler.OnItemPickup;
-			Exiled.Events.Handlers.Player.DroppingAmmo += Handler.OnDroppingAmmo;
 			Exiled.Events.Handlers.Player.Hurting += Handler.OnHurting;
 			Exiled.Events.Handlers.Player.Shooting += Handler.OnShooting;
 			Exiled.Events.Handlers.Player.UsedItem += Handler.OnMedicalItemDequipped;
@@ -79,14 +75,12 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Scp096.Enraging += Handler.OnRaging;
 			Exiled.Events.Handlers.Player.Spawning += Handler.OnSpawning;
 			Exiled.Events.Handlers.Player.DroppingItem += Handler.OnDropItem;
-			Exiled.Events.Handlers.Player.Banning += Handler.OnBan;
 			Exiled.Events.Handlers.Player.ReloadingWeapon += Handler.OnReloading;
 			//Exiled.Events.Handlers.Player.ReceivingEffect += Handler.OnEffect;
 			Exiled.Events.Handlers.Scp049.FinishingRecall += Handler.OnRevive;
 			Exiled.Events.Handlers.Player.SpawningRagdoll += Handler.RagdollSpawning;
 			Exiled.Events.Handlers.Player.ChangingRole += Handler.OnSetClass;
 			Exiled.Events.Handlers.Player.InteractingDoor += Handler.DoorInteraction;
-			Exiled.Events.Handlers.Player.InteractingElevator += Handler.ElevatorInteraction;
 			Exiled.Events.Handlers.Player.RemovingHandcuffs += Handler.OnRemoveHandcuffs;
 			Exiled.Events.Handlers.Scp096.CalmingDown += Handler.Nevercalmdown;
 			Exiled.Events.Handlers.Server.RestartingRound += Handler.RoundRestart;
@@ -95,7 +89,6 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Warhead.Detonated += Handler.OnWarheadDetonated;
 			Exiled.Events.Handlers.Scp914.Activating += Handler.OnActivating914;
 			Exiled.Events.Handlers.Player.FlippingCoin += Handler.OnCoinFlip;
-			Exiled.Events.Handlers.Player.ProcessingHotkey += Handler.OnHotkey;
 			Exiled.Events.Handlers.Warhead.Starting += Handler.OnStartingWarhead;
 			Exiled.Events.Handlers.Warhead.Stopping += Handler.OnStoppingWarhead;
 			Exiled.Events.Handlers.Player.Handcuffing += Handler.OnHandcuff;
@@ -163,7 +156,6 @@ namespace PlayhousePlugin
 		{
 			Exiled.Events.Handlers.Server.EndingRound -= Handler.RoundEnding;
 			Exiled.Events.Handlers.Player.Destroying -= Handler.OnDestroying;
-			Exiled.Events.Handlers.Server.WaitingForPlayers -= Handler.WaitingForPlayers;
 			Exiled.Events.Handlers.Player.Verified -= Handler.VerifiedPlayer;
 			Exiled.Events.Handlers.Server.RoundStarted -= Handler.OnRoundStart;
 			Exiled.Events.Handlers.Server.RespawningTeam -= Handler.OnRespawn;
@@ -171,7 +163,6 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Player.Dying -= Handler.OnDying;
 			Exiled.Events.Handlers.Player.Escaping -= Handler.OnEscape;
 			Exiled.Events.Handlers.Player.PickingUpItem -= Handler.OnItemPickup;
-			Exiled.Events.Handlers.Player.DroppingAmmo -= Handler.OnDroppingAmmo;
 			Exiled.Events.Handlers.Player.Hurting -= Handler.OnHurting;
 			Exiled.Events.Handlers.Player.Shooting -= Handler.OnShooting;
 			Exiled.Events.Handlers.Player.UsedItem -= Handler.OnMedicalItemDequipped;
@@ -181,22 +172,18 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Scp096.Enraging -= Handler.OnRaging;
 			Exiled.Events.Handlers.Player.Spawning -= Handler.OnSpawning;
 			Exiled.Events.Handlers.Player.DroppingItem -= Handler.OnDropItem;
-			Exiled.Events.Handlers.Player.DroppingAmmo -= Handler.OnDroppingAmmo;
-			Exiled.Events.Handlers.Player.Banning -= Handler.OnBan;
 			Exiled.Events.Handlers.Player.ReloadingWeapon -= Handler.OnReloading;
 			//Exiled.Events.Handlers.Player.ReceivingEffect -= Handler.OnEffect;
 			Exiled.Events.Handlers.Scp049.FinishingRecall -= Handler.OnRevive;
 			Exiled.Events.Handlers.Player.SpawningRagdoll -= Handler.RagdollSpawning;
 			Exiled.Events.Handlers.Player.ChangingRole -= Handler.OnSetClass;
 			Exiled.Events.Handlers.Player.InteractingDoor -= Handler.DoorInteraction;
-			Exiled.Events.Handlers.Player.InteractingElevator -= Handler.ElevatorInteraction;
 			Exiled.Events.Handlers.Scp096.CalmingDown -= Handler.Nevercalmdown;
 			Exiled.Events.Handlers.Server.RestartingRound -= Handler.RoundRestart;
 			Exiled.Events.Handlers.Player.UsingRadioBattery -= Handler.OnUsingRadioBattery;
 			Exiled.Events.Handlers.Map.Decontaminating -= Handler.OnDecontaminating;
 			Exiled.Events.Handlers.Warhead.Detonated -= Handler.OnWarheadDetonated;
 			Exiled.Events.Handlers.Player.FlippingCoin -= Handler.OnCoinFlip;
-			Exiled.Events.Handlers.Player.ProcessingHotkey -= Handler.OnHotkey;
 			Exiled.Events.Handlers.Warhead.Starting -= Handler.OnStartingWarhead;
 			Exiled.Events.Handlers.Warhead.Stopping -= Handler.OnStoppingWarhead;
 			Exiled.Events.Handlers.Player.Handcuffing -= Handler.OnHandcuff;

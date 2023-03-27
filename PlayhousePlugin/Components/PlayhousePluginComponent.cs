@@ -43,37 +43,6 @@ namespace PlayhousePlugin.Components
 			//_hudTemplate = _hudTemplate.Replace("[VERSION]", $"Ver{}");
 		}
 
-		private void FixedUpdate()
-		{
-			_timer += Time.deltaTime;
-
-			UpdateTimers();
-			//CheckVoiceChatting();				
-
-			//EverySeconds
-			if(_timer > 0.5f)
-			{
-				//CheckSinkholeDistance();
-				//Check079Spot();
-
-				//UpdateScpLists();
-				//UpdateMyCustomText();
-				//UpdateRespawnCounter();
-
-				if (player.CurrentItem != null)
-				{
-					if(!player.CurrentItem.IsToolGun())
-						UpdateExHud();
-				}
-				else
-				{
-					UpdateExHud();
-				}
-				
-				_timer = 0f;
-			}				
-		}
-
 		public void AddHudCenterUpText(string text, ulong timer)
 		{
 			_hudCenterUpString = text;
@@ -109,18 +78,6 @@ namespace PlayhousePlugin.Components
 		{
 			_hudCenterDownTime = -1f;
 		}
-		
-		public void AddHudBottomText(string text, ulong timer)
-		{
-			_hudBottomDownString = text;
-			_hudBottomDownTime = timer;
-			_hudBottomDownTimer = 0f;
-		}
-
-		public void ClearHudBottomText()
-		{
-			_hudBottomDownTime = -1f;
-		}
 
 		public void UpdateTimers()
 		{
@@ -138,13 +95,8 @@ namespace PlayhousePlugin.Components
 				_hudCenterDownTimer += Time.deltaTime;
 			else
 				_hudCenterDownString = string.Empty;
-			
-			if(_hudBottomDownTimer < _hudBottomDownTime)
-				_hudBottomDownTimer += Time.deltaTime;
-			else
-				_hudBottomDownString = string.Empty;*/
 
-			private void UpdateExHud()
+			void UpdateExHud()
 		{
 			string curText = _hudTemplate.Replace("[STATS]",
 				$"<color=#FF0000>K</color><color=#FF5500>o</color><color=#FFAA00>g</color><color=#FFFF00>n</color><color=#CCFF00>i</color><color=#99FF00>t</color><color=#66FF00>y</color><color=#33FF00>'</color><color=#00FF00>s</color><color=#00FF3F> </color><color=#00FF7F>P</color><color=#00FFBF>l</color><color=#00FFFF>a</color><color=#00CCFF>y</color><color=#0099FF>h</color><color=#0066FF>o</color><color=#0033FF>u</color><color=#0000FF>s</color><color=#3F00FF>e</color><color=#7F00FF> </color><color=#BF00FF>{Utils.ServerPort[Server.Port]}</color> [Server Time: {DateTime.Now:HH:mm:ss}]");

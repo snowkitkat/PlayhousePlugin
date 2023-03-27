@@ -21,6 +21,7 @@ using Respawning;
 using Exiled.Loader;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Pickups;
+using Exiled.API.Features.Roles;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp049;
@@ -71,7 +72,7 @@ namespace PlayhousePlugin
 		public static Stream stream;
 		public static Pickup Radio;
 
-		public static Vector3 SpawnPoint = new Vector3(240.1f,977,95.8f);
+		public static Vector3 SpawnPoint = new Vector3(240.1f, 977, 95.8f);
 
 		public static Vector3 ClassDPoint = new Vector3(245, 980, 81.6f);
 		public static Vector3 GuardPoint = new Vector3(237, 980, 81.7f);
@@ -99,7 +100,7 @@ namespace PlayhousePlugin
 		public static bool RewardPlayers = false;
 		public static bool WipeRadio = false;
 		public static Stopwatch Stopwatch = new Stopwatch();
-		
+
 		public List<Pickup> Letters = new List<Pickup> { };
 
 		public List<Pickup> LetterM = new List<Pickup> { };
@@ -118,7 +119,7 @@ namespace PlayhousePlugin
 		public List<Ragdoll> ArtRagdolls2 = new List<Ragdoll> { };
 
 		public static List<Player> Stunned = new List<Player>();
-		
+
 		public static HashSet<Player> PlayersWithInfiniteAmmo = new HashSet<Player>();
 		public static StringBuilder PlayerLister = new StringBuilder();
 
@@ -152,7 +153,7 @@ namespace PlayhousePlugin
 		private static readonly HttpClient client = new HttpClient();
 
 		public List<Player> PlayersWithInfiniteDrop = new List<Player>();
-		
+
 		public static bool SillySunday = false;
 
 		// Escape zone area
@@ -181,35 +182,6 @@ namespace PlayhousePlugin
 
 		public WebSocket ws = new WebSocket("ws://127.0.0.1:8765");
 
-		public void ConnectToServer()
-		{
-			ws.Connect();
-		}
-
-		public void SetUpWebsockets()
-		{
-			ws.OnMessage += Ws_OnMessage;
-			ws.OnError += Ws_OnError;
-			ws.OnClose += Ws_OnClose;
-
-		}
-
-		private void Ws_OnClose(object sender, CloseEventArgs e)
-		{
-			ws.Connect();
-		}
-
-		private void Ws_OnError(object sender, WebSocketSharp.ErrorEventArgs e)
-		{
-			Log.Error((object)e.Message);
-		}
-
-		private void Ws_OnMessage(object sender, WebSocketSharp.MessageEventArgs messageEventArgs)
-		{
-			Log.Info("EEEEEEEEEEEEEEEEEEEE");
-			Log.Info((object)e.playerId);
-		}
-
 		public void MapDonatorToObjects()
 		{
 			using (StreamReader reader = new StreamReader(@"/home/ubuntu/.config/EXILED/Configs/Donators/donators.csv"))
@@ -233,7 +205,8 @@ namespace PlayhousePlugin
 
 		public void OnReloading(ReloadingWeaponEventArgs ev)
 		{
-			if(SillySundayEventHandler.NerfWarMode || SillySundayEventHandler.slaughterhouse || SillySundayEventHandler.ohfiverescuemode)
+			if (SillySundayEventHandler.NerfWarMode || SillySundayEventHandler.slaughterhouse ||
+			    SillySundayEventHandler.ohfiverescuemode)
 				ev.Firearm.Ammo = Byte.MaxValue;
 		}
 
@@ -254,8 +227,8 @@ namespace PlayhousePlugin
 				}
 			}
 
-			foreach(var player in Player.List)
-				if(player.GameObject.TryGetComponent<PlayhousePluginComponent>(out var comp))
+			foreach (var player in Player.List)
+				if (player.GameObject.TryGetComponent<PlayhousePluginComponent>(out var comp))
 					UnityEngine.Object.Destroy(comp);
 		}
 
@@ -263,14 +236,14 @@ namespace PlayhousePlugin
 		{
 			if (ev.IsRoundEnded)
 			{
-				if(IsEventServer)
+				if (IsEventServer)
 					Stopwatch.Stop();
 				Server.FriendlyFire = true;
-				
+
 				UtilityMethods.RewardPlayers();
-				
+
 				RoundActive = false;
-				
+
 				if (!IsEventServer)
 				{
 					if (GeneralKills.Count == 0)
@@ -347,16 +320,18 @@ namespace PlayhousePlugin
 					messageToSend += $"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&killbinds%&@&{killBindsUsed[Ply]}\n";
 
 				foreach (Player Ply in mtfAndChaosConverted.Keys)
-					messageToSend += $"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&mtfciconverted%&@&{mtfAndChaosConverted[Ply]}\n";
+					messageToSend +=
+						$"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&mtfciconverted%&@&{mtfAndChaosConverted[Ply]}\n";
 
 				foreach (Player Ply in lastResortConverted.Keys)
-					messageToSend += $"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&lastresortconverted%&@&{lastResortConverted[Ply]}\n";
+					messageToSend +=
+						$"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&lastresortconverted%&@&{lastResortConverted[Ply]}\n";
 
 
 				if (GeneralKills.Count != 0)
 				{
 					var t = GeneralKills.OrderByDescending(x => x.Value).ToList();
-					foreach(var e in t)
+					foreach (var e in t)
 					{
 						if (!e.Key.DoNotTrack)
 						{
@@ -402,10 +377,7 @@ namespace PlayhousePlugin
 				else
 				{
 					ws.Connect();
-					Timing.CallDelayed(0.4f, () =>
-					{
-						ws.Send(messageToSend);
-					});
+					Timing.CallDelayed(0.4f, () => { ws.Send(messageToSend); });
 				}
 			}
 		}
@@ -434,7 +406,7 @@ namespace PlayhousePlugin
 			RecentlyUncuffer.Clear();
 			InfectedPlayers.Clear();
 			RagdollGun.Clear();
-			
+
 			JailedPlayers.Clear();
 
 			ContentGun.Clear();
@@ -447,13 +419,13 @@ namespace PlayhousePlugin
 
 			SillySundayEventHandler.ResetToDefaults();
 			SillySundayInfectionController.ResetToDefaults();
-			
+
 			RoundActive = false;
-			
+
 			Donator.Donators.Clear();
-			
+
 			PlayersWithInfiniteDrop.Clear();
-			
+
 			Hat.KillAllhats();
 
 			SillySunday = false;
@@ -474,7 +446,6 @@ namespace PlayhousePlugin
 			lastResortConverted.Clear();
 			killBindsUsed.Clear();
 
-			CommonUtilsStuff.AutoNukeDetonated = false;
 			SCP939Consts.killsBy939.Clear();
 
 			MTFSign = false;
@@ -498,13 +469,13 @@ namespace PlayhousePlugin
 
 			DisableBulletHoles.DisableBulletHolesBool = false;
 			WipeRadio = false;
-			
+
 			CustomClassManager.Players.Clear();
 		}
-		
+
 		public void ChangingItem(ChangingItemEventArgs ev)
 		{
-			if(Stunned.Contains(ev.Player))
+			if (Stunned.Contains(ev.Player))
 				ev.IsAllowed = false;
 		}
 
@@ -528,10 +499,11 @@ namespace PlayhousePlugin
 				}
 			}
 
-			if (ev.Item.Type == ItemType.Adrenaline && ConfigFile.ServerConfig.GetFloat("stamina_balance_use", 0.05f) == 0)
+			if (ev.Item.Type == ItemType.Adrenaline &&
+			    ConfigFile.ServerConfig.GetFloat("stamina_balance_use", 0.05f) == 0)
 			{
 				ev.Player.EnableEffect<MovementBoost>(1);
-				ev.Player.ChangeEffectIntensity(EffectType.MovementBoost,  15, 8);
+				ev.Player.ChangeEffectIntensity(EffectType.MovementBoost, 15, 8);
 				ev.Player.ShowHint("<color=yellow>+Movement Speed Boost</color>", 4);
 			}
 
@@ -551,11 +523,10 @@ namespace PlayhousePlugin
 				ev.Player.Health = ev.Player.MaxHealth;
 				if (ev.Player.CustomClassManager().CustomClass?.Name == "NTF Scout")
 				{
-					Timing.CallDelayed(0.2f, () =>
-					{
-						ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Scp207>();
-					});
+					Timing.CallDelayed(0.2f,
+						() => { ev.Player.ReferenceHub.playerEffectsController.EnableEffect<Scp207>(); });
 				}
+
 				if (SillySundayEventHandler.sugarrush)
 				{
 					Timing.CallDelayed(0.2f, () =>
@@ -568,7 +539,8 @@ namespace PlayhousePlugin
 				}
 			}
 
-			if (ev.Item.Type == ItemType.Medkit && ev.Player.ReferenceHub.playerEffectsController.GetEffect<Hemorrhage>().IsEnabled)
+			if (ev.Item.Type == ItemType.Medkit &&
+			    ev.Player.ReferenceHub.playerEffectsController.GetEffect<Hemorrhage>().IsEnabled)
 			{
 				ev.Player.ReferenceHub.playerEffectsController.DisableEffect<Hemorrhage>();
 			}
@@ -582,81 +554,6 @@ namespace PlayhousePlugin
 			}
 		}
 
-		public void OnMute(ChangingMuteStatusEventArgs ev)
-		{
-			if (ev.Player == null)
-				return;
-			if (!ev.Player.IsVerified)
-				return;
-			if (ev.Player.Nickname.IsNullOrEmpty() && ev.Player.UserId.IsNullOrEmpty())
-				return;
-			Log.Info("A");
-			List<Player> raPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
-			Log.Info("B");
-			string modsOnline = "";
-			foreach (Player Ply in raPermsPlayers)
-			{
-				modsOnline += $"{Ply.Nickname} ";
-				Log.Info("C");
-			}
-			if (Server.Port == 7777)
-			{
-				SendMessageAsync($"Mute Status Change on **Server #1**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else if (Server.Port == 8888)
-			{
-				SendMessageAsync($"Mute Status Change on **Server #2**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else if (Server.Port == 9999)
-			{
-				SendMessageAsync($"Mute Status Change on **Server #3**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else if (Server.Port == 7778)
-			{
-				SendMessageAsync($"Mute Status Change on **Dev Server**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else
-			{
-				SendMessageAsync($"Mute Status Change on **Server with port: {Server.Port}**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-		}
-
-		public void OnIntercomMute(ChangingIntercomMuteStatusEventArgs ev)
-		{
-			if (ev.Player == null)
-				return;
-			if (!ev.Player.IsVerified)
-				return;
-			if (ev.Player.Nickname.IsNullOrEmpty() && ev.Player.UserId.IsNullOrEmpty())
-				return;
-			List<Player> raPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
-			string modsOnline = "";
-			foreach (Player Ply in raPermsPlayers)
-			{
-				modsOnline += $"{Ply.Nickname} ";
-			}
-			if (Server.Port == 7777)
-			{
-				SendMessageAsync($"Intercom Mute Status Change on **Server #1**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else if (Server.Port == 8888)
-			{
-				SendMessageAsync($"Intercom Mute Status Change on **Server #2**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else if (Server.Port == 9999)
-			{
-				SendMessageAsync($"Intercom Mute Status Change on **Server #3**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else if (Server.Port == 7778)
-			{
-				SendMessageAsync($"Intercom Mute Status Change on **Dev Server**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMuted?: {ev.IsMuted}\nMods online: {modsOnline}```", true);
-			}
-			else
-			{
-				SendMessageAsync($"Intercom Mute Status Change on **Server with port: {Server.Port}**:\n```Offender: {ev.Player.Nickname} ({ev.Player.UserId})\nMods online: {modsOnline}```", true);
-			}
-		}
-
 		public void OnRaging(EnragingEventArgs ev)
 		{
 			// Atmospheric thing (should be base game ngl)
@@ -665,7 +562,7 @@ namespace PlayhousePlugin
 
 		public void Nevercalmdown(CalmingDownEventArgs ev)
 		{
-			if(Server.Port == 7778)
+			if (Server.Port == 7778)
 				ev.IsAllowed = false;
 		}
 
@@ -689,13 +586,13 @@ namespace PlayhousePlugin
 		public void DoorInteraction(InteractingDoorEventArgs ev)
 		{
 			// Ensuring that any SCP can open checkpoints even if they have items in their hands
-			if(!ev.IsAllowed && ev.Door.Base.IsCheckpoint() && ev.Player.IsScp)
+			if (!ev.IsAllowed && ev.Door.Base.IsCheckpoint() && ev.Player.IsScp)
 				ev.IsAllowed = true;
-			
+
 			// Ensuring that people can't open any doors in heavy containment on deathmatch server
 			if (IsDeathMatchServer)
 			{
-				if(ev.Player.CurrentRoom.Zone == ZoneType.HeavyContainment)
+				if (ev.Player.CurrentRoom.Zone == ZoneType.HeavyContainment)
 					ev.IsAllowed = false;
 				return;
 			}
@@ -722,7 +619,7 @@ namespace PlayhousePlugin
 								InformSCPs(ZoneType.LightContainment, "You sense activity at Checkpoint B");
 							}
 						}
-						
+
 						//Find 939s in light and notify them
 
 					}
@@ -778,13 +675,15 @@ namespace PlayhousePlugin
 			ev.Door.Base.TryGetComponent(out DoorNametagExtension doorNameExt1);
 			if (ev.IsAllowed)
 				return;
-			
-			if (ev.Player.Role.Type == RoleTypeId.Scp0492 && (!ev.Door.Base.IsCheckpoint()) && !(ev.Door.Base.NetworkActiveLocks == 1))
+
+			if (ev.Player.Role.Type == RoleTypeId.Scp0492 && (!ev.Door.Base.IsCheckpoint()) &&
+			    !(ev.Door.Base.NetworkActiveLocks == 1))
 			{
 				if ((!false && ev.Door.Base.IsConsideredOpen()) || (true && doorNameExt1.GetName.Contains("106")))
 				{
 					return;
 				}
+
 				int amount = 0;
 				DoorNametagExtension d = doorNameExt1;
 				foreach (Player Ply in Player.List.Where(r => r.Role.Type == RoleTypeId.Scp0492).ToList())
@@ -804,6 +703,7 @@ namespace PlayhousePlugin
 						}
 					}
 				}
+
 				if (amount >= 4)
 				{
 					ev.IsAllowed = true;
@@ -812,7 +712,9 @@ namespace PlayhousePlugin
 				}
 				else
 				{
-					ev.Player.ShowHint("<color=red> You need at least %amount more zombies to open this door.</color>".Replace("%amount", $"{4 - amount}"), 4);
+					ev.Player.ShowHint(
+						"<color=red> You need at least %amount more zombies to open this door.</color>".Replace(
+							"%amount", $"{4 - amount}"), 4);
 				}
 			}
 		}
@@ -834,22 +736,19 @@ namespace PlayhousePlugin
 		{
 			if (PlayersWithInfiniteDrop.Contains(ev.Player))
 			{
-				if(ev.Player.Items.Count < 8)
+				if (ev.Player.Items.Count < 8)
 					ev.Player.AddItem(ev.Item.Type);
 			}
 		}
-		
+
 		public void OnSpawning(SpawningEventArgs ev)
 		{
 			// Flashlight for juless lmao
 			if (ev.Player.RawUserId == "76561198434926562")
 			{
-				Timing.CallDelayed(5f, () =>
-				{
-					ev.Player.AddItem(ItemType.Flashlight);
-				});
+				Timing.CallDelayed(5f, () => { ev.Player.AddItem(ItemType.Flashlight); });
 			}
-			
+
 			// Tony's coin
 			if (ev.Player.RawUserId == "76561198059742329")
 			{
@@ -871,7 +770,7 @@ namespace PlayhousePlugin
 
 			if (IsDeathMatchServer)
 				return;
-			
+
 			// TODO complete all this shit
 			/*
 			if (ev.Player.IsHatOwner(out HatOwner hatOwner))
@@ -981,13 +880,13 @@ namespace PlayhousePlugin
 		{
 			if (!ev.Player.IsVerified)
 				return;
-			
+
 			if (ev.Player.IsGodModeEnabled)
 				return;
-			
+
 			ItemType type = ItemType.None;
 			byte TranslationID = 0;
-			
+
 			if (ev.DamageHandler.Base is ExplosionDamageHandler)
 				type = ItemType.GrenadeHE;
 			else if (ev.DamageHandler.Base is MicroHidDamageHandler)
@@ -1002,14 +901,15 @@ namespace PlayhousePlugin
 				TranslationID = scpDamageHandler._translationId;
 
 			// Zombie Infection
-			if (ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.Scp0492 && ev.Attacker != ev.Player && TranslationID == DeathTranslations.Zombie.Id)
+			if (ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.Scp0492 && ev.Attacker != ev.Player &&
+			    TranslationID == DeathTranslations.Zombie.Id)
 			{
 				if (!InfectedPlayers.Contains(ev.Player) && ev.Player.Role.Type != RoleTypeId.Tutorial)
 				{
 					UtilityMethods.InfectPlayer(ev.Player);
 				}
 			}
-			
+
 			// Cuffed protection
 			if (ev.Player.IsCuffed)
 			{
@@ -1019,7 +919,7 @@ namespace PlayhousePlugin
 					{
 						if (type != ItemType.None)
 						{
-							ev.Attacker.ShowHint("<color=yellow>You cannot injure detained players</color>",3);
+							ev.Attacker.ShowHint("<color=yellow>You cannot injure detained players</color>", 3);
 							ev.Amount = 0;
 							ev.IsAllowed = false;
 							return;
@@ -1027,7 +927,7 @@ namespace PlayhousePlugin
 					}
 				}
 			}
-			
+
 			// Damage tweaks for custom classes
 			if (ev.Player.CustomClassManager().CustomClass?.Name == "NTF Scout" ||
 			    ev.Player.CustomClassManager().CustomClass?.Name == "Chaos Scout" ||
@@ -1039,39 +939,45 @@ namespace PlayhousePlugin
 					ev.Amount = 0;
 				}
 			}
-			
+
 			// Containment Specialist
-			if(ev.Attacker != null && (ev.Attacker.CustomClassManager().CustomClass?.Name == "NTF Containment Specialist"  ||
-			   ev.Attacker.CustomClassManager().CustomClass?.Name == "Chaos Containment Specialist"))
+			if (ev.Attacker != null &&
+			    (ev.Attacker.CustomClassManager().CustomClass?.Name == "NTF Containment Specialist" ||
+			     ev.Attacker.CustomClassManager().CustomClass?.Name == "Chaos Containment Specialist"))
 			{
 				if (type == ItemType.GunCOM18)
 					ev.Amount *= 1.4f;
-				
+
 				else if (type == ItemType.GunRevolver)
 				{
-					if(ev.Attacker.Role.Team == Team.FoundationForces && (ev.Player.Role.Team != Team.FoundationForces && ev.Player.Role.Team != Team.Scientists && ev.Player.Role.Team != Team.OtherAlive && ev.Player.Role.Team != Team.Dead))
+					if (ev.Attacker.Role.Team == Team.FoundationForces &&
+					    (ev.Player.Role.Team != Team.FoundationForces && ev.Player.Role.Team != Team.Scientists &&
+					     ev.Player.Role.Team != Team.OtherAlive && ev.Player.Role.Team != Team.Dead))
 						ev.Player.EnableEffect(EffectType.Burned, 10, false);
-					
-					else if(ev.Attacker.Role.Team == Team.ChaosInsurgency && (ev.Player.Role.Team != Team.ChaosInsurgency && ev.Player.Role.Team != Team.ClassD && ev.Player.Role.Team != Team.OtherAlive && ev.Player.Role.Team != Team.Dead))
+
+					else if (ev.Attacker.Role.Team == Team.ChaosInsurgency &&
+					         (ev.Player.Role.Team != Team.ChaosInsurgency && ev.Player.Role.Team != Team.ClassD &&
+					          ev.Player.Role.Team != Team.OtherAlive && ev.Player.Role.Team != Team.Dead))
 						ev.Player.EnableEffect(EffectType.Burned, 10, false);
 				}
 			}
-			
-			if(ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.NtfCaptain)
+
+			if (ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.NtfCaptain)
 			{
 				if (ev.Attacker.CustomClassManager().CustomClass?.Name == "NTF Captain")
 				{
-					if(((HotBullets)ev.Attacker.CustomClassManager().CustomClass.ActiveAbilities[0]).IsActive)
+					if (((HotBullets)ev.Attacker.CustomClassManager().CustomClass.ActiveAbilities[0]).IsActive)
 						ev.Player.EnableEffect(EffectType.Burned, 10, false);
 				}
 			}
-			
+
 			// Zombie overclocking shit
-			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Overclocker" && TranslationID == DeathTranslations.Scp207.Id)
+			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Overclocker" &&
+			    TranslationID == DeathTranslations.Scp207.Id)
 			{
 				ev.Amount = 18;
 			}
-			
+
 			// Making Sprinter immune to 207 Damage 
 			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Sprinter")
 			{
@@ -1080,14 +986,15 @@ namespace PlayhousePlugin
 					ev.Amount = 0;
 				}
 			}
-			
+
 			// Sprinter's Attack Damage 
-			if (ev.Attacker != null && ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Sprinter" && TranslationID == DeathTranslations.Zombie.Id)
+			if (ev.Attacker != null && ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Sprinter" &&
+			    TranslationID == DeathTranslations.Zombie.Id)
 			{
 				ev.Amount = 20;
 			}
 
-			
+
 			// Damage calculations
 			int damageAmount = 0;
 			if (type == ItemType.GrenadeHE)
@@ -1095,23 +1002,24 @@ namespace PlayhousePlugin
 				if (ev.Player.Role.Type != RoleTypeId.Tutorial && !ev.Player.IsGodModeEnabled)
 					damageAmount = (int)Math.Ceiling(ev.Amount);
 			}
-			else if (TranslationID == DeathTranslations.Scp049.Id || TranslationID == DeathTranslations.Scp096.Id || TranslationID == DeathTranslations.Scp173.Id)
+			else if (TranslationID == DeathTranslations.Scp049.Id || TranslationID == DeathTranslations.Scp096.Id ||
+			         TranslationID == DeathTranslations.Scp173.Id)
 			{
 				if (ev.Player.Role.Type != RoleTypeId.Tutorial && !ev.Player.IsGodModeEnabled)
 					damageAmount = (int)Math.Ceiling(ev.Player.Health);
 			}
-			else if (TranslationID == DeathTranslations.Warhead.Id || 
-			         TranslationID == DeathTranslations.Decontamination.Id || 
-			         TranslationID == DeathTranslations.Recontained.Id || 
-			         TranslationID == DeathTranslations.PocketDecay.Id || 
-			         TranslationID == DeathTranslations.UsedAs106Bait.Id || 
-			         TranslationID == DeathTranslations.Unknown.Id || 
-			         TranslationID == DeathTranslations.Falldown.Id || 
-			         TranslationID == DeathTranslations.Crushed.Id || 
-			         TranslationID == DeathTranslations.SeveredHands.Id || 
-			         TranslationID == DeathTranslations.Warhead.Id || 
-			         TranslationID == DeathTranslations.Warhead.Id 
-			         )
+			else if (TranslationID == DeathTranslations.Warhead.Id ||
+			         TranslationID == DeathTranslations.Decontamination.Id ||
+			         TranslationID == DeathTranslations.Recontained.Id ||
+			         TranslationID == DeathTranslations.PocketDecay.Id ||
+			         TranslationID == DeathTranslations.UsedAs106Bait.Id ||
+			         TranslationID == DeathTranslations.Unknown.Id ||
+			         TranslationID == DeathTranslations.Falldown.Id ||
+			         TranslationID == DeathTranslations.Crushed.Id ||
+			         TranslationID == DeathTranslations.SeveredHands.Id ||
+			         TranslationID == DeathTranslations.Warhead.Id ||
+			         TranslationID == DeathTranslations.Warhead.Id
+			        )
 			{
 				damageAmount = 0;
 			}
@@ -1170,6 +1078,7 @@ namespace PlayhousePlugin
 				}
 			}
 		}
+
 		public void OnUsingRadioBattery(UsingRadioBatteryEventArgs ev)
 		{
 			ev.IsAllowed = false;
@@ -1193,11 +1102,8 @@ namespace PlayhousePlugin
 							kc.Competitor = kc.Queue[0];
 							kc.Queue.Remove(kc.Queue[0]);
 
-							Timing.CallDelayed(0.2f, () =>
-							{
-								Deathmatch.StartMatch(kc);
-							});
-							Log.Info("A1");							
+							Timing.CallDelayed(0.2f, () => { Deathmatch.StartMatch(kc); });
+							Log.Info("A1");
 						}
 						else // No competitors were able to replace the King that left.
 						{
@@ -1216,7 +1122,7 @@ namespace PlayhousePlugin
 						Deathmatch.activeMatch[index] = false;
 					}
 				}
-				else if (KingAndCompetitor.IsCompetitor(ev.Player))  // If the player who left is a competitor
+				else if (KingAndCompetitor.IsCompetitor(ev.Player)) // If the player who left is a competitor
 				{
 					var index = KingAndCompetitor.GetIndex(ev.Player);
 					var kc = KingAndCompetitor.GetAtIndex(index);
@@ -1228,10 +1134,7 @@ namespace PlayhousePlugin
 							kc.Competitor = kc.Queue[0];
 							kc.Queue.Remove(kc.Queue[0]);
 
-							Timing.CallDelayed(0.2f, () =>
-							{
-								Deathmatch.StartMatch(kc);
-							});
+							Timing.CallDelayed(0.2f, () => { Deathmatch.StartMatch(kc); });
 							Log.Info("A3");
 						}
 						else // No competitors were able to replace the one that left.
@@ -1242,7 +1145,7 @@ namespace PlayhousePlugin
 							Deathmatch.activeMatch[index] = false;
 							kc.King.Role.Set(RoleTypeId.Spectator);
 							kc.King.Broadcast(5, "Your opponent has left and you have been put into spectator.");
-							Log.Info("A4");							
+							Log.Info("A4");
 						}
 					}
 					else // Means there was no King, set everything to standby
@@ -1262,8 +1165,8 @@ namespace PlayhousePlugin
 			{
 				// If it is the dev server or if the round is ended or hasn't started yet, do nothing
 				if (IsDevServer || !RoundActive) return;
-				
-				if(Player.List.Count() - 1 <= 0)
+
+				if (Player.List.Count() - 1 <= 0)
 					Round.Restart();
 			}
 		}
@@ -1279,14 +1182,6 @@ namespace PlayhousePlugin
 				float y = item.NetworkInfo.Position.y;
 				if (y < 200f && y > -200f)
 					item.DestroySelf();
-			}
-
-			// Cleans all the ragdolls
-			foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
-			{
-				float y = doll.Transform.position.y;
-				if (y < 200f && y > -200f)
-					NetworkServer.Destroy(doll.GameObject);
 			}
 		}
 
@@ -1307,20 +1202,12 @@ namespace PlayhousePlugin
 					if (y < 500f)
 						item.DestroySelf();
 				}
-
-				// Cleans all the ragdolls
-				foreach (Ragdoll doll in UnityEngine.Object.FindObjectsOfType<Ragdoll>())
-				{
-					float y = doll.Transform.position.y;
-					if (y < 500f)
-						NetworkServer.Destroy(doll.GameObject);
-				}
 			});
 		}
 
 		public void PlayerJoined(JoinedEventArgs ev)
 		{
-			
+
 		}
 
 		public void VerifiedPlayer(VerifiedEventArgs ev)
@@ -1330,12 +1217,13 @@ namespace PlayhousePlugin
 				string name = ev.Player.Nickname.ToLower();
 				if (name.Contains(phrase) && !Utils.WhitelistedIDs.Contains(ev.Player.RawUserId))
 				{
-					ServerConsole.Disconnect(ev.Player.GameObject, $"<color=\"cyan\">Detected advertising ({phrase}) in your username. Please change it before joining the server.\nIf you believe this was a mistake, contact a staff member in our discord: https://discord.gg/kognity</color>");
+					ServerConsole.Disconnect(ev.Player.GameObject,
+						$"<color=\"cyan\">Detected advertising ({phrase}) in your username. Please change it before joining the server.\nIf you believe this was a mistake, contact a staff member in our discord: https://discord.gg/kognity</color>");
 					return;
 				}
 			}
-			
-			if(!ev.Player.GameObject.TryGetComponent<PlayhousePluginComponent>(out _))
+
+			if (!ev.Player.GameObject.TryGetComponent<PlayhousePluginComponent>(out _))
 				ev.Player.GameObject.AddComponent<PlayhousePluginComponent>();
 
 			UtilityMethods.FindAndSetCustomBadge(ev.Player);
@@ -1347,7 +1235,9 @@ namespace PlayhousePlugin
 					joins.Add(ev.Player);
 				}
 			}
-			if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 || GameCore.RoundStart.singleton.NetworkTimer == -2))
+
+			if (!Round.IsStarted && (GameCore.RoundStart.singleton.NetworkTimer > 1 ||
+			                         GameCore.RoundStart.singleton.NetworkTimer == -2))
 			{
 				Timing.CallDelayed(0.5f, () =>
 				{
@@ -1355,7 +1245,7 @@ namespace PlayhousePlugin
 					                        GameCore.RoundStart.singleton.NetworkTimer != -2)) return;
 					ev.Player.IsOverwatchEnabled = false;
 					ev.Player.Role.Set(RoleTypeId.Tutorial);
-					Scp096.TurnedPlayers.Add(ev.Player);
+					Scp096Role.TurnedPlayers.Add(ev.Player);
 				});
 
 				Timing.CallDelayed(1.5f, () =>
@@ -1365,19 +1255,21 @@ namespace PlayhousePlugin
 					ev.Player.Position = SpawnPoint + Vector3.up;
 					ev.Player.AddItem(ItemType.Coin);
 				});
-				
+
 				Timing.CallDelayed(1.5f, () =>
 				{
 					if (Round.IsStarted || (GameCore.RoundStart.singleton.NetworkTimer <= 1 &&
 					                        GameCore.RoundStart.singleton.NetworkTimer != -2)) return;
-					ev.Player.Inventory.ServerSelectItem(ev.Player.Inventory.UserInventory.Items.FirstOrDefault(x => x.Value.ItemTypeId == ItemType.Coin).Value.ItemSerial);
+					ev.Player.Inventory.ServerSelectItem(ev.Player.Inventory.UserInventory.Items
+						.FirstOrDefault(x => x.Value.ItemTypeId == ItemType.Coin).Value.ItemSerial);
 				});
-				
+
 				Timing.CallDelayed(1.5f, () =>
 				{
 					if (Round.IsStarted || (GameCore.RoundStart.singleton.NetworkTimer <= 1 &&
 					                        GameCore.RoundStart.singleton.NetworkTimer != -2)) return;
-					ev.Player.Inventory.ServerSelectItem(ev.Player.Inventory.UserInventory.Items.FirstOrDefault(x => x.Value.ItemTypeId == ItemType.Coin).Value.ItemSerial);
+					ev.Player.Inventory.ServerSelectItem(ev.Player.Inventory.UserInventory.Items
+						.FirstOrDefault(x => x.Value.ItemTypeId == ItemType.Coin).Value.ItemSerial);
 				});
 			}
 
@@ -1448,24 +1340,30 @@ namespace PlayhousePlugin
 					}
 				}
 			}
+
 			if (SillySunday)
 			{
 				switch (random.Next(5))
 				{
 					case 0:
-						ev.Player.Broadcast(5, $"<size=50><color=aqua>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=50><color=aqua>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
 						break;
 					case 1:
-						ev.Player.Broadcast(5, $"<size=50><color=#ff96de>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=50><color=#ff96de>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
 						break;
 					case 2:
-						ev.Player.Broadcast(5, $"<size=50><color=#ff96de>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=50><color=#ff96de>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
 						break;
 					case 3:
-						ev.Player.Broadcast(5, $"<size=50><color=aqua>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=50><color=aqua>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
 						break;
 					case 4:
-						ev.Player.Broadcast(5, $"<size=50><color=orange>Welcome <b><color=orange>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=50><color=orange>Welcome <b><color=orange>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-69\nEnjoy the events!</color></size>");
 						break;
 				}
 			}
@@ -1474,27 +1372,34 @@ namespace PlayhousePlugin
 				switch (random.Next(5))
 				{
 					case 0:
-						ev.Player.Broadcast(5, $"<size=70><color=aqua>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=70><color=aqua>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
 						break;
 					case 1:
-						ev.Player.Broadcast(5, $"<size=70><color=#ff96de>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=70><color=#ff96de>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
 						break;
 					case 2:
-						ev.Player.Broadcast(5, $"<size=70><color=#ff96de>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=70><color=#ff96de>Welcome <b><color=#ff96de>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
 						break;
 					case 3:
-						ev.Player.Broadcast(5, $"<size=70><color=aqua>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=70><color=aqua>Welcome <b><color=aqua>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
 						break;
 					case 4:
-						ev.Player.Broadcast(5, $"<size=70><color=orange>Welcome <b><color=orange>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
+						ev.Player.Broadcast(5,
+							$"<size=70><color=orange>Welcome <b><color=orange>{ev.Player.Nickname}</color></b> to\nKognity's Playhouse and to Site-79</color></size>");
 						break;
 				}
 			}
 
 			Timing.CallDelayed(15, () =>
 			{
-				ev.Player.Broadcast(4, "<size=48><color=aqua>Just as a reminder please <color=#ff96de><b>read the rules</b></color> before playing!</color></size>");
-				ev.Player.Broadcast(7, "<size=38><color=aqua>Rules can be checked by pressing <color=#ff96de>Escape</color> then clicking on <color=#ff96de>Server Info</color></color></size>");
+				ev.Player.Broadcast(4,
+					"<size=48><color=aqua>Just as a reminder please <color=#ff96de><b>read the rules</b></color> before playing!</color></size>");
+				ev.Player.Broadcast(7,
+					"<size=38><color=aqua>Rules can be checked by pressing <color=#ff96de>Escape</color> then clicking on <color=#ff96de>Server Info</color></color></size>");
 				ev.Player.Broadcast(3, "<b><size=130><color=#ff96de>Thanks for playing!</color></size></b>");
 
 				/// Canada Day
@@ -1538,45 +1443,42 @@ namespace PlayhousePlugin
 
 		public void OnItemPickup(PickingUpItemEventArgs ev)
 		{
-			if(ev.Pickup == Radio)
+			if (ev.Pickup == Radio)
 			{
-				ev.Player.ShowCenterDownHint($"<color=yellow>You cannot pickup Music Radios!</color>", 4);
+				ev.Player.ShowHint($"<color=yellow>You cannot pickup Music Radios!</color>", 4);
 				ev.IsAllowed = false;
 				ev.Pickup.IsLocked = false;
 				ev.Pickup.InUse = false;
 				return;
 			}
-			if (PetFollow.Pets.Contains(ev.Pickup))
-			{
-				ev.Player.ShowCenterDownHint($"<color=yellow>You cannot pickup Pets!</color>", 4);
-				ev.IsAllowed = false;
-				ev.Pickup.IsLocked = false;
-				ev.Pickup.InUse = false;
-				return;
-			}
+
 			if (Letters.Contains(ev.Pickup))
 			{
-				ev.Player.ShowCenterDownHint($"<color=yellow> You cannot pickup letters!</color>", 4);
+				ev.Player.ShowHint($"<color=yellow> You cannot pickup letters!</color>", 4);
 				ev.IsAllowed = false;
 				ev.Pickup.IsLocked = false;
 				ev.Pickup.InUse = false;
 				return;
 			}
+
 			if (ArtItems.Contains(ev.Pickup))
 			{
-				ev.Player.ShowCenterDownHint($"<color=yellow> You cannot pickup dev tools!</color>", 4);
+				ev.Player.ShowHint($"<color=yellow> You cannot pickup dev tools!</color>", 4);
 				ev.IsAllowed = false;
 				ev.Pickup.IsLocked = false;
 				ev.Pickup.InUse = false;
 				return;
 			}
-			KeyValuePair<Player, Pickup[]> playerAndSticky = StickyPositions.Where(x => x.Value.Contains(ev.Pickup)).FirstOrDefault();
+
+			KeyValuePair<Player, Pickup[]> playerAndSticky =
+				StickyPositions.Where(x => x.Value.Contains(ev.Pickup)).FirstOrDefault();
 			if (playerAndSticky.Value == null || playerAndSticky.Key == null) return;
-			ev.Player.ShowCenterDownHint($"<color=yellow> You cannot pickup sticky bombs!</color>", 4);
+			ev.Player.ShowHint($"<color=yellow> You cannot pickup sticky bombs!</color>", 4);
 			ev.IsAllowed = false;
 			ev.Pickup.IsLocked = false;
 			ev.Pickup.InUse = false;
 		}
+
 		public IEnumerator<float> ServerRestarter()
 		{
 			while (true)
@@ -1592,9 +1494,9 @@ namespace PlayhousePlugin
 		{
 			if (SillySunday)
 			{
-				foreach(var room in Room.List)
+				foreach (var room in Room.List)
 				{
-					if(!room.gameObject.TryGetComponent<RainbowLightController>(out var v))
+					if (!room.gameObject.TryGetComponent<RainbowLightController>(out var v))
 					{
 						room.gameObject.AddComponent<RainbowLightController>();
 					}
@@ -1608,7 +1510,9 @@ namespace PlayhousePlugin
 			{
 				foreach (var room in Room.List)
 				{
-					if(room.Type != RoomType.LczPlants && room.Type != RoomType.LczGlassBox && room.Type != RoomType.Lcz173 && !room.Name.Contains("Chkp") && !room.Name.Contains("Checkpoint"))
+					if (room.Type != RoomType.LczPlants && room.Type != RoomType.LczGlassBox &&
+					    room.Type != RoomType.Lcz173 && !room.Name.Contains("Chkp") &&
+					    !room.Name.Contains("Checkpoint"))
 					{
 						UnityEngine.Object.Destroy(room.gameObject.GetComponent<RainbowLightController>());
 						room.ResetColor();
@@ -1624,27 +1528,6 @@ namespace PlayhousePlugin
 			RoundActive = true;
 
 			RewardPlayers = Server.PlayerCount <= 17;
-			
-			if (IsDeathMatchServer)
-			{
-				coroutines.Add(Timing.RunCoroutine(DeathmatchPlayerStats()));
-				Timing.RunCoroutine(ServerRestarter());
-			}
-			else if (IsEventServer)
-			{
-				CustomItemSpawning.SpawnItems();
-				coroutines.Add(Timing.RunCoroutine(CheckEscape()));
-				coroutines.Add(Timing.RunCoroutine(BreakoutBlitz.ItemAndRagdollClear()));
-				Stopwatch = Stopwatch.StartNew();
-			}
-			else
-			{
-				if(!IsDevServer)
-					coroutines.Add(Timing.RunCoroutine(CommonUtilsStuff.AutoNuke()));
-				
-				CustomItemSpawning.SpawnItems();
-				coroutines.Add(Timing.RunCoroutine(CheckEscape()));
-			}
 
 			foreach (var room in Room.List)
 			{
@@ -1655,14 +1538,16 @@ namespace PlayhousePlugin
 				}
 				else
 				{
-					if(room.Zone == ZoneType.LightContainment || room.Zone == ZoneType.HeavyContainment)
+					if (room.Zone == ZoneType.LightContainment || room.Zone == ZoneType.HeavyContainment)
 						room.LightIntensity = 1.25f;
 				}
 			}
-			
+
 			if (SillySunday)
 			{
-				foreach(var room in Room.List.Where(x => x.Type == RoomType.LczGlassBox || x.Type == RoomType.LczPlants || x.Type == RoomType.Lcz173 || x.Name.Contains("Chkp") || x.Name.Contains("Checkpoint")))
+				foreach (var room in Room.List.Where(x =>
+					         x.Type == RoomType.LczGlassBox || x.Type == RoomType.LczPlants ||
+					         x.Type == RoomType.Lcz173 || x.Name.Contains("Chkp") || x.Name.Contains("Checkpoint")))
 				{
 					room.gameObject.AddComponent<RainbowLightController>();
 				}
@@ -1680,11 +1565,13 @@ namespace PlayhousePlugin
 			{
 				foreach (Player Ply in Player.List)
 				{
-					Ply.ShowCenterDownHint("<b>There are less than 18 players! Redeem your <color=red>reward</color> via \n<color=red>'klp redeem rounds'</color> in #bot-commands!</b>", 12);
+					Ply.ShowHint(
+						"<b>There are less than 18 players! Redeem your <color=red>reward</color> via \n<color=red>'klp redeem rounds'</color> in #bot-commands!</b>",
+						12);
 				}
-			}				
+			}
 
-			if(lobby != null)
+			if (lobby != null)
 				lobby.Destroy();
 
 			List<Player> BulkList = Player.List.ToList();
@@ -1704,7 +1591,10 @@ namespace PlayhousePlugin
 			int GuardsToSpawn = 0;
 
 			List<char> SpawnSequence = new List<char>
-				{ '4', '0', '1', '4', '3', '1', '4', '0', '3', '1', '4', '4', '1', '4', '0', '4', '1', '3', '4', '0', '3', '1', '4', '4', '1', '4', '0', '4', '1', '3', '0', '4', '4', '1', '0', '1', '4', '3', '3', '1' };
+			{
+				'4', '0', '1', '4', '3', '1', '4', '0', '3', '1', '4', '4', '1', '4', '0', '4', '1', '3', '4', '0', '3',
+				'1', '4', '4', '1', '4', '0', '4', '1', '3', '0', '4', '4', '1', '0', '1', '4', '3', '3', '1'
+			};
 
 			for (int x = 0; x < Player.List.ToList().Count; x++)
 			{
@@ -1748,6 +1638,7 @@ namespace PlayhousePlugin
 					GuardPlayers.Add(player);
 					Log.Info($"Guard1: {player}");
 				}
+
 				player.Role.Set(RoleTypeId.None);
 			}
 
@@ -1755,7 +1646,8 @@ namespace PlayhousePlugin
 			// ClassD
 			if (ClassDsToSpawn != 0)
 			{
-				if (ClassDPlayers.Count <= ClassDsToSpawn) // Less people (or equal) voted than what is required in the game.
+				if (ClassDPlayers.Count <=
+				    ClassDsToSpawn) // Less people (or equal) voted than what is required in the game.
 				{
 					foreach (Player ply in ClassDPlayers)
 					{
@@ -1773,6 +1665,7 @@ namespace PlayhousePlugin
 						ClassDPlayers.Remove(Ply); // Removing winner from the list
 						BulkList.Remove(Ply); // Removing the winners from the bulk list
 					}
+
 					ClassDsToSpawn = 0;
 				}
 			}
@@ -1781,7 +1674,8 @@ namespace PlayhousePlugin
 			// Scientists
 			if (ScientistsToSpawn != 0)
 			{
-				if (ScientistPlayers.Count <= ScientistsToSpawn) // Less people (or equal) voted than what is required in the game.
+				if (ScientistPlayers.Count <=
+				    ScientistsToSpawn) // Less people (or equal) voted than what is required in the game.
 				{
 					foreach (Player ply in ScientistPlayers)
 					{
@@ -1799,6 +1693,7 @@ namespace PlayhousePlugin
 						ScientistPlayers.Remove(Ply); // Removing winner from the list
 						BulkList.Remove(Ply); // Removing the winners from the bulk list
 					}
+
 					ScientistsToSpawn = 0;
 				}
 			}
@@ -1807,7 +1702,8 @@ namespace PlayhousePlugin
 			// Guards
 			if (GuardsToSpawn != 0)
 			{
-				if (GuardPlayers.Count <= GuardsToSpawn) // Less people (or equal) voted than what is required in the game.
+				if (GuardPlayers.Count <=
+				    GuardsToSpawn) // Less people (or equal) voted than what is required in the game.
 				{
 					foreach (Player ply in GuardPlayers)
 					{
@@ -1825,6 +1721,7 @@ namespace PlayhousePlugin
 						GuardPlayers.Remove(Ply); // Removing winner from the list
 						BulkList.Remove(Ply); // Removing the winners from the bulk list
 					}
+
 					GuardsToSpawn = 0;
 				}
 			}
@@ -1851,6 +1748,7 @@ namespace PlayhousePlugin
 						PlayersToSpawnAsSCP.Add(Ply); // Removing winner from the list
 						BulkList.Remove(Ply); // Removing the winners from the bulk list
 					}
+
 					SCPsToSpawn = 0;
 				}
 			}
@@ -1869,6 +1767,7 @@ namespace PlayhousePlugin
 					BulkList.Remove(Ply); // Removing the winners from the bulk list
 				}
 			}
+
 			if (SCPsToSpawn != 0)
 			{
 				for (int x = 0; x < SCPsToSpawn; x++)
@@ -1878,6 +1777,7 @@ namespace PlayhousePlugin
 					BulkList.Remove(Ply); // Removing the winners from the bulk list
 				}
 			}
+
 			if (ScientistsToSpawn != 0)
 			{
 				for (int x = 0; x < ScientistsToSpawn; x++)
@@ -1887,6 +1787,7 @@ namespace PlayhousePlugin
 					BulkList.Remove(Ply); // Removing the winners from the bulk list
 				}
 			}
+
 			if (GuardsToSpawn != 0)
 			{
 				for (int x = 0; x < GuardsToSpawn; x++)
@@ -1902,24 +1803,17 @@ namespace PlayhousePlugin
 			// Okay we have the list! Time to spawn everyone in, we'll leave SCP for last as it has a bit of logic.
 			foreach (Player ply in PlayersToSpawnAsClassD)
 			{
-				Timing.CallDelayed(0.1f, () =>
-				{
-					ply.Role.Set(RoleTypeId.ClassD);
-				});
+				Timing.CallDelayed(0.1f, () => { ply.Role.Set(RoleTypeId.ClassD); });
 			}
+
 			foreach (Player ply in PlayersToSpawnAsScientist)
 			{
-				Timing.CallDelayed(0.1f, () =>
-				{
-					ply.Role.Set(RoleTypeId.Scientist);
-				});
+				Timing.CallDelayed(0.1f, () => { ply.Role.Set(RoleTypeId.Scientist); });
 			}
+
 			foreach (Player ply in PlayersToSpawnAsGuard)
 			{
-				Timing.CallDelayed(0.1f, () =>
-				{
-					ply.Role.Set(RoleTypeId.FacilityGuard);
-				});
+				Timing.CallDelayed(0.1f, () => { ply.Role.Set(RoleTypeId.FacilityGuard); });
 			}
 
 			// ---------------------------------------------------------------------------------------\\
@@ -1939,7 +1833,8 @@ namespace PlayhousePlugin
 				Timing.CallDelayed(0.1f, () =>
 				{
 					ply.Role.Set(role);
-					ply.Broadcast(10, "<color=yellow><b> Did you know you can swap classes with other SCP's?</b></color> Simply type <color=orange>.scpswap (role number)</color> in your in-game console (not RA) to swap!)");
+					ply.Broadcast(10,
+						"<color=yellow><b> Did you know you can swap classes with other SCP's?</b></color> Simply type <color=orange>.scpswap (role number)</color> in your in-game console (not RA) to swap!)");
 				});
 			}
 
@@ -1947,7 +1842,7 @@ namespace PlayhousePlugin
 			{
 				Timing.CallDelayed(10f, () =>
 				{
-					if(!SillySundayEventHandler.NerfWarMode)
+					if (!SillySundayEventHandler.NerfWarMode)
 						Round.IsLocked = false;
 				});
 			}
@@ -1956,14 +1851,17 @@ namespace PlayhousePlugin
 			{
 				Log.Info($"Guard: {thing}");
 			}
+
 			foreach (var thing in PlayersToSpawnAsScientist)
 			{
 				Log.Info($"Scientist: {thing}");
 			}
+
 			foreach (var thing in PlayersToSpawnAsClassD)
 			{
 				Log.Info($"ClassD: {thing}");
 			}
+
 			foreach (var thing in PlayersToSpawnAsSCP)
 			{
 				Log.Info($"SCP: {thing}");
@@ -1981,8 +1879,8 @@ namespace PlayhousePlugin
 
 			Timing.CallDelayed(3, () =>
 			{
-				Scp096.TurnedPlayers.Clear();
-				Scp173.TurnedPlayers.Clear();
+				Scp096Role.TurnedPlayers.Clear();
+				Scp173Role.TurnedPlayers.Clear();
 			});
 
 			Timing.RunCoroutine(PromotePlayers());
@@ -1990,37 +1888,12 @@ namespace PlayhousePlugin
 				coroutines.Add(Timing.RunCoroutine(Deathmatch.TimerDeathMatch()));
 			else
 			{
-				if(!IsEventServer)
-					coroutines.Add(Timing.RunCoroutine(Timer()));	
+				if (!IsEventServer)
+					coroutines.Add(Timing.RunCoroutine(Timer()));
 			}
 
 			allowSwaps = true;
 			Timing.CallDelayed(120, () => allowSwaps = false);
-		}
-
-		public void OnBan(BanningEventArgs ev)
-		{
-			if (Server.Port == 7777)
-			{
-				SendMessageAsync($"Banned Player on **Server #1**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
-			}
-			else if (Server.Port == 8888)
-			{
-				SendMessageAsync($"Banned Player on **Server #2**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
-			}
-			else if (Server.Port == 9999)
-			{
-				SendMessageAsync($"Banned Player on **Server #3**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
-			}
-			else if (Server.Port == 7778)
-			{
-				SendMessageAsync($"Banned Player on **Dev Server**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
-			}
-			else
-			{
-				SendMessageAsync($"Banned Player on **Server with port: {Server.Port}**:\n```Offender: {ev.Target.Nickname} ({ev.Target.UserId})\nReason: {ev.Reason}\nDuration: {ev.Duration} seconds\nIssuer: {ev.Player.Nickname} ({ev.Player.UserId})```", true);
-			}
-
 		}
 
 		public void OnEscape(EscapingEventArgs ev)
@@ -2044,45 +1917,10 @@ namespace PlayhousePlugin
 				Round.EndRound(true);
 			}
 
-			if (IsEventServer)
-			{
-				switch (ev.NewRole)
-				{
-					case RoleTypeId.ChaosConscript:
-						if (BreakoutBlitz.ClassDEscapes + 1 >= BreakoutBlitz.RequiredClassDEscapes)
-						{
-							Map.ClearBroadcasts();
-							Cassie.Message("pitch_0.3 .g4 .g4 .g4 .g4");
-							Map.Broadcast(10, "<size=70><b><color=green>Chaos Won!\n</color></b></size><i>Restarting Round...</i>");
-							Timing.CallDelayed(10, () => Round.Restart());
-						}
-						else
-						{
-							BreakoutBlitz.ClassDEscapes++;
-						}
-						break;
-					
-					case RoleTypeId.NtfPrivate:
-					case RoleTypeId.NtfSpecialist:
-						if (BreakoutBlitz.ScientistEscapes + 1 >= BreakoutBlitz.RequiredScientistEscapes)
-						{
-							Map.ClearBroadcasts();
-							Cassie.Message("pitch_0.3 .g4 .g4 .g4 .g4");
-							Map.Broadcast(10, "<size=70><b><color=blue>NTF Won!\n</color></b></size><i>Restarting Round...</i>");
-							Timing.CallDelayed(10, () => Round.Restart());
-						}
-						else
-						{
-							BreakoutBlitz.ScientistEscapes++;
-						}
-						break;
-				}
-			}
-			
 			Timing.CallDelayed(0.3f, () =>
 			{
 				ev.Player.DropItems();
-				
+
 				switch (ev.NewRole)
 				{
 					case RoleTypeId.NtfSpecialist:
@@ -2107,6 +1945,7 @@ namespace PlayhousePlugin
 								Ntf.MakeNtfContainmentSpecialist(ev.Player);
 								break;
 						}
+
 						break;
 
 					case RoleTypeId.NtfPrivate:
@@ -2131,8 +1970,9 @@ namespace PlayhousePlugin
 								Ntf.MakeNtfContainmentSpecialist(ev.Player);
 								break;
 						}
+
 						break;
-				
+
 					case RoleTypeId.ChaosConscript:
 						switch (random.Next(6))
 						{
@@ -2146,15 +1986,13 @@ namespace PlayhousePlugin
 								CI.MakeChaosBulldozer(ev.Player);
 								break;
 							case 3:
-								CI.MakeChaosHunter(ev.Player);
-								break;
-							case 4:
 								CI.MakeChaosPoisonCarrier(ev.Player);
 								break;
-							case 5:
+							case 4:
 								CI.MakeChaosMachinist(ev.Player);
 								break;
 						}
+
 						break;
 				}
 			});
@@ -2162,7 +2000,8 @@ namespace PlayhousePlugin
 
 		public void OnDying(DyingEventArgs ev)
 		{
-			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Boomer" && (ev.DamageHandler.Base is FirearmDamageHandler || ev.DamageHandler.Base is ExplosionDamageHandler))
+			if (ev.Player.CustomClassManager().CustomClass?.Name == "Zombie Boomer" &&
+			    (ev.DamageHandler.Base is FirearmDamageHandler || ev.DamageHandler.Base is ExplosionDamageHandler))
 			{
 				UtilityMethods.FakeExplode(ev.Player);
 				Timing.RunCoroutine(PassiveAbilities.ToxicZone(ev.Player));
@@ -2173,12 +2012,10 @@ namespace PlayhousePlugin
 				if (ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.Scp049 && ev.Player != ev.Attacker)
 				{
 					ev.Player.Role.Set(RoleTypeId.Scp0492);
-					Timing.CallDelayed(0.5f, () =>
-					{
-						ev.Player.Position = ev.Attacker.Position;
-					});
+					Timing.CallDelayed(0.5f, () => { ev.Player.Position = ev.Attacker.Position; });
 				}
 			}
+
 			if (SillySundayEventHandler.slaughterhouse)
 			{
 				Vector3 DeathPosition = ev.Player.Position;
@@ -2196,96 +2033,52 @@ namespace PlayhousePlugin
 					ev.Target.Ammo[ItemType.Ammo762x39] = 450;
 					*/
 					ev.Player.Broadcast(6, "<color=yellow><i>Welcome back...</i>\n<b>Kill the Scientists.</b></color>");
-					Timing.CallDelayed(0.5f, () =>
-					{
-						ev.Player.Position = DeathPosition;
-					});
+					Timing.CallDelayed(0.5f, () => { ev.Player.Position = DeathPosition; });
 				});
 			}
 
-			if (IsEventServer)
+			switch (ev.Player.Role.Team)
 			{
-				if (ev.Attacker?.Role.Team == Team.SCPs && ev.Attacker != ev.Player)
-				{
-					if (BreakoutBlitz.SCPKills + 1 >= BreakoutBlitz.RequiredSCPKills)
+				case Team.ChaosInsurgency:
+				case Team.ClassD:
+					if (Stopwatch.ElapsedMilliseconds >= 600000)
 					{
-						Map.ClearBroadcasts();
-						Cassie.Message("pitch_0.3 .g4 .g4 .g4 .g4", isNoisy:false);
-						Map.Broadcast(10, "<size=70><b><color=red>SCPs Won!\n</color></b></size><i>Restarting Round...</i>");
-						Timing.CallDelayed(10, ()=>Round.Restart());
-					}
-					else
-					{
-						BreakoutBlitz.SCPKills++;
-					}
-				}
-
-				switch (ev.Player.Role.Team)
-				{
-					case Team.ChaosInsurgency:
-					case Team.ClassD:
-						if (Stopwatch.ElapsedMilliseconds >= 600000)
+						if (UtilityMethods.RandomChance(3))
 						{
-							if (UtilityMethods.RandomChance(3))
+							Timing.CallDelayed(10, () =>
 							{
-								Timing.CallDelayed(10, () =>
-								{
-									if (!RoundActive)
-										return;
-									ev.Player.Role.Set(RoleTypeId.ChaosRifleman);
-								});
+								if (!RoundActive)
+									return;
+								ev.Player.Role.Set(RoleTypeId.ChaosRifleman);
+							});
 
-								/*
-								Timing.CallDelayed(12, () =>
-								{
-									if (!RoundActive)
-										return;
-									switch (random.Next(6))
-									{
-										case 0:
-											CI.MakeChaosHeretic(ev.Target);
-											break;
-										case 1:
-											CI.MakeChaosDemo(ev.Target);
-											break;
-										case 2:
-											CI.MakeChaosBulldozer(ev.Target);
-											break;
-										case 3:
-											CI.MakeChaosHunter(ev.Target);
-											break;
-										case 4:
-											CI.MakeChaosPoisonCarrier(ev.Target);
-											break;
-										case 5:
-											CI.MakeChaosMachinist(ev.Target);
-											break;
-									}
-								});*/
-							}
-							else
+							/*
+							Timing.CallDelayed(12, () =>
 							{
-								Timing.CallDelayed(10, () =>
+								if (!RoundActive)
+									return;
+								switch (random.Next(6))
 								{
-									if (!RoundActive)
-										return;
-									ev.Player.Role.Set(RoleTypeId.ClassD);
-								});
-								
-								Timing.CallDelayed(12, () =>
-								{
-									if (!RoundActive)
-										return;
-									ev.Player.Position = RoleTypeId.Scientist.GetRandomSpawnLocation()
-										.Position;
-									
-									if (UtilityMethods.RandomChance(2))
-										ev.Player.AddItem(ItemType.KeycardJanitor);
-								
-									if (UtilityMethods.RandomChance(5))
-										ev.Player.AddItem(ItemType.GunCOM15);
-								});
-							}
+									case 0:
+										CI.MakeChaosHeretic(ev.Target);
+										break;
+									case 1:
+										CI.MakeChaosDemo(ev.Target);
+										break;
+									case 2:
+										CI.MakeChaosBulldozer(ev.Target);
+										break;
+									case 3:
+										CI.MakeChaosHunter(ev.Target);
+										break;
+									case 4:
+										CI.MakeChaosPoisonCarrier(ev.Target);
+										break;
+									case 5:
+										CI.MakeChaosMachinist(ev.Target);
+										break;
+								}
+							});*/
 						}
 						else
 						{
@@ -2295,7 +2088,7 @@ namespace PlayhousePlugin
 									return;
 								ev.Player.Role.Set(RoleTypeId.ClassD);
 							});
-							
+
 							Timing.CallDelayed(12, () =>
 							{
 								if (!RoundActive)
@@ -2305,70 +2098,77 @@ namespace PlayhousePlugin
 
 								if (UtilityMethods.RandomChance(2))
 									ev.Player.AddItem(ItemType.KeycardJanitor);
-								
+
 								if (UtilityMethods.RandomChance(5))
 									ev.Player.AddItem(ItemType.GunCOM15);
 							});
 						}
-						ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
-						break;
-					
-					case Team.FoundationForces:
-					case Team.Scientists:
-						if (Stopwatch.ElapsedMilliseconds >= 600000)
+					}
+					else
+					{
+						Timing.CallDelayed(10, () =>
 						{
-							if (UtilityMethods.RandomChance(3))
+							if (!RoundActive)
+								return;
+							ev.Player.Role.Set(RoleTypeId.ClassD);
+						});
+
+						Timing.CallDelayed(12, () =>
+						{
+							if (!RoundActive)
+								return;
+							ev.Player.Position = RoleTypeId.Scientist.GetRandomSpawnLocation()
+								.Position;
+
+							if (UtilityMethods.RandomChance(2))
+								ev.Player.AddItem(ItemType.KeycardJanitor);
+
+							if (UtilityMethods.RandomChance(5))
+								ev.Player.AddItem(ItemType.GunCOM15);
+						});
+					}
+
+					ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
+					break;
+
+				case Team.FoundationForces:
+				case Team.Scientists:
+					if (Stopwatch.ElapsedMilliseconds >= 600000)
+					{
+						if (UtilityMethods.RandomChance(3))
+						{
+							if (!RoundActive)
+								return;
+
+							Timing.CallDelayed(10, () => { ev.Player.Role.Set(RoleTypeId.NtfSergeant); });
+
+							/*
+							Timing.CallDelayed(12, () =>
 							{
 								if (!RoundActive)
 									return;
-								
-								Timing.CallDelayed(10, () =>
+								switch (random.Next(6))
 								{
-									ev.Player.Role.Set(RoleTypeId.NtfSergeant);
-									
-								});
-
-								/*
-								Timing.CallDelayed(12, () =>
-								{
-									if (!RoundActive)
-										return;
-									switch (random.Next(6))
-									{
-										case 0:
-											Ntf.MakeNtfEngineer(ev.Target);
-											break;
-										case 1:
-											Ntf.MakeNtfDemo(ev.Target);
-											break;
-										case 2:
-											Ntf.MakeNtfHeavy(ev.Target);
-											break;
-										case 3:
-											Ntf.MakeNtfMedic(ev.Target);
-											break;
-										case 4:
-											Ntf.MakeNtfScout(ev.Target);
-											break;
-										case 5:
-											Ntf.MakeNtfContainmentSpecialist(ev.Target);
-											break;
-									}
-								});*/
-							}
-							else
-							{
-								Timing.CallDelayed(10, () =>
-								{
-									if (!RoundActive)
-										return;
-									
-									if (UtilityMethods.RandomChance(2))
-										ev.Player.Role.Set(RoleTypeId.Scientist);
-									else
-										ev.Player.Role.Set(RoleTypeId.FacilityGuard);
-								});
-							}
+									case 0:
+										Ntf.MakeNtfEngineer(ev.Target);
+										break;
+									case 1:
+										Ntf.MakeNtfDemo(ev.Target);
+										break;
+									case 2:
+										Ntf.MakeNtfHeavy(ev.Target);
+										break;
+									case 3:
+										Ntf.MakeNtfMedic(ev.Target);
+										break;
+									case 4:
+										Ntf.MakeNtfScout(ev.Target);
+										break;
+									case 5:
+										Ntf.MakeNtfContainmentSpecialist(ev.Target);
+										break;
+								}
+							});*/
 						}
 						else
 						{
@@ -2376,107 +2176,46 @@ namespace PlayhousePlugin
 							{
 								if (!RoundActive)
 									return;
-									
+
 								if (UtilityMethods.RandomChance(2))
 									ev.Player.Role.Set(RoleTypeId.Scientist);
 								else
 									ev.Player.Role.Set(RoleTypeId.FacilityGuard);
 							});
 						}
-						ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
-						break;
-					
-					case Team.SCPs:
-						RoleTypeId role = ev.Player.Role.Type;
-
+					}
+					else
+					{
 						Timing.CallDelayed(10, () =>
 						{
-							ev.Player.Role.Set(role);
-						});
-						
-						Timing.CallDelayed(13, () =>
-						{
-							ev.Player.Health /= 5;
-							ev.Player.MaxHealth /= 5;
-						});
-						
-						ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
-						break;
-				}
-			}
+							if (!RoundActive)
+								return;
 
-			if (ev.Attacker != null && RecentlyUncuffed.Contains(ev.Player.Id) && (ev.Attacker.Role.Team != Team.SCPs && ev.Player != ev.Attacker))
-			{
-				List<Player> RAPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
-				string modsOnline = "";
-				foreach (Player Ply in RAPermsPlayers)
-				{
-					if (Ply.RankName.Contains("Moderator") || Ply.RankName.Contains("Admin") || Ply.RawUserId == "kognity")
-					{
-						Ply.Broadcast(10, $"Suspected undetain to kill detected, check Discord Channel for info.",
-							Broadcast.BroadcastFlags.AdminChat);
-						modsOnline += $"{Ply.Nickname} ";
+							if (UtilityMethods.RandomChance(2))
+								ev.Player.Role.Set(RoleTypeId.Scientist);
+							else
+								ev.Player.Role.Set(RoleTypeId.FacilityGuard);
+						});
 					}
-				}
-				if (Server.Port == 7777)
-				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #1**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
-				}
-				else if (Server.Port == 8888)
-				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #2**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
-				}
-				else if (Server.Port == 9999)
-				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server #3**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
-				}
-				else if (Server.Port == 7778)
-				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Dev Server**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname} ({Player.Get(RecentlyUncuffer[ev.Player.Id]).UserId}) as {Player.Get(RecentlyUncuffer[ev.Player.Id]).Role.Type.ToString()}\nMods Online: {modsOnline}```", true);
-				}
-				else
-				{
-					SendMessageAsync($"Suspected Detained Kill (undetain to kill) on **Server with port: {Server.Port}**:\n```Killer:{ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nUncuffer: {Player.Get(RecentlyUncuffer[ev.Player.Id]).Nickname}\nMods Online: {modsOnline}```", true);
-				}
-			}
 
-			if (ev.Attacker != null && ev.Attacker != null && ev.Player.IsCuffed && ev.Attacker.Role.Team != Team.SCPs && ev.Player != ev.Attacker)
-			{
-				List<Player> RAPermsPlayers = Player.List.Where(r => r.ReferenceHub.serverRoles.RemoteAdmin).ToList();
-				string modsOnline = "";
-				foreach (Player Ply in RAPermsPlayers)
-				{
-					if (Ply.RankName.Contains("Moderator") || Ply.RankName.Contains("Admin") || Ply.RawUserId == "kognity")
+					ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
+					break;
+
+				case Team.SCPs:
+					RoleTypeId role = ev.Player.Role.Type;
+
+					Timing.CallDelayed(10, () => { ev.Player.Role.Set(role); });
+
+					Timing.CallDelayed(13, () =>
 					{
-						Ply.Broadcast(10,
-							$"{ev.Attacker.Nickname} as {ev.Attacker.Role.Type.ToString()} killed {ev.Player.Nickname} as {ev.Player.Role.Type.ToString()} detained by {ev.Player.Cuffer.Nickname}",
-							Broadcast.BroadcastFlags.AdminChat);
-						modsOnline += $"{Ply.Nickname} ";
-					}
-				}
-				if (Server.Port == 7777)
-				{
-					SendMessageAsync($"Detained Kill on **Server #1**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
-				}
-				else if (Server.Port == 8888)
-				{
-					SendMessageAsync($"Detained Kill on **Server #2**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
-				}
-				else if (Server.Port == 9999)
-				{
-					SendMessageAsync($"Detained Kill on **Server #3**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
-				}
-				else if (Server.Port == 7778)
-				{
-					SendMessageAsync($"Detained Kill on **Dev Server**:\n```Killer: {ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
-				}
-				else
-				{
-					SendMessageAsync($"Detained Kill on **Server with port: {Server.Port}**:\n```Killer:{ev.Attacker.Nickname} ({ev.Attacker.UserId}) as {ev.Attacker.Role.Type.ToString()}\nDetained Victim: {ev.Player.Nickname} ({ev.Player.UserId}) as {ev.Player.Role.Type.ToString()}\nDetainer: {ev.Player.Cuffer.Nickname}\nMods Online: {modsOnline}```", true);
-				}
+						ev.Player.Health /= 5;
+						ev.Player.MaxHealth /= 5;
+					});
+
+					ev.Player.Broadcast(10, "<b>Respawning in 10 seconds...</b>");
+					break;
 			}
 		}
-		
 
 		public void OnHandcuff(HandcuffingEventArgs ev)
 		{
@@ -2486,7 +2225,7 @@ namespace PlayhousePlugin
 				return;
 			}
 		}
-		
+
 		public void OnRemoveHandcuffs(RemovingHandcuffsEventArgs ev)
 		{
 			try
@@ -2518,34 +2257,28 @@ namespace PlayhousePlugin
 			{
 				Timing.CallDelayed(0.5f, () =>
 				{
-					RoleTypeId[] scp_list = new RoleTypeId[] { RoleTypeId.Scp096, RoleTypeId.Scp106, RoleTypeId.Scp173, RoleTypeId.Scp939 };
+					RoleTypeId[] scp_list = new RoleTypeId[]
+						{ RoleTypeId.Scp096, RoleTypeId.Scp106, RoleTypeId.Scp173, RoleTypeId.Scp939 };
 					int random_scp = random.Next(5);
 					ev.Target.Role.Set(scp_list[random_scp]);
-					Timing.CallDelayed(0.5f, () =>
-					{
-						ev.Target.Position = ev.Scp049.Position;
-					});
-					Timing.CallDelayed(1.7f, () =>
-					{
-						ev.Target.Health *= 0.3f;
-					});
+					Timing.CallDelayed(0.5f, () => { ev.Target.Position = ev.Player.Position; });
+					Timing.CallDelayed(1.7f, () => { ev.Target.Health *= 0.3f; });
 				});
 				return;
 			}
+
 			if (SillySunday)
 			{
 				ev.Target.Broadcast(10, "<b>Type in 'cmdbind f .zfe' in console.\nThen press F to explode!!</b>");
 			}
 
-			Timing.CallDelayed(0.5f, () =>
-			{
-				PickRandomZombieVariant(ev.Target);
-			});
+			Timing.CallDelayed(0.5f, () => { PickRandomZombieVariant(ev.Target); });
 		}
 
 		public void OnShooting(ShootingEventArgs ev)
 		{
-			if(ev.Player.CustomClassManager().CustomClass?.Name == "NTF Containment Specialist" || ev.Player.CustomClassManager().CustomClass?.Name == "Chaos Containment Specialist")
+			if (ev.Player.CustomClassManager().CustomClass?.Name == "NTF Containment Specialist" ||
+			    ev.Player.CustomClassManager().CustomClass?.Name == "Chaos Containment Specialist")
 			{
 				if (ev.Player.CurrentItem.Type == ItemType.GunRevolver)
 				{
@@ -2589,41 +2322,16 @@ namespace PlayhousePlugin
 						circle.UpdatePositionServer();
 						Timing.RunCoroutine(UtilityMethods.FadeAway(circle));
 					});
-					
+
 					// Recoil
 					var pos1 = ev.Player.CameraTransform.position + ev.Player.CameraTransform.forward +
-					          Vector3.up * 0.3f;
-					
+					           Vector3.up * 0.3f;
+
 					ev.Player.CameraTransform.LookAt(pos1);
 					var eulerAngles = ev.Player.CameraTransform.eulerAngles;
 					ev.Player.Rotation = new Vector2(0f - eulerAngles.x, eulerAngles.y);
 				}
 			}
-
-			var p = Player.Get(ev.TargetNetId);
-			// 106 stuff
-			if (p != null)
-			{
-				if (p.Role.Type == RoleTypeId.Scp106)
-				{
-					SCP106CustomClass customClass = (SCP106CustomClass) p.CustomClassManager().CustomClass;
-					Vanish ability = (Vanish) customClass.ActiveAbilities[0];
-					
-					if (ability.IsVanish)
-					{
-						// If they are NOT in the list they can DO damage
-						if (!p.TargetGhostsHashSet.Contains(ev.Player.Id) && !ev.Player.TargetGhostsHashSet.Contains(p.Id))
-						{
-							ev.IsAllowed = true;
-						}
-						else
-						{
-							ev.IsAllowed = false;
-						}
-					}
-				}
-			}
-
 
 			if (IsDevServer)
 			{
@@ -2640,7 +2348,7 @@ namespace PlayhousePlugin
 				{
 					ragdoll.Delete();
 				});*/
-				
+
 				/*
 				var gasGrenade = MapUtils.GetSchematicDataByName("ChefHat1");
 				var gasGrenadeObject = ObjectSpawner.SpawnSchematic(new SchematicObject() {SchematicName = "ChefHat1"},
@@ -2653,47 +2361,13 @@ namespace PlayhousePlugin
 				Timing.CallDelayed(10, () => gasGrenadeObject.Destroy());
 */
 			}
-			
+
 			/*
 			if (IsDevServer)
 			{
 				var item = (Item)Item.Create(ev.Shooter.CurrentItem.Type).Spawn(ev.Shooter.CameraTransform.position);
 				item.Base.Rb.velocity = ev.Shooter.CameraTransform.forward * 10;
 			}*/
-			if (ContentGun.ContainsKey(ev.Player))
-			{
-				if (ContentGun[ev.Player].First > ContentGun[ev.Player].Second)
-				{
-					ev.IsAllowed = false;
-
-					ContentGun[ev.Player].Second += 1;
-					
-					var handler = new CustomReasonDamageHandler("Spawned by your nearby patreon supporter :trollface:", float.MaxValue);
-					handler.StartVelocity = ev.Player.CameraTransform.forward * 10
-					                        + ev.Player.CameraTransform.up;
-					var ragdoll = new Exiled.API.Features.Ragdoll(new RagdollData(Exiled.API.Features.Server.Host.ReferenceHub, handler, RoleTypeId.Scientist, ev.Player.Position, ev.Player.CameraTransform.rotation, "gaming", 1.0));
-					ragdoll.Scale = new Vector3(UnityEngine.Random.Range(0.25f, 6), UnityEngine.Random.Range(0.25f, 6), UnityEngine.Random.Range(0.25f, 6));
-					
-					ragdoll.Spawn();
-
-					Timing.CallDelayed(8f, () =>
-					{
-						ragdoll.Destroy();
-					});
-
-					ev.Player.ShowCenterDownHint($"<color=blue>{ContentGun[ev.Player].First - ContentGun[ev.Player].Second} ragdolls left</color>",1);
-				}
-				else
-				{
-					if (ContentGun[ev.Player].First != -1)
-					{
-						ev.Player.Broadcast(5, "<i>You have run out of content gun rounds!</i>");
-						ContentGun[ev.Player].First = -1;
-						ContentGun[ev.Player].Second = -1;
-					}
-				}
-			}
-
 			/*
 			Vector3 forward = ev.Shooter.CameraTransform.forward;
 			if (Physics.Raycast(ev.Shooter.CameraTransform.position + forward, forward, out var hit, 500))
@@ -2716,31 +2390,30 @@ namespace PlayhousePlugin
 
 		public void RagdollSpawning(SpawningRagdollEventArgs ev)
 		{
-			if (DeletePlayerRagdoll.Contains(ev.Owner))
+			if (DeletePlayerRagdoll.Contains(ev.Player))
 			{
 				ev.IsAllowed = false;
-				DeletePlayerRagdoll.Remove(ev.Owner);
+				DeletePlayerRagdoll.Remove(ev.Player);
 			}
-				/*
-				if (Server.Port == 7778)
-				{
+			/*
+			if (Server.Port == 7778)
+			{
+				ev.Velocity *= 2.5f;
+			}
+
+			var d = Donator.Donators.Where(x => x.UserId == ev.Owner.RawUserId).FirstOrDefault();
+			if (d != null)
+				if (d.DonatorNum >= 3)
 					ev.Velocity *= 2.5f;
-				}
-	
-				var d = Donator.Donators.Where(x => x.UserId == ev.Owner.RawUserId).FirstOrDefault();
-				if (d != null)
-					if (d.DonatorNum >= 3)
-						ev.Velocity *= 2.5f;
-				return;
-				*/
-			Timing.RunCoroutine(UtilityMethods.DensifyAmmoBoxes(ev));
+			return;
+			*/
 		}
 
 		public void OnSetClass(ChangingRoleEventArgs ev)
 		{
 			ev.Player.IsGodModeEnabled = ev.NewRole == RoleTypeId.Tutorial;
-			
-			if(ev.NewRole != RoleTypeId.Tutorial && ev.Player.Role.Type != RoleTypeId.Tutorial)
+
+			if (ev.NewRole != RoleTypeId.Tutorial && ev.Player.Role.Type != RoleTypeId.Tutorial)
 				ev.Player.CustomClassManager().DisposeCustomClass();
 
 			switch (ev.NewRole)
@@ -2749,27 +2422,17 @@ namespace PlayhousePlugin
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP049CustomClass(ev.Player);
 					break;
-				
-				case RoleTypeId.Scp079:
-					ev.Player.CustomClassManager().DisposeCustomClass();
-					ev.Player.CustomClassManager().CustomClass = new SCP079CustomClass(ev.Player);
-					break;
-				
-				case RoleTypeId.Scp106:
-					ev.Player.CustomClassManager().DisposeCustomClass();
-					ev.Player.CustomClassManager().CustomClass = new SCP106CustomClass(ev.Player);
-					break;
-				
+
 				case RoleTypeId.Scp096:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP096CustomClass(ev.Player);
 					break;
-				
+
 				case RoleTypeId.Scp173:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP173CustomClass(ev.Player);
 					break;
-				
+
 				case RoleTypeId.Scp939:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new SCP93953CustomClass(ev.Player);
@@ -2779,7 +2442,7 @@ namespace PlayhousePlugin
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new NTFSergeant(ev.Player);
 					break;
-				
+
 				case RoleTypeId.NtfCaptain:
 					ev.Player.CustomClassManager().DisposeCustomClass();
 					ev.Player.CustomClassManager().CustomClass = new NTFCaptain(ev.Player);
@@ -2799,7 +2462,7 @@ namespace PlayhousePlugin
 
 			if (SillySundayEventHandler.ohfiverescuemode)
 			{
-				if(ev.Player == SillySundayEventHandler.OhFivePlayer)
+				if (ev.Player == SillySundayEventHandler.OhFivePlayer)
 				{
 					Map.Broadcast(10, "The 05 has died. Chaos wins! Facility wipe initiated!");
 					Warhead.Start();
@@ -2823,7 +2486,8 @@ namespace PlayhousePlugin
 						ev.Target.AddItem(ItemType.KeycardChaosInsurgency);
 						ev.Target.Ammo[ItemType.Ammo762x39] = 450;
 						*/
-						ev.Player.Broadcast(6, "<color=yellow><i>Welcome back...</i>\n<b>Kill the remaining foundation personnel.</b></color>");
+						ev.Player.Broadcast(6,
+							"<color=yellow><i>Welcome back...</i>\n<b>Kill the remaining foundation personnel.</b></color>");
 					});
 				}
 			}
@@ -2833,13 +2497,10 @@ namespace PlayhousePlugin
 				if (ev.Attacker.Role.Type == SillySundayInfectionController.InfectedRole)
 				{
 					ev.Player.Role.Set(ev.Attacker.Role.Type);
-					Timing.CallDelayed(0.5f, () =>
-					{
-						ev.Player.Position = ev.Attacker.Position;
-					});
-				}				
+					Timing.CallDelayed(0.5f, () => { ev.Player.Position = ev.Attacker.Position; });
+				}
 			}
-			
+
 			if (InfectedPlayers.Contains(ev.Player))
 			{
 				if (ev.Attacker != null && ev.Attacker != ev.Player) // If its not a suicide
@@ -2860,7 +2521,7 @@ namespace PlayhousePlugin
 							return;
 						}
 					}
-					
+
 					// 049 wasn't alive let's see if ANY zombies are alive
 					foreach (Player Ply in Player.List)
 					{
@@ -2872,14 +2533,15 @@ namespace PlayhousePlugin
 							return;
 						}
 					}
-					
+
 					// Welp no zombies or 049 is alive. Put the poor guy on surface.
 					InfectedPlayers.Remove(ev.Player);
 					Timing.RunCoroutine(ChangeToSCP(ev.Player, ev.Attacker, true));
 				}
 			}
 
-			if (!DoNotSpawn.Contains(ev.Player.UserId) && ev.Player.IsVerified && ev.DamageHandler.Type == DamageType.Unknown)
+			if (!DoNotSpawn.Contains(ev.Player.UserId) && ev.Player.IsVerified &&
+			    ev.DamageHandler.Type == DamageType.Unknown)
 			{
 				if (ev.Attacker == null || ev.Attacker.Role.Team == Team.SCPs)
 				{
@@ -2897,14 +2559,12 @@ namespace PlayhousePlugin
 					Timing.KillCoroutines(obj.Unfreezer);
 					if (Deathmatch.roundPaused)
 					{
-						Timing.CallDelayed(0.5f, () =>
-						{
-							UtilityMethods.CleanupRagdollsAndItems();
-						});
+						Timing.CallDelayed(0.5f, () => { UtilityMethods.CleanupItems(); });
 						return;
 					}
 
-					if ((KingAndCompetitor.IsKing(ev.Attacker) || KingAndCompetitor.IsKing(ev.Player)) && ev.Attacker != ev.Player)
+					if ((KingAndCompetitor.IsKing(ev.Attacker) || KingAndCompetitor.IsKing(ev.Player)) &&
+					    ev.Attacker != ev.Player)
 					{
 						if (Deathmatch.playerAndWins.ContainsKey(ev.Attacker.UserId))
 						{
@@ -2922,14 +2582,18 @@ namespace PlayhousePlugin
 						//ev.Killer.PlayCassieAnnouncement("pitch_0.3 .g5 .g5 .g5", false, false);
 						//ev.Target.PlayCassieAnnouncement("pitch_0.3 .g5 .g5 .g5", false, false);
 
-						ev.Attacker.Broadcast(10, $"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
-						ev.Player.Broadcast(10, $"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
+						ev.Attacker.Broadcast(10,
+							$"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
+						ev.Player.Broadcast(10,
+							$"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
 
 						// Giving notifications to global players who are not actively playing
-						foreach(Player p in Player.List)
+						foreach (Player p in Player.List)
 						{
-							if(p.Role.Type == RoleTypeId.Tutorial || p.Role.Type == RoleTypeId.Spectator && p != ev.Player)
-								p.Broadcast(3, $"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
+							if (p.Role.Type == RoleTypeId.Tutorial ||
+							    p.Role.Type == RoleTypeId.Spectator && p != ev.Player)
+								p.Broadcast(3,
+									$"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
 						}
 
 						if (!ev.Attacker.DoNotTrack)
@@ -2939,6 +2603,7 @@ namespace PlayhousePlugin
 							else
 								dmWins.Add(ev.Attacker, 1);
 						}
+
 						if (!ev.Player.DoNotTrack)
 						{
 							if (dmLosses.ContainsKey(ev.Player))
@@ -2975,23 +2640,15 @@ namespace PlayhousePlugin
 							obj.Queue.Remove(obj.Competitor); // Now remove them from the queue.
 						}
 
-						Timing.CallDelayed(0.5f, () =>
-						{
-							UtilityMethods.CleanupRagdollsAndItems();
-						});
+						Timing.CallDelayed(0.5f, () => { UtilityMethods.CleanupItems(); });
 
-						Timing.CallDelayed(5, () =>
-						{
-							ev.Attacker.Role.Set(RoleTypeId.Spectator);
-						});
+						Timing.CallDelayed(5, () => { ev.Attacker.Role.Set(RoleTypeId.Spectator); });
 
-						Timing.CallDelayed(7, () =>
-						{
-							Deathmatch.StartMatch(obj);
-						});
+						Timing.CallDelayed(7, () => { Deathmatch.StartMatch(obj); });
 					}
 				}
 			}
+
 			if (ev.Attacker != null && !ev.Attacker.DoNotTrack)
 			{
 				if (ev.DamageHandler.Base is UniversalDamageHandler universalDamageHandler1)
@@ -3005,16 +2662,17 @@ namespace PlayhousePlugin
 							{
 								if (damageDealt.ContainsKey(ply))
 								{
-									damageDealt[ply] += (int) Math.Ceiling(ev.Player.Health);
+									damageDealt[ply] += (int)Math.Ceiling(ev.Player.Health);
 								}
 								else
 								{
-									damageDealt.Add(ply, (int) Math.Ceiling(ev.Player.Health));
+									damageDealt.Add(ply, (int)Math.Ceiling(ev.Player.Health));
 								}
 							}
 						}
 					}
 				}
+
 				if (kills.ContainsKey(ev.Attacker))
 				{
 					kills[ev.Attacker] += 1;
@@ -3025,6 +2683,7 @@ namespace PlayhousePlugin
 					kills.Add(ev.Attacker, 1);
 				}
 			}
+
 			if (!ev.Player.DoNotTrack)
 			{
 				if (deaths.ContainsKey(ev.Player))
@@ -3063,7 +2722,6 @@ namespace PlayhousePlugin
 					break;
 				case Team.FoundationForces:
 					AddGeneralKills(ev.Attacker);
-					AddSquadKills(ev.Attacker);
 					AddHumanKills(ev.Attacker);
 					break;
 				case Team.ClassD:
@@ -3105,14 +2763,6 @@ namespace PlayhousePlugin
 				HumanKills.Add(ply, 1);
 		}
 
-		public void AddSquadKills(Player ply)
-		{
-			if (MTFSquadKills.ContainsKey(ply.ReferenceHub.characterClassManager.CurUnitName))
-				MTFSquadKills[ply.ReferenceHub.characterClassManager.CurUnitName] += 1;
-			else
-				MTFSquadKills.Add(ply.ReferenceHub.characterClassManager.CurUnitName, 1);
-		}
-
 		public void OnRespawn(RespawningTeamEventArgs ev)
 		{
 			if (IsEventServer)
@@ -3120,6 +2770,7 @@ namespace PlayhousePlugin
 				ev.IsAllowed = false;
 				return;
 			}
+
 			if (IsDeathMatchServer)
 			{
 				ev.IsAllowed = false;
@@ -3142,30 +2793,22 @@ namespace PlayhousePlugin
 						ev.Players.Add(player);
 					}
 				}
-				
+
 				List<Player> playersToSpawn = new List<Player>(ev.Players);
-				
+
 				Timing.RunCoroutine(ChangeTeamPlayers(ev, playersToSpawn));
-				Timing.RunCoroutine(UtilityMethods.SoftCleanItems());
-				
+				Timing.RunCoroutine(UtilityMethods.CleanupItems());
+
 				if (ev.NextKnownTeam == SpawnableTeamType.NineTailedFox && !MTFSign)
 				{
 					//Timing.RunCoroutine(MTFLetter(new Vector3(157,999,-45f)));
 					MTFSign = true;
 				}
+
 				if (ev.NextKnownTeam == SpawnableTeamType.ChaosInsurgency && !CISign)
 				{
 					//Timing.RunCoroutine(CILetter(new Vector3(42, 993, -67)));
 					CISign = true;
-				}
-
-				if (ObjectivePointController.RapidSpawnWaves)
-				{
-					Timing.CallDelayed(2, () =>
-					{
-						RespawnManager.Singleton.NextKnownTeam = ObjectivePointController.Team;
-						RespawnManager.Singleton._timeForNextSequence = 60;
-					});
 				}
 			}
 		}
@@ -3178,7 +2821,7 @@ namespace PlayhousePlugin
 			{
 				var pickup = new ItemPickup(item);
 
-				if(pickup.Type.IsAmmo())
+				if (pickup.Type.IsAmmo())
 					if (Vector3.Distance(new Vector3(179, 993, -59), pickup.Position) <= 9.4)
 						pickup.Destroy();
 			}
@@ -3192,9 +2835,11 @@ namespace PlayhousePlugin
 				f.FuseTime = 0.5f;
 				f.SpawnActive(new Vector3(12, 999, -58));
 				yield return Timing.WaitForSeconds(0.5f);
-				foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, new Vector3(-9f, 1004, -59)) <= 80))
+				foreach (var ply in Player.List.Where(x =>
+					         Vector3.Distance(x.Position, new Vector3(-9f, 1004, -59)) <= 80))
 				{
-					if (ply.Role.Team != Team.ClassD && ply.Role.Team != Team.ChaosInsurgency && ply.Role.Type != RoleTypeId.Scp079 && ply.Role.Type != RoleTypeId.Tutorial)
+					if (ply.Role.Team != Team.ClassD && ply.Role.Team != Team.ChaosInsurgency &&
+					    ply.Role.Type != RoleTypeId.Scp079 && ply.Role.Type != RoleTypeId.Tutorial)
 					{
 						ply.EnableEffect<Flashed>(7);
 					}
@@ -3202,7 +2847,7 @@ namespace PlayhousePlugin
 			}
 			else
 				yield return Timing.WaitForSeconds(0.5f);
-			
+
 			if (ev.NextKnownTeam == SpawnableTeamType.NineTailedFox)
 			{
 				List<Player> Cadets = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.NtfPrivate).ToList();
@@ -3275,13 +2920,8 @@ namespace PlayhousePlugin
 				List<Player> Shotguns = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.ChaosMarauder).ToList();
 				List<Player> Logicers = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.ChaosRepressor).ToList();
 				List<Player> Riflemen = playersToSpawn.Where(r => r.Role.Type == RoleTypeId.ChaosRifleman).ToList();
-				
+
 				Player Ply;
-				foreach (var player in Shotguns)
-				{
-					CI.MakeChaosHunter(player);
-				}
-				
 				foreach (var player in Logicers)
 				{
 					CI.MakeChaosBulldozer(player);
@@ -3298,7 +2938,7 @@ namespace PlayhousePlugin
 					}
 					else
 						break;
-					
+
 					if (Riflemen.Count != 0)
 					{
 						Ply = Riflemen[random.Next(Riflemen.Count)];
@@ -3306,7 +2946,7 @@ namespace PlayhousePlugin
 					}
 					else
 						break;
-					
+
 					if (Riflemen.Count != 0)
 					{
 						Ply = Riflemen[random.Next(Riflemen.Count)];
@@ -3315,7 +2955,7 @@ namespace PlayhousePlugin
 					}
 					else
 						break;
-					
+
 					if (Riflemen.Count != 0)
 					{
 						Ply = Riflemen[random.Next(Riflemen.Count)];
@@ -3324,7 +2964,7 @@ namespace PlayhousePlugin
 					}
 					else
 						break;
-					
+
 					if (Riflemen.Count != 0)
 					{
 						Ply = Riflemen[random.Next(Riflemen.Count)];
@@ -3333,7 +2973,7 @@ namespace PlayhousePlugin
 					}
 					else
 						break;
-					
+
 					if (Riflemen.Count != 0)
 					{
 						Ply = Riflemen[random.Next(Riflemen.Count)];
@@ -3380,7 +3020,7 @@ namespace PlayhousePlugin
 					if (ClassD.Count != 0)
 					{
 						Ply = ClassD[random.Next(ClassD.Count)];
-						if(UtilityMethods.RandomChance(2))
+						if (UtilityMethods.RandomChance(2))
 							Ply.AddItem(ItemType.Coin);
 						ClassD.Remove(Ply);
 					}
@@ -3390,7 +3030,7 @@ namespace PlayhousePlugin
 					if (ClassD.Count != 0)
 					{
 						Ply = ClassD[random.Next(ClassD.Count)];
-						if(UtilityMethods.RandomChance(2))
+						if (UtilityMethods.RandomChance(2))
 							Ply.AddItem(ItemType.Coin);
 						ClassD.Remove(Ply);
 					}
@@ -3398,6 +3038,7 @@ namespace PlayhousePlugin
 						break;
 				}
 			}
+
 			if (Guards.Count != 0)
 			{
 				Player GuardManager = Guards[random.Next(Guards.Count)];
@@ -3512,7 +3153,7 @@ namespace PlayhousePlugin
 			string webhooksChannelURL = "";
 			Dictionary<string, string> values = new Dictionary<string, string>
 			{
-				{"content", message}
+				{ "content", message }
 			};
 
 			FormUrlEncodedContent content = new FormUrlEncodedContent(values);
@@ -3535,10 +3176,7 @@ namespace PlayhousePlugin
 			{
 				if (item.Value.ItemTypeId == ItemType.KeycardO5)
 				{
-					Timing.CallDelayed(0.1f, () =>
-					{
-						Ply.AddItem(ItemType.KeycardO5);
-					});
+					Timing.CallDelayed(0.1f, () => { Ply.AddItem(ItemType.KeycardO5); });
 					break;
 				}
 			}
@@ -3571,13 +3209,13 @@ namespace PlayhousePlugin
 		{
 			Vector3 pos = Killer.Position;
 			yield return Timing.WaitForSeconds(1f);
-			
+
 			Ply.Role.Set(RoleTypeId.Scp0492);
 			Ply.Scale = new Vector3(1, 1, 1);
 			SCP0492.Overclocker(Ply);
-			
+
 			yield return Timing.WaitForSeconds(1f);
-			
+
 			if (Fallback)
 			{
 				Ply.Position = RoleExtensions.GetRandomSpawnLocation(RoleTypeId.NtfCaptain).Position;
@@ -3589,7 +3227,7 @@ namespace PlayhousePlugin
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------------------------------------//
-		private IEnumerator<float> CheckEscape()
+		public IEnumerator<float> CheckEscape()
 		{
 			List<Player> PlayersAffected = new List<Player>();
 			while (RoundActive)
@@ -3597,7 +3235,8 @@ namespace PlayhousePlugin
 				try
 				{
 					PlayersAffected.Clear();
-					foreach (var ply in Player.List.Where(x=> Vector3.Distance(x.Position, escapeArea) <= Escape.radius))
+					foreach (var ply in Player.List.Where(x =>
+						         Vector3.Distance(x.Position, escapeArea) <= Escape.RadiusSqr))
 					{
 						if (!ply.IsCuffed) continue;
 						if (PlayersAffected.Contains(ply)) continue;
@@ -3633,7 +3272,7 @@ namespace PlayhousePlugin
 		}
 
 		// Taken from RespawnTimer Plugin, modified for Silly Sunday
-		private IEnumerator<float> Timer()
+		public IEnumerator<float> Timer()
 		{
 			yield return Timing.WaitForSeconds(3);
 			while (Round.IsStarted)
@@ -3643,7 +3282,7 @@ namespace PlayhousePlugin
 				if (!Respawn.IsSpawning && false) continue;
 
 				text.Clear();
-				
+
 				text.Append("<color=#ff96de>You will respawn in: </color>");
 
 				text.Append("<b>{minutes} min.</b>");
@@ -3664,13 +3303,6 @@ namespace PlayhousePlugin
 
 				if (RespawnManager.Singleton.NextKnownTeam != SpawnableTeamType.None)
 				{
-					if (ObjectivePointController.RapidSpawnWaves)
-					{
-						RespawnManager.Singleton.NextKnownTeam = ObjectivePointController.Team;
-						if(RespawnManager.Singleton._curSequence != RespawnManager.RespawnSequencePhase.SpawningSelectedTeam &&
-						   RespawnManager.Singleton._curSequence != RespawnManager.RespawnSequencePhase.PlayingEntryAnimations)
-							RespawnManager.Singleton._timeForNextSequence = 60;
-					}
 
 					if (SillySundayEventHandler.ohfiverescuemode)
 						RespawnManager.Singleton.NextKnownTeam = SpawnableTeamType.ChaosInsurgency;
@@ -3698,8 +3330,12 @@ namespace PlayhousePlugin
 					{
 						switch (RespawnManager.Singleton.NextKnownTeam)
 						{
-							case SpawnableTeamType.NineTailedFox: text.Append("<color=blue>Nine-Tailed Fox</color>"); break;
-							case SpawnableTeamType.ChaosInsurgency: text.Append("<color=green>Chaos Insurgency</color>"); break;
+							case SpawnableTeamType.NineTailedFox:
+								text.Append("<color=blue>Nine-Tailed Fox</color>");
+								break;
+							case SpawnableTeamType.ChaosInsurgency:
+								text.Append("<color=green>Chaos Insurgency</color>");
+								break;
 						}
 					}
 				}
@@ -3708,13 +3344,13 @@ namespace PlayhousePlugin
 				{
 					if (ply.Role.Team == Team.Dead)
 					{
-						ply.ShowCenterDownHint(text.ToString(), 1);
+						ply.ShowHint(text.ToString(), 1);
 					}
 				}
 			}
 		}
 
-		public IEnumerator<float> DeathmatchPlayerStats()
+		private IEnumerator<float> DeathmatchPlayerStats()
 		{
 			while (true)
 			{
@@ -3740,7 +3376,7 @@ namespace PlayhousePlugin
 					messageToSend += $"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&dmlosses%&@&{dmLosses[Ply]}\n";
 
 				foreach (Player Ply in deletes)
-					messageToSend += $"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&delete%&@&0";				
+					messageToSend += $"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&delete%&@&0";
 
 				if (messageToSend != "")
 				{
@@ -3749,11 +3385,9 @@ namespace PlayhousePlugin
 					else
 					{
 						ws.Connect();
-						Timing.CallDelayed(0.4f, () =>
-						{
-							ws.Send(messageToSend);
-						});
+						Timing.CallDelayed(0.4f, () => { ws.Send(messageToSend); });
 					}
+
 					kills.Clear();
 					deaths.Clear();
 					damageDealt.Clear();

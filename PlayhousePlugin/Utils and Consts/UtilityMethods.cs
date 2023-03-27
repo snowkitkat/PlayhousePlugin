@@ -326,13 +326,14 @@ namespace PlayhousePlugin
 			ReferenceHub target = owner?.ReferenceHub ?? ReferenceHub.HostHub;
 			Exiled.API.Features.Ragdoll.Spawn(new RagdollData(target, new CustomReasonDamageHandler(deathCause), pos, rot));
 		}*/
-		public static void CleanupItems()
+		public static IEnumerator<float> CleanupItems()
 		{
 			// Cleans all the items
 			foreach (ItemPickupBase item in UnityEngine.Object.FindObjectsOfType<ItemPickupBase>())
 				item.DestroySelf();
+			return null;
 		}
-		
+
 		/// <summary>
 		/// Changes their PlayerInfo based on params
 		/// </summary>

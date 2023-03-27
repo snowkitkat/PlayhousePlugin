@@ -22,7 +22,6 @@ namespace PlayhousePlugin.CustomClass
             PassiveAbilities = new CoroutineHandle[] { };
             ActiveAbilities = new AbilityBase[] { };
             
-            PlayhousePlugin.PlayhousePluginRef.Handler.CheckandGive05(ply);
             ply.ClearInventory();
             ply.AddItem(ItemType.KeycardResearchCoordinator);
             ply.AddItem(ItemType.Medkit);

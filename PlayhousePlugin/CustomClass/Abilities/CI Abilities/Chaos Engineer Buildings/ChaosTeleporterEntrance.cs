@@ -77,8 +77,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 
 				if (Warhead.IsInProgress ||
 				    Warhead.IsDetonated ||
-				    Map.IsLczDecontaminated ||
-				    (ObjectivePointController.RapidSpawnWaves && ObjectivePointController.Team == SpawnableTeamType.NineTailedFox)
+				    Map.IsLczDecontaminated
 				)
 				{
 					if (Map.IsLczDecontaminated)
@@ -95,9 +94,7 @@ namespace PlayhousePlugin.CustomClass.Abilities
 							continue;
 						}
 					}
-
-					if (ObjectivePointController.RapidSpawnWaves && ObjectivePointController.Team == SpawnableTeamType.NineTailedFox)
-					{
+					
 						if (!(teleporterExit.Room is null) && teleporterExit.Room.Zone != ZoneType.Surface)
 						{
 							if (IsSpinning)
@@ -109,9 +106,8 @@ namespace PlayhousePlugin.CustomClass.Abilities
 							
 							continue;
 						}
-					}
 
-					if (Warhead.IsDetonated || Warhead.IsInProgress)
+						if (Warhead.IsDetonated || Warhead.IsInProgress)
 					{
 						if (IsSpinning)
 						{
