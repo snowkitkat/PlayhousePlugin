@@ -393,7 +393,7 @@ namespace PlayhousePlugin
 					Userid = player.UserId,
 					CurrentRound = true,
 					Ammo = ammo,
-					SCP207Intensity = player.ReferenceHub.playerEffectsController.GetEffect<Scp207>()._intensity
+					SCP207Intensity = player.ReferenceHub.playerEffectsController.GetEffect<Scp207>().Intensity
 				});
 			}
 

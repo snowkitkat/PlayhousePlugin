@@ -43,7 +43,6 @@ using PlayerStatsSystem;
 using PlayhousePlugin.Commands;
 using Respawning.NamingRules;
 using PlayhousePlugin.Components;
-using PlayhousePlugin.Controllers;
 using PlayhousePlugin.CustomClass;
 using PlayhousePlugin.CustomClass.Abilities;
 using PlayhousePlugin.CustomClass.SCP;
@@ -52,7 +51,6 @@ using PluginAPI.Core.Items;
 using Steamworks.ServerList;
 using Unity.Mathematics;
 using UnityEngine.Networking.PlayerConnection;
-using WebSocketSharp;
 using Cassie = Exiled.API.Features.Cassie;
 using Log = Exiled.API.Features.Log;
 using Map = Exiled.API.Features.Map;
@@ -60,7 +58,6 @@ using MessageEventArgs = UnityEngine.Networking.PlayerConnection.MessageEventArg
 using Player = Exiled.API.Features.Player;
 using Server = Exiled.API.Features.Server;
 using Warhead = Exiled.API.Features.Warhead;
-using WebSocket = WebSocketSharp.WebSocket;
 
 namespace PlayhousePlugin
 {
@@ -179,8 +176,6 @@ namespace PlayhousePlugin
 		public Dictionary<Player, int> SCPKills = new Dictionary<Player, int> { };
 		public Dictionary<Player, int> HumanKills = new Dictionary<Player, int> { };
 		public Dictionary<string, int> MTFSquadKills = new Dictionary<string, int> { };
-
-		public WebSocket ws = new WebSocket("ws://127.0.0.1:8765");
 
 		public void MapDonatorToObjects()
 		{
@@ -369,25 +364,12 @@ namespace PlayhousePlugin
 
 				foreach (Player Ply in deletes)
 					messageToSend += $"{Ply.RawUserId}%&@&{Ply.Nickname}%&@&delete%&@&0";
-
-				if (ws.IsAlive)
-				{
-					ws.Send(messageToSend);
-				}
-				else
-				{
-					ws.Connect();
-					Timing.CallDelayed(0.4f, () => { ws.Send(messageToSend); });
-				}
 			}
 		}
 
 		private void ClearLists()
 		{
 			Stunned.Clear();
-			KingAndCompetitor.ClearQueues();
-			Deathmatch.playerAndWins.Clear();
-			Deathmatch.activeMatch.Clear();
 			Letters.Clear();
 			LetterM.Clear();
 			LetterT.Clear();
@@ -455,8 +437,6 @@ namespace PlayhousePlugin
 
 			StickyPositions.Clear();
 			TempStickies.Clear();
-
-			CustomItemSpawning.Clear();
 
 			GeneralKills.Clear();
 			HumanKills.Clear();
@@ -897,8 +877,8 @@ namespace PlayhousePlugin
 				type = firearmDamageHandler.WeaponType;
 			else if (ev.DamageHandler.Base is UniversalDamageHandler universalDamageHandler)
 				TranslationID = universalDamageHandler.TranslationId;
-			else if (ev.DamageHandler.Base is ScpDamageHandler scpDamageHandler)
-				TranslationID = scpDamageHandler._translationId;
+			/*else if (ev.DamageHandler.Base is ScpDamageHandler scpDamageHandler)
+				TranslationID = scpDamageHandler._translationId;*/
 
 			// Zombie Infection
 			if (ev.Attacker != null && ev.Attacker.Role.Type == RoleTypeId.Scp0492 && ev.Attacker != ev.Player &&
@@ -1084,125 +1064,10 @@ namespace PlayhousePlugin
 			ev.IsAllowed = false;
 		}
 
-		public void OnDestroying(DestroyingEventArgs ev)
-		{
-			if (IsDeathMatchServer)
-			{
-				if (KingAndCompetitor.IsKing(ev.Player)) // If the player who left is a king
-				{
-					var index = KingAndCompetitor.GetIndex(ev.Player);
-					var kc = KingAndCompetitor.GetAtIndex(index);
-
-					if (kc.Competitor != null) // If there was actually a competitor
-					{
-						kc.King = kc.Competitor; // Set the competitor as the new king
-
-						if (kc.Queue.Count >= 1) // Try to replace the competitor
-						{
-							kc.Competitor = kc.Queue[0];
-							kc.Queue.Remove(kc.Queue[0]);
-
-							Timing.CallDelayed(0.2f, () => { Deathmatch.StartMatch(kc); });
-							Log.Info("A1");
-						}
-						else // No competitors were able to replace the King that left.
-						{
-							Timing.KillCoroutines(kc.StalemateChecker);
-							Timing.KillCoroutines(kc.Unfreezer);
-							kc.Competitor = null;
-							Deathmatch.activeMatch[index] = false;
-							kc.King.Role.Set(RoleTypeId.Spectator);
-							kc.King.Broadcast(5, "Your opponent has left and you have been put into spectator.");
-							Log.Info("A2");
-						}
-					}
-					else // Means there was no competitor, set everything to standby
-					{
-						kc.King = null;
-						Deathmatch.activeMatch[index] = false;
-					}
-				}
-				else if (KingAndCompetitor.IsCompetitor(ev.Player)) // If the player who left is a competitor
-				{
-					var index = KingAndCompetitor.GetIndex(ev.Player);
-					var kc = KingAndCompetitor.GetAtIndex(index);
-
-					if (kc.King != null) // If there was actually a king
-					{
-						if (kc.Queue.Count >= 1) // Try to replace the competitor
-						{
-							kc.Competitor = kc.Queue[0];
-							kc.Queue.Remove(kc.Queue[0]);
-
-							Timing.CallDelayed(0.2f, () => { Deathmatch.StartMatch(kc); });
-							Log.Info("A3");
-						}
-						else // No competitors were able to replace the one that left.
-						{
-							Timing.KillCoroutines(kc.StalemateChecker);
-							Timing.KillCoroutines(kc.Unfreezer);
-							kc.Competitor = null;
-							Deathmatch.activeMatch[index] = false;
-							kc.King.Role.Set(RoleTypeId.Spectator);
-							kc.King.Broadcast(5, "Your opponent has left and you have been put into spectator.");
-							Log.Info("A4");
-						}
-					}
-					else // Means there was no King, set everything to standby
-					{
-						kc.Competitor = null;
-						Deathmatch.activeMatch[index] = false;
-						Log.Info("A5");
-					}
-				}
-				else
-				{
-					if (KingAndCompetitor.IsInQueue(ev.Player)) // This guy was just a spectator
-						KingAndCompetitor.RemoveFromQueue(ev.Player);
-				}
-			}
-			else
-			{
-				// If it is the dev server or if the round is ended or hasn't started yet, do nothing
-				if (IsDevServer || !RoundActive) return;
-
-				if (Player.List.Count() - 1 <= 0)
-					Round.Restart();
-			}
-		}
-
-		public void OnDecontaminating(DecontaminatingEventArgs ev)
-		{
-			if (IsDeathMatchServer)
-				ev.IsAllowed = false;
-
-			// Cleans all the items
-			foreach (ItemPickupBase item in UnityEngine.Object.FindObjectsOfType<ItemPickupBase>())
-			{
-				float y = item.NetworkInfo.Position.y;
-				if (y < 200f && y > -200f)
-					item.DestroySelf();
-			}
-		}
-
 		public void OnActivating914(ActivatingEventArgs ev)
 		{
 			if (IsDeathMatchServer)
 				ev.IsAllowed = false;
-		}
-
-		public void OnWarheadDetonated()
-		{
-			Timing.CallDelayed(1f, () =>
-			{
-				// Cleans all the items
-				foreach (ItemPickupBase item in UnityEngine.Object.FindObjectsOfType<ItemPickupBase>())
-				{
-					float y = item.NetworkInfo.Position.y;
-					if (y < 500f)
-						item.DestroySelf();
-				}
-			});
 		}
 
 		public void PlayerJoined(JoinedEventArgs ev)
@@ -1528,20 +1393,6 @@ namespace PlayhousePlugin
 			RoundActive = true;
 
 			RewardPlayers = Server.PlayerCount <= 17;
-
-			foreach (var room in Room.List)
-			{
-				room.ResetColor();
-				if (room.Type == RoomType.Surface)
-				{
-					room.LightIntensity = 1.5f;
-				}
-				else
-				{
-					if (room.Zone == ZoneType.LightContainment || room.Zone == ZoneType.HeavyContainment)
-						room.LightIntensity = 1.25f;
-				}
-			}
 
 			if (SillySunday)
 			{
@@ -1882,11 +1733,7 @@ namespace PlayhousePlugin
 				Scp096Role.TurnedPlayers.Clear();
 				Scp173Role.TurnedPlayers.Clear();
 			});
-
-			Timing.RunCoroutine(PromotePlayers());
-			if (IsDeathMatchServer)
-				coroutines.Add(Timing.RunCoroutine(Deathmatch.TimerDeathMatch()));
-			else
+			
 			{
 				if (!IsEventServer)
 					coroutines.Add(Timing.RunCoroutine(Timer()));
@@ -2319,7 +2166,7 @@ namespace PlayhousePlugin
 							circle.transform.rotation.eulerAngles.y, 0);
 
 						NetworkServer.Spawn(circle.gameObject);
-						circle.UpdatePositionServer();
+						// circle.UpdatePositionServer();
 						Timing.RunCoroutine(UtilityMethods.FadeAway(circle));
 					});
 
@@ -2546,106 +2393,6 @@ namespace PlayhousePlugin
 				if (ev.Attacker == null || ev.Attacker.Role.Team == Team.SCPs)
 				{
 					DoNotSpawn.Add(ev.Player.UserId);
-				}
-			}
-
-			if (IsDeathMatchServer)
-			{
-				if (ev.Attacker != null)
-				{
-					int index = KingAndCompetitor.GetIndex(ev.Attacker);
-					var obj = KingAndCompetitor.GetAtIndex(index);
-					Timing.KillCoroutines(obj.StalemateChecker);
-					Timing.KillCoroutines(obj.Unfreezer);
-					if (Deathmatch.roundPaused)
-					{
-						Timing.CallDelayed(0.5f, () => { UtilityMethods.CleanupItems(); });
-						return;
-					}
-
-					if ((KingAndCompetitor.IsKing(ev.Attacker) || KingAndCompetitor.IsKing(ev.Player)) &&
-					    ev.Attacker != ev.Player)
-					{
-						if (Deathmatch.playerAndWins.ContainsKey(ev.Attacker.UserId))
-						{
-							Deathmatch.playerAndWins[ev.Attacker.UserId] += 1;
-						}
-						else
-						{
-							Deathmatch.playerAndWins.Add(ev.Attacker.UserId, 1);
-						}
-
-						//RespawnEffectsController.ClearQueue();
-						//RespawnEffectsController.ClearQueue();
-
-						// Giving notifications to the Winner and Loser specifically
-						//ev.Killer.PlayCassieAnnouncement("pitch_0.3 .g5 .g5 .g5", false, false);
-						//ev.Target.PlayCassieAnnouncement("pitch_0.3 .g5 .g5 .g5", false, false);
-
-						ev.Attacker.Broadcast(10,
-							$"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
-						ev.Player.Broadcast(10,
-							$"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
-
-						// Giving notifications to global players who are not actively playing
-						foreach (Player p in Player.List)
-						{
-							if (p.Role.Type == RoleTypeId.Tutorial ||
-							    p.Role.Type == RoleTypeId.Spectator && p != ev.Player)
-								p.Broadcast(3,
-									$"{ev.Attacker.Nickname} won!\nThey have {Deathmatch.playerAndWins[ev.Attacker.UserId]} total wins!");
-						}
-
-						if (!ev.Attacker.DoNotTrack)
-						{
-							if (dmWins.ContainsKey(ev.Attacker))
-								dmWins[ev.Attacker] += 1;
-							else
-								dmWins.Add(ev.Attacker, 1);
-						}
-
-						if (!ev.Player.DoNotTrack)
-						{
-							if (dmLosses.ContainsKey(ev.Player))
-								dmLosses[ev.Player] += 1;
-							else
-								dmLosses.Add(ev.Player, 1);
-						}
-
-						// King lost
-						if (!KingAndCompetitor.IsKing(ev.Attacker))
-						{
-							Player newKing = obj.Competitor;
-							Player oldKing = obj.King;
-							obj.Queue.Add(oldKing); // Add old king to player queue
-
-							obj.King = newKing; // Set new King as the killer of the old king.
-							obj.Competitor = obj.Queue[0]; // Set competitor to the first person in the queue.
-							obj.Queue.Remove(obj.Competitor); // Now remove them from the queue.
-
-
-
-							/*
-						playerQueue.Add(ev.Target); // Add the old king to the player queue
-
-						King[King.IndexOf(ev.Target)] = ev.Killer; // Replacing the old king with the new king
-						playerQueue.Remove(ev.Killer); // Remove the new king from the player queue
-						*/
-						}
-						else
-						{
-							// King won, NEXT!
-							obj.Queue.Add(obj.Competitor);
-							obj.Competitor = obj.Queue[0]; // Set competitor to the first person in the queue.
-							obj.Queue.Remove(obj.Competitor); // Now remove them from the queue.
-						}
-
-						Timing.CallDelayed(0.5f, () => { UtilityMethods.CleanupItems(); });
-
-						Timing.CallDelayed(5, () => { ev.Attacker.Role.Set(RoleTypeId.Spectator); });
-
-						Timing.CallDelayed(7, () => { Deathmatch.StartMatch(obj); });
-					}
 				}
 			}
 
@@ -3227,49 +2974,6 @@ namespace PlayhousePlugin
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------------------------------------//
-		public IEnumerator<float> CheckEscape()
-		{
-			List<Player> PlayersAffected = new List<Player>();
-			while (RoundActive)
-			{
-				try
-				{
-					PlayersAffected.Clear();
-					foreach (var ply in Player.List.Where(x =>
-						         Vector3.Distance(x.Position, escapeArea) <= Escape.RadiusSqr))
-					{
-						if (!ply.IsCuffed) continue;
-						if (PlayersAffected.Contains(ply)) continue;
-
-						if (ply.CustomClassManager().CustomClass != null)
-						{
-							ply.CustomClassManager().CustomClass.Escape();
-							PlayersAffected.Add(ply);
-							continue;
-						}
-
-						switch (ply.Role.Team)
-						{
-							case Team.FoundationForces:
-								ply.Role.Set(RoleTypeId.ChaosRifleman);
-								PlayersAffected.Add(ply);
-								break;
-							case Team.ChaosInsurgency:
-								ply.Role.Set(RoleTypeId.NtfSergeant);
-								PlayersAffected.Add(ply);
-								break;
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					Log.Error(e.ToString());
-					Log.Error(e.StackTrace);
-				}
-
-				yield return Timing.WaitForSeconds(1f);
-			}
-		}
 
 		// Taken from RespawnTimer Plugin, modified for Silly Sunday
 		public IEnumerator<float> Timer()
@@ -3380,14 +3084,6 @@ namespace PlayhousePlugin
 
 				if (messageToSend != "")
 				{
-					if (ws.IsAlive)
-						ws.Send(messageToSend);
-					else
-					{
-						ws.Connect();
-						Timing.CallDelayed(0.4f, () => { ws.Send(messageToSend); });
-					}
-
 					kills.Clear();
 					deaths.Clear();
 					damageDealt.Clear();

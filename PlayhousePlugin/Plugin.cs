@@ -57,7 +57,6 @@ namespace PlayhousePlugin
 			
 			Handler = new EventHandler(this);
 			Exiled.Events.Handlers.Server.EndingRound += Handler.RoundEnding;
-			Exiled.Events.Handlers.Player.Destroying += Handler.OnDestroying;
 			Exiled.Events.Handlers.Player.Verified += Handler.VerifiedPlayer;
 			Exiled.Events.Handlers.Player.Joined += Handler.PlayerJoined;
 			Exiled.Events.Handlers.Server.RoundStarted += Handler.OnRoundStart;
@@ -85,8 +84,6 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Scp096.CalmingDown += Handler.Nevercalmdown;
 			Exiled.Events.Handlers.Server.RestartingRound += Handler.RoundRestart;
 			Exiled.Events.Handlers.Player.UsingRadioBattery += Handler.OnUsingRadioBattery;
-			Exiled.Events.Handlers.Map.Decontaminating += Handler.OnDecontaminating;
-			Exiled.Events.Handlers.Warhead.Detonated += Handler.OnWarheadDetonated;
 			Exiled.Events.Handlers.Scp914.Activating += Handler.OnActivating914;
 			Exiled.Events.Handlers.Player.FlippingCoin += Handler.OnCoinFlip;
 			Exiled.Events.Handlers.Warhead.Starting += Handler.OnStartingWarhead;
@@ -155,7 +152,6 @@ namespace PlayhousePlugin
 		public override void OnDisabled()
 		{
 			Exiled.Events.Handlers.Server.EndingRound -= Handler.RoundEnding;
-			Exiled.Events.Handlers.Player.Destroying -= Handler.OnDestroying;
 			Exiled.Events.Handlers.Player.Verified -= Handler.VerifiedPlayer;
 			Exiled.Events.Handlers.Server.RoundStarted -= Handler.OnRoundStart;
 			Exiled.Events.Handlers.Server.RespawningTeam -= Handler.OnRespawn;
@@ -181,8 +177,6 @@ namespace PlayhousePlugin
 			Exiled.Events.Handlers.Scp096.CalmingDown -= Handler.Nevercalmdown;
 			Exiled.Events.Handlers.Server.RestartingRound -= Handler.RoundRestart;
 			Exiled.Events.Handlers.Player.UsingRadioBattery -= Handler.OnUsingRadioBattery;
-			Exiled.Events.Handlers.Map.Decontaminating -= Handler.OnDecontaminating;
-			Exiled.Events.Handlers.Warhead.Detonated -= Handler.OnWarheadDetonated;
 			Exiled.Events.Handlers.Player.FlippingCoin -= Handler.OnCoinFlip;
 			Exiled.Events.Handlers.Warhead.Starting -= Handler.OnStartingWarhead;
 			Exiled.Events.Handlers.Warhead.Stopping -= Handler.OnStoppingWarhead;
