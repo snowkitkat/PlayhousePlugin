@@ -743,7 +743,6 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Patches\Patches.cs" />
-    <Compile Include="Utils and Consts\SCP939Consts.cs" />
     <Compile Include="Utils and Consts\UtilityMethods.cs" />
     <Compile Include="Utils and Consts\Utils.cs" />
     <Compile Include="Webhooks\Message.cs" />

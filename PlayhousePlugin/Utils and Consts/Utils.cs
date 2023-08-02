@@ -46,6 +46,8 @@ namespace PlayhousePlugin
 			"bandit.camp",
 			"rustchance.com",
 			"flx.gg",
+			"ifn.gg",
+			"discord.gg",
 		};
 
 		public static List<string> WhitelistedIDs = new List<string>

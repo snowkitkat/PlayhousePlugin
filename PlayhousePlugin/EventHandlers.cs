@@ -428,8 +428,6 @@ namespace PlayhousePlugin
 			lastResortConverted.Clear();
 			killBindsUsed.Clear();
 
-			SCP939Consts.killsBy939.Clear();
-
 			MTFSign = false;
 			CISign = false;
 			allowSwaps = false;
