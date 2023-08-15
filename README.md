@@ -1,8 +1,6 @@
 # PlayhousePlugin
-The entire monolith of Playhouse Plugin.
+Hey everyone! You might recognize this plugin but might not recognize me.
 
-Feel free to pick and prod as you like. All the code is here as is, half of it is absolute garbage code the other half I'd like to think it's at least half decent. Schematics are also open source on MER (https://github.com/Michal78900/MapEditorReborn/) discord https://discord.com/channels/947849283514814486/952573231204798536/997925149972107366. All schematics were designed and modelled by Moklman, all credit to that goes to him.
+I am snowkitkat. I know a little bit about programming and I can sorta code in C#. This was my first real project and this took me months to port.
 
-I'd like to thank everyone who made the Playhouse what it was, I hope someone can take its place and make more memories for everyone.
-
-Cya.
+This is not the entire plugin. I remove redundant features a regular server wouldn't use and left in most things. All of it can be seen in the code.
